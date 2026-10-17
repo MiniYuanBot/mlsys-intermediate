@@ -86,4 +86,4 @@ tags: [planning, research]
 
 ## 资料汇总
 
-[阅读方法](reading.md) · [周报模板](../templates/weekly-report.md) · [实验规范](experiments.md) · [提案模板](../templates/proposal.md)
+[阅读方法](../readings/reading.md) · [周报模板](../templates/weekly-report.md) · [实验规范](experiments.md) · [提案模板](../templates/proposal.md)

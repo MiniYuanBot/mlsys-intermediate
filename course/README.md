@@ -31,8 +31,9 @@ python3 tools/run.py --lab 1 --impl reference --mode test
 
 ## 延伸阅读
 
+- [阅读资料入口](readings/README.md)：资料索引、论文卡和阅读维护工具。
 - [大学课程与开放 lab](readings/courses-and-labs.md)、[论文和源码索引](readings/resources.md)、[固定源码阅读入口](readings/code-map.md)。
 - [可视化阅读索引](readings/visualizations.md)：各讲的图解、开源交互与性能分析工具，附观察任务。
-- [论文阅读方法](guides/reading.md)、[实验规范](guides/experiments.md)、[研究提案模板](templates/proposal.md)。
+- [论文阅读方法](readings/reading.md)、[实验规范](guides/experiments.md)、[研究提案模板](templates/proposal.md)。
 
 > 编辑笔记和代码时，可查阅[统一格式规范](../labs/docs/formatting.md)。

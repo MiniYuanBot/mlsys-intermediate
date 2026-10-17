@@ -71,3 +71,6 @@ compile_commands.json
 !/labs/reports/README.md
 *.nsys-rep
 *.ncu-rep
+
+# Generated reading-resource link checks
+/course/readings/results/

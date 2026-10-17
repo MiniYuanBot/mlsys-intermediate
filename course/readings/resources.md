@@ -8,7 +8,7 @@ checked: 2026-10-17
 
 [课程索引](../index.md) · [课程与开放 lab](courses-and-labs.md) · [可视化](visualizations.md) · [固定源码入口](code-map.md)
 
-核验日期为 **2026-10-17**。资料优先取自作者、大学、会议和官方文档，年份区分首次预印本与会议发表时间。这里的前沿资料包括仍可作为强基线的既有方法，以及 2026 年公开的工作，不保证覆盖每个方向的全部最新论文。正式选题前，需按 [查新流程](../guides/reading.md) 更新最接近的相关工作。
+核验日期为 **2026-10-17**。资料优先取自作者、大学、会议和官方文档，年份区分首次预印本与会议发表时间。这里的前沿资料包括仍可作为强基线的既有方法，以及 2026 年公开的工作，不保证覆盖每个方向的全部最新论文。正式选题前，需按 [查新流程](reading.md) 更新最接近的相关工作。
 
 ## 论文与项目
 
@@ -61,6 +61,6 @@ checked: 2026-10-17
 
 ## 核验与更新
 
-[upstream-snapshots.json](upstream-snapshots.json) 记录 13 个仓库的 commit 与相关文件路径。需要检查外部链接时，在 `labs/` 下运行 `python tools/audit_external_links.py`，结果写入本地 `results/external-links.json`。HTTP 200 仅表示页面可访问，不能证明方法已复现、许可已完整审查或硬件兼容。遇到 403/429 或网络失败时，优先尝试作者 GitHub 或论文入口；限流不代表论文不存在。
+[upstream-snapshots.json](upstream-snapshots.json) 记录 13 个仓库的 commit 与相关文件路径。需要检查外部链接时，从仓库根目录运行 `python3 course/readings/audit_external_links.py`，结果写入本地 `course/readings/results/external-links.json`；完整用法见[阅读资料说明](README.md)。HTTP 200 仅表示页面可访问，不能证明方法已复现、许可已完整审查或硬件兼容。遇到 403/429 或网络失败时，优先尝试作者 GitHub 或论文入口；限流不代表论文不存在。
 
 重跑某篇论文之前固定模型、数据、代码 commit、依赖和硬件。对外引用使用实际论文版本，实验报告中应说明本课程简化实现与原论文的差异。新论文如果只有标题或新闻，尚未公开全文或代码，就不列为必做实验。

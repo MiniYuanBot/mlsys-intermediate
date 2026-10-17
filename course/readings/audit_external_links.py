@@ -5,6 +5,7 @@ import argparse
 import concurrent.futures
 import datetime
 import json
+import os
 import re
 import urllib.error
 import urllib.request
@@ -15,14 +16,35 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def collect_urls():
-    from source_files import project_files
-
     urls = {}
-    for path in project_files(ROOT):
-        if path.suffix != ".md":
-            continue
-        for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text()):
-            urls.setdefault(url, []).append(str(path.relative_to(ROOT)))
+    excluded = {
+        "__pycache__",
+        "venv",
+        "env",
+        "node_modules",
+        "target",
+        "CMakeFiles",
+        "external",
+        "third_party",
+        "third-party",
+        "vendor",
+        "results",
+        "reports",
+        "artifacts",
+        "generated",
+    }
+    for directory, dirs, names in os.walk(ROOT):
+        dirs[:] = [
+            name
+            for name in dirs
+            if not name.startswith((".", "build", "cmake-build-")) and name not in excluded
+        ]
+        for name in sorted(names):
+            if not name.endswith(".md"):
+                continue
+            path = Path(directory) / name
+            for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text()):
+                urls.setdefault(url, []).append(str(path.relative_to(ROOT)))
     return urls
 
 
@@ -48,7 +70,9 @@ def check(item):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "labs/results/external-links.json")
+    parser.add_argument(
+        "--output", type=Path, default=ROOT / "course/readings/results/external-links.json"
+    )
     args = parser.parse_args()
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
         results = list(pool.map(check, sorted(collect_urls().items())))

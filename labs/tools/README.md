@@ -4,19 +4,18 @@
 
 所有示例从 `labs/` 执行。工具不自动下载模型，不把参考答案复制到学生目录；实验记录的默认位置是 `labs/results/`。
 
-| 工具                                               | 用途                                     | 最小调用                                                                             |
-| -------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| [doctor.py](doctor.py)                             | 查看解释器、编译器和 GPU                 | `python tools/doctor.py`                                                             |
-| [run.py](run.py)                                   | 临时副本中编译/运行，记录源码和日志      | `python tools/run.py --lab 1 --impl student --mode test`                             |
-| [materialize.py](materialize.py)                   | 导出单个 lab 调试副本；目标须不存在      | `python tools/materialize.py --lab 2 --impl reference --to /tmp/my-lab2`             |
-| [record.py](record.py)                             | 记录学生新增实验；子进程 cwd 固定为 labs | `python tools/record.py --label my-exp -- python lab3/torch_bench.py --mode eager`   |
-| [extract.py](extract.py)                           | 从 stdout 中解析数据表，先列编号再导出   | `python tools/extract.py results/run.json`                                           |
-| [plot.py](plot.py)                                 | 筛选相同配置后画均值±样本标准差          | 见 [CSV 导出与绘图示例](../results/README.md)                                        |
-| [capture_model.py](capture_model.py)               | 已有本地模型的串行生成/KV 采集           | 见 [模型采集说明](../setup.md)                                                       |
-| [analyze_kv.py](analyze_kv.py)                     | K/V 热图与两轴量化误差                   | `python tools/analyze_kv.py results/probe/prefill-kv-0.pt --out results/kv-analysis` |
-| [format_check.py](format_check.py)                 | 按 foundations 规则统一格式/检查         | `python tools/format_check.py`                                                       |
-| [check_links.py](check_links.py)                   | 检查项目内 Markdown 链接                 | `python tools/check_links.py`                                                        |
-| [audit_external_links.py](audit_external_links.py) | 检查外部链接，结果保存到 results         | `python tools/audit_external_links.py`                                               |
+| 工具                                 | 用途                                     | 最小调用                                                                             |
+| ------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| [doctor.py](doctor.py)               | 查看解释器、编译器和 GPU                 | `python tools/doctor.py`                                                             |
+| [run.py](run.py)                     | 临时副本中编译/运行，记录源码和日志      | `python tools/run.py --lab 1 --impl student --mode test`                             |
+| [materialize.py](materialize.py)     | 导出单个 lab 调试副本；目标须不存在      | `python tools/materialize.py --lab 2 --impl reference --to /tmp/my-lab2`             |
+| [record.py](record.py)               | 记录学生新增实验；子进程 cwd 固定为 labs | `python tools/record.py --label my-exp -- python lab3/torch_bench.py --mode eager`   |
+| [extract.py](extract.py)             | 从 stdout 中解析数据表，先列编号再导出   | `python tools/extract.py results/run.json`                                           |
+| [plot.py](plot.py)                   | 筛选相同配置后画均值±样本标准差          | 见 [CSV 导出与绘图示例](../results/README.md)                                        |
+| [capture_model.py](capture_model.py) | 已有本地模型的串行生成/KV 采集           | 见 [模型采集说明](../setup.md)                                                       |
+| [analyze_kv.py](analyze_kv.py)       | K/V 热图与两轴量化误差                   | `python tools/analyze_kv.py results/probe/prefill-kv-0.pt --out results/kv-analysis` |
+| [format_check.py](format_check.py)   | 按 foundations 规则统一格式/检查         | `python tools/format_check.py`                                                       |
+| [check_links.py](check_links.py)     | 检查项目内 Markdown 链接                 | `python tools/check_links.py`                                                        |
 
 ## 记录不是结论
 
@@ -38,4 +37,4 @@ python tools/extract.py results/run.json --table 0 --out results/table.csv
 
 `python tools/workload_audit.py --output results/workload.json` 检查每个 lab 的学生代码与答案：BEGIN/END TODO 标记是否配对，编号是否唯一，三个阶段是否都有任务，参考实现中是否还有未实现的占位代码。统计只计参考 TODO 区域的有效物理行，排除注释、空行和纯括号行，不要求学生写出相同的行数。统计口径与时间安排见[工作量说明](../docs/workload.md)。
 
-`python tools/audit_external_links.py` 将外部链接检查结果保存到 `results/external-links.json`，可用 `--output` 指定其他位置。HTTP 状态只反映检查时的可达性；403/429 等结果需人工核对。该命令不会修改课程资料。
+阅读资料的链接维护工具见 [course/readings/](../../course/readings/README.md)。
