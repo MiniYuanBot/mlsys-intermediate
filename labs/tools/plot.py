@@ -22,7 +22,7 @@ p.add_argument("--out", type=Path, required=True)
 a = p.parse_args()
 filters = dict(pair.split("=", 1) for pair in a.filter)
 data = defaultdict(lambda: defaultdict(list))
-for row in csv.DictReader(a.csv.open()):
+for row in csv.DictReader(a.csv.open(encoding="utf-8", newline="")):
     if all(row[k] == v for k, v in filters.items()):
         data[row[a.group]][float(row[a.x])].append(float(row[a.y]))
 if not data:

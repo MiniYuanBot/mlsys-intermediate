@@ -12,6 +12,8 @@ import subprocess
 from fnmatch import fnmatch
 from pathlib import Path
 
+from platform_tools import node_package_command
+
 LABS = Path(__file__).resolve().parents[1]
 ROOT = LABS.parent
 CONFIG = ROOT
@@ -49,7 +51,7 @@ EXCLUDED_FILES = ("*.generated.*", "*.min.*", "package-lock.json", "Cargo.lock")
 
 def files() -> list[Path]:
     selected = [p for p in ROOT.iterdir() if p.is_file()]
-    for base in ("course", "labs", "solutions", ".vscode", ".obsidian"):
+    for base in ("course", "labs", "solutions", ".vscode", ".obsidian", ".github"):
         for directory, dirs, names in os.walk(ROOT / base):
             dirs[:] = [d for d in dirs if not any(fnmatch(d, p) for p in EXCLUDED_DIRS)]
             if Path(directory) == ROOT / ".obsidian":
@@ -75,10 +77,28 @@ def resolve(name: str) -> str | None:
     return shutil.which(name, path=os.pathsep.join(filter(None, directories)))
 
 
+def resolve_command(name):
+    if name == "prettier":
+        local = LABS / ".venv-format/node_modules/prettier/bin/prettier.cjs"
+        if local.is_file():
+            return [resolve("node"), str(local)] if resolve("node") else None
+    executable = resolve(name)
+    if executable is None:
+        return None
+    if name == "prettier" and Path(executable).suffix.lower() in {".cmd", ".bat"}:
+        try:
+            return node_package_command("prettier", executable)
+        except RuntimeError:
+            return None
+    return [executable]
+
+
 def pinned_versions() -> dict[str, str]:
     return dict(
         line.strip().split("=", 1)
-        for line in (LABS / "tools" / "formatter-versions.env").read_text().splitlines()
+        for line in (LABS / "tools" / "formatter-versions.env")
+        .read_text(encoding="utf-8")
+        .splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     )
 
@@ -164,14 +184,20 @@ def main() -> int:
             item["status"] = "skipped_no_files"
             print(f"[SKIP] {name}: no files")
             continue
-        executable = resolve(tool)
-        version_exe = resolve("rustc") if tool == "rustfmt" else executable
+        executable = resolve_command(tool)
+        version_exe = resolve_command("rustc") if tool == "rustfmt" else executable
         if executable is None or version_exe is None:
             item["status"] = "missing_tool"
-            print(f"[FAIL] {name}: run bash tools/setup-format.sh")
+            print(f"[FAIL] {name}: run python tools/setup_format.py")
             failed = True
             continue
-        version = subprocess.run([version_exe, "--version"], capture_output=True, text=True)
+        version = subprocess.run(
+            [*version_exe, "--version"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
         item["version"] = version.stdout.strip()
         detected = re.search(r"\d+\.\d+\.\d+", version.stdout)
         if version.returncode or detected is None or detected.group() != pins[pin]:
@@ -181,8 +207,15 @@ def main() -> int:
             continue
         item["status"] = "passed"
         for start in range(0, len(targets), 80):
-            command = [executable, *options, *targets[start : start + 80]]
-            run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+            command = [*executable, *options, *targets[start : start + 80]]
+            run = subprocess.run(
+                command,
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
             item["commands"].append(
                 {
                     "argv": command,
@@ -199,7 +232,9 @@ def main() -> int:
     report["status"] = "failed" if failed else "passed"
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+        args.report.write_text(
+            json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+        )
     return int(failed)
 
 

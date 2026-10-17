@@ -15,6 +15,7 @@ import tempfile
 import time
 from pathlib import Path
 
+from platform_tools import find_cxx, host_platform, stage_helpers
 from source_files import ignore_files, project_files
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -29,7 +30,9 @@ def main():
     p.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     p.add_argument("--part", choices=["all", "A", "B", "C"], default="all")
     p.add_argument("--output", type=Path)
+    p.add_argument("--cuda-arch", default=os.environ.get("MLSYS_CUDA_ARCH", "native"))
     args = p.parse_args()
+    os.environ["MLSYS_CUDA_ARCH"] = args.cuda_arch
     record = {
         "lab": args.lab,
         "implementation": args.impl,
@@ -37,6 +40,8 @@ def main():
         "device": args.device,
         "part": args.part,
         "host": platform.platform(),
+        "host_platform": host_platform(),
+        "cuda_arch": args.cuda_arch,
         "python": sys.version,
         "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "commands": [],
@@ -57,15 +62,28 @@ def main():
         for src in sources
         for f in project_files(src)
     }
-    for tool in ["g++", "nvcc", "rustc", "nvidia-smi"]:
+    helper = LABS / "tools/platform_tools.py"
+    record["source_sha256"][str(helper.relative_to(ROOT))] = hashlib.sha256(
+        helper.read_bytes()
+    ).hexdigest()
+    try:
+        record["cxx"] = find_cxx()
+    except RuntimeError as error:
+        record["cxx"] = str(error)
+    record["nvcc_override"] = os.environ.get("NVCC")
+    for tool in ["c++", "g++", "clang++", "cl", "nvcc", "cargo", "rustc", "nvidia-smi"]:
         if shutil.which(tool):
             cmd = (
                 [tool, "--version"]
                 if tool != "nvidia-smi"
                 else [tool, "--query-gpu=name,driver_version,memory.total", "--format=csv,noheader"]
             )
-            q = subprocess.run(cmd, capture_output=True, text=True)
-            record[tool] = q.stdout.strip()
+            if tool == "cl":
+                cmd = [tool]
+            q = subprocess.run(
+                cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
+            )
+            record[tool] = (q.stdout + q.stderr).strip()
     started = time.perf_counter()
     try:
         with tempfile.TemporaryDirectory(prefix=f"mlsys-lab{args.lab}-") as temp:
@@ -74,6 +92,8 @@ def main():
             if args.impl == "reference":
                 shutil.copytree(sources[1], work, dirs_exist_ok=True, ignore=ignore_files)
 
+            stage_helpers(work)
+
             def run(cmd, env=None):
                 print("+", " ".join(map(str, cmd)), flush=True)
                 out = subprocess.run(
@@ -81,7 +101,15 @@ def main():
                     cwd=work,
                     capture_output=True,
                     text=True,
-                    env=env or {**os.environ, "PYTHONUNBUFFERED": "1"},
+                    encoding="utf-8",
+                    errors="replace",
+                    env=env
+                    or {
+                        **os.environ,
+                        "PYTHONUNBUFFERED": "1",
+                        "PYTHONUTF8": "1",
+                        "PYTHONIOENCODING": "utf-8",
+                    },
                 )
                 print(out.stdout, end="", flush=True)
                 print(out.stderr, end="", file=sys.stderr, flush=True)
@@ -123,7 +151,9 @@ def main():
             / f"lab{args.lab}-{args.impl}-{args.part}-{args.mode}-{args.device}-{time.time_ns()}.json"
         )
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n")
+        out.write_text(
+            json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+        )
         print(f"RECORD: {out}")
     return 0 if record["status"] == "passed" else 1
 

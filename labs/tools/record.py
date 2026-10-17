@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -43,7 +44,15 @@ for package in ["torch", "transformers", "numpy", "matplotlib"]:
         pass
 start = time.perf_counter()
 try:
-    result = subprocess.run(cmd, cwd=labs, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd,
+        cwd=labs,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env={**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"},
+    )
 except OSError as error:
     result = subprocess.CompletedProcess(cmd, 127, "", str(error) + "\n")
 record["wall_seconds"] = time.perf_counter() - start
@@ -53,7 +62,9 @@ record["commands"].append(
 record["status"] = "passed" if result.returncode == 0 else "failed"
 out = labs / "results" / f"{a.label}-{time.time_ns()}.json"
 out.parent.mkdir(exist_ok=True)
-out.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
+out.write_text(
+    json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
+)
 print(result.stdout, end="")
 print(result.stderr, file=sys.stderr, end="")
 print("RECORD:", out)

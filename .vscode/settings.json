@@ -19,7 +19,7 @@
     "source.organizeImports.ruff": "never"
   },
   "C_Cpp.formatting": "clangFormat",
-  "C_Cpp.clang_format_path": "${workspaceFolder}/labs/.venv-format/bin/clang-format",
+  "C_Cpp.clang_format_path": "clang-format",
   "C_Cpp.clang_format_style": "file",
   "C_Cpp.clang_format_fallbackStyle": "none",
   "ruff.path": [
@@ -32,7 +32,7 @@
   "ruff.showSyntaxErrors": false,
   "prettier.requireConfig": true,
   "prettier.resolveGlobalModules": true,
-  "shfmt.executablePath": "${workspaceFolder}/labs/.venv-format/bin/shfmt",
+  "shfmt.executablePath": "shfmt",
   "shfmt.executableArgs": [],
   "shfmt.formatIgnored": false,
   "[c]": {

@@ -10,7 +10,7 @@
 python tools/run.py --lab 4 --impl reference --mode test
 python tools/run.py --lab 2 --impl reference --mode bench --device cuda
 # 需要手动调试时，创建新副本；目标已存在会拒绝。
-python tools/materialize.py --lab 2 --impl reference --to /tmp/mlsys-lab2-reference
+python tools/materialize.py --lab 2 --impl reference --to results/lab2-reference-debug
 ```
 
 `run.py` 每次复制整个 lab 到临时目录后覆盖参考 TODO，结束后清理副本；结果记录始终保留。不会修改学生实现，无需先 git commit 或创建 worktree。

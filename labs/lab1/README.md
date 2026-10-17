@@ -171,7 +171,7 @@ python tools/capture_model.py --model /path/to/Qwen3-0.6B \
   --max-input 128 --max-new 32 --capture-kv
 ```
 
-环境依赖与计时边界见[模型采集说明](../setup.md#真实模型采集)。
+Windows PowerShell 中将上述命令合为一行；模型路径加引号。Mac 或无 CUDA 时加 `--device cpu`。环境依赖与计时边界见[模型采集说明](../setup.md#真实模型采集)。
 
 ## 资料汇总
 

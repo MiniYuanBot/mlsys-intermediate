@@ -24,7 +24,7 @@ python3 tools/run.py --lab 1 --impl student --mode test --part A
 
 初始代码的 TODO 尚未实现，第一次测试失败是预期行为。完成相应任务后重跑测试，再按实验要求运行 benchmark。原始输出保存在 `labs/results/`，个人报告放在 `labs/reports/`。
 
-各实验的 CPU/CUDA 范围见[实验索引](labs/index.md)。CUDA 部分需要 NVIDIA GPU；Windows 使用 WSL2，Mac 可从 CPU 部分开始。参考答案的运行和对照方法见 [solutions/](solutions/index.md)，建议独立尝试后再看；参考运行使用临时副本，不覆盖学生源码。
+各实验的 CPU/CUDA 范围见[实验索引](labs/index.md)。CUDA 部分需要 NVIDIA GPU；Windows 原生、Linux、WSL2 和 macOS 的环境与命令见[平台配置](labs/setup.md)，Mac 使用 CPU 路线。参考答案的运行和对照方法见 [solutions/](solutions/index.md)，建议独立尝试后再看；参考运行使用临时副本，不覆盖学生源码。
 
 ## 阅读与开发
 

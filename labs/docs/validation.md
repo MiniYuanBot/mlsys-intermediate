@@ -59,3 +59,17 @@ python3 tools/format_check.py
 ```
 
 这些检查分别覆盖 TODO 配对与规模、内部 Markdown 文件链接和格式，不能替代算法测试与实验分析。
+
+## 跨平台工具回归
+
+编译驱动已统一选择 MSVC/GCC/Clang、处理 Windows 的 `.exe` 后缀，并将公共编译辅助代码复制到独立 lab 副本。Python 文档、CSV 和日志读写显式使用 UTF-8；格式工具提供跨平台 Python 安装入口。
+
+本机 WSL2 的执行结果：
+
+- `python tools/test_platform.py` 的 7 项回归通过，包括中文/空格路径下的真实编译和仓库外独立 lab 运行。MSVC 命令、macOS CUDA 拒绝、Node 包入口和下载文件名使用分支测试；这些分支测试不代表对应系统的实机运行。
+- CPU：lab1/4/5/6/7/8 全阶段、lab2 A/C、lab3 A/B 测试通过。
+- CUDA：lab2 全阶段、lab3 C、lab7 C 使用 `native` 架构编译并执行通过。
+- lab1/7 CPU benchmark、lab2 CUDA benchmark 试跑通过；显式 `sm_89` 参数和 CPU/CUDA Inductor 探测通过。
+- 默认 ASCII locale 下的 Markdown 链接检查通过；TODO 配对与有效代码量不变。
+
+[三平台 CI](../../.github/workflows/portability.yml)在 Windows、Linux、macOS 分别检查 CPU 编译、独立副本、Rust 实验和 PyTorch CPU 训练。该工作流需要推送后由 GitHub 执行；本次本地验证没有原生 Windows/macOS runner，也未执行远程 CI。CUDA 仍以本机 WSL2 结果为准。

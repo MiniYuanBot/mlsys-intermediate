@@ -89,7 +89,7 @@ def main():
         "scope": "single request; per-token synchronization; KV capture outside token timing; cold first prompt included",
     }
     (a.output / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
 
     def sync():
@@ -98,7 +98,10 @@ def main():
 
     eos = model.generation_config.eos_token_id
     eos = set(eos if isinstance(eos, list) else ([] if eos is None else [eos]))
-    with torch.inference_mode(), (a.output / "requests.jsonl").open("w") as out:
+    with (
+        torch.inference_mode(),
+        (a.output / "requests.jsonl").open("w", encoding="utf-8", newline="\n") as out,
+    ):
         for request_id, text in enumerate(prompts):
             if not text.strip():
                 continue

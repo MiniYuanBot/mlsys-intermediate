@@ -59,5 +59,7 @@ a.out.mkdir(parents=True, exist_ok=False)
 fig.suptitle(f"Captured KV | layer {a.layer}, head {a.head} | separate color scales")
 fig.tight_layout()
 fig.savefig(a.out / "kv-distribution.png", dpi=160)
-(a.out / "axis-error.json").write_text(json.dumps(rows, indent=2) + "\n")
+(a.out / "axis-error.json").write_text(
+    json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n"
+)
 print(a.out)

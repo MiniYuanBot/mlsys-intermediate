@@ -1,0 +1,55 @@
+name: CPU portability
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cpu:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: amd64
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+      - name: Check tooling and CPU labs
+        shell: python
+        run: |
+          import subprocess
+          import sys
+          def run(*args):
+              subprocess.run([sys.executable, *args], check=True)
+          run("labs/tools/test_platform.py")
+          run("labs/tools/check_links.py")
+          for lab in (1, 4, 5, 7, 8):
+              run("labs/tools/run.py", "--lab", str(lab), "--impl", "reference", "--mode", "test")
+          for part in ("A", "B"):
+              run("labs/tools/run.py", "--lab", "3", "--impl", "reference", "--part", part)
+          for part in ("A", "C"):
+              run("labs/tools/run.py", "--lab", "2", "--impl", "reference", "--part", part)
+      - name: Install CPU PyTorch
+        shell: python
+        run: |
+          import subprocess
+          import sys
+          command = [sys.executable, "-m", "pip", "install", "torch"]
+          if sys.platform != "darwin":
+              command += ["--index-url", "https://download.pytorch.org/whl/cpu"]
+          subprocess.run(command, check=True)
+      - name: Check CPU training
+        run: python labs/tools/run.py --lab 6 --impl reference --mode test

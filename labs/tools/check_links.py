@@ -13,7 +13,7 @@ for f in root.rglob("*.md"):
         x.startswith(".venv") or x in ("target", "build", ".git", "node_modules") for x in f.parts
     ):
         continue
-    for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", f.read_text()):
+    for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", f.read_text(encoding="utf-8")):
         target = target.strip("<>").split("#")[0]
         if not target or "://" in target or target.startswith("mailto:"):
             continue

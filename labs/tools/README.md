@@ -8,7 +8,7 @@
 | ------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------ |
 | [doctor.py](doctor.py)               | 查看解释器、编译器和 GPU                 | `python tools/doctor.py`                                                             |
 | [run.py](run.py)                     | 临时副本中编译/运行，记录源码和日志      | `python tools/run.py --lab 1 --impl student --mode test`                             |
-| [materialize.py](materialize.py)     | 导出单个 lab 调试副本；目标须不存在      | `python tools/materialize.py --lab 2 --impl reference --to /tmp/my-lab2`             |
+| [materialize.py](materialize.py)     | 导出单个 lab 调试副本；目标须不存在      | `python tools/materialize.py --lab 2 --impl reference --to results/my-lab2-debug`    |
 | [record.py](record.py)               | 记录学生新增实验；子进程 cwd 固定为 labs | `python tools/record.py --label my-exp -- python lab3/torch_bench.py --mode eager`   |
 | [extract.py](extract.py)             | 从 stdout 中解析数据表，先列编号再导出   | `python tools/extract.py results/run.json`                                           |
 | [plot.py](plot.py)                   | 筛选相同配置后画均值±样本标准差          | 见 [CSV 导出与绘图示例](../results/README.md)                                        |
@@ -36,5 +36,7 @@ python tools/extract.py results/run.json --table 0 --out results/table.csv
 ## 维护课程时的检查
 
 `python tools/workload_audit.py --output results/workload.json` 检查每个 lab 的学生代码与答案：BEGIN/END TODO 标记是否配对，编号是否唯一，三个阶段是否都有任务，参考实现中是否还有未实现的占位代码。统计只计参考 TODO 区域的有效物理行，排除注释、空行和纯括号行，不要求学生写出相同的行数。统计口径与时间安排见[工作量说明](../docs/workload.md)。
+
+格式工具安装使用 `python tools/setup_format.py`，适用于 Windows、Linux、macOS 和 WSL；编译器选择、CUDA 架构和终端配置见[环境说明](../setup.md)。导出副本自带 `_tools/platform_tools.py`，可在仓库外独立运行。
 
 阅读资料的链接维护工具见 [course/readings/](../../course/readings/README.md)。

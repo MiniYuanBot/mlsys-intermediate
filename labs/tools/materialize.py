@@ -5,6 +5,7 @@ import argparse
 import shutil
 from pathlib import Path
 
+from platform_tools import stage_helpers
 from source_files import ignore_files
 
 p = argparse.ArgumentParser(description=__doc__)
@@ -24,4 +25,5 @@ if a.impl == "reference":
     shutil.copytree(
         root / "solutions" / f"lab{a.lab}", a.to, dirs_exist_ok=True, ignore=ignore_files
     )
+stage_helpers(a.to)
 print(a.to.resolve())

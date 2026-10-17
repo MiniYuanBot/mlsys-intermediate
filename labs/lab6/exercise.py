@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 import subprocess
 import sys
 
@@ -12,4 +13,4 @@ if args.mode == "test":
     command += ["--part", args.part]
 elif args.part != "all":
     parser.error("benchmark combines A/B/C; use --part all")
-subprocess.run(command, check=True)
+subprocess.run(command, cwd=Path(__file__).resolve().parent, check=True)

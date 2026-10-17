@@ -22,10 +22,12 @@
 python3 course/readings/audit_external_links.py
 ```
 
+Windows 可用 `py -3` 或已激活环境中的 `python` 代替 `python3`，命令可直接在 PowerShell 执行。
+
 结果保存在本目录的 `results/external-links.json`，该目录由 Git 忽略。每个链接记录来源文档、HTTP 状态及重定向后的地址；检查不会修改讲义和资料表。也可以指定输出路径：
 
 ```bash
-python3 course/readings/audit_external_links.py --output /tmp/mlsys-external-links.json
+python3 course/readings/audit_external_links.py --output course/readings/results/custom-links.json
 ```
 
 在 `labs/` 目录中运行时，脚本路径写为 `../course/readings/audit_external_links.py`；默认输出位置不随当前目录改变。

@@ -53,7 +53,7 @@ def main():
     p.add_argument("--table", type=int)
     p.add_argument("--out", type=Path)
     a = p.parse_args()
-    found = tables(json.loads(a.record.read_text()))
+    found = tables(json.loads(a.record.read_text(encoding="utf-8")))
     if a.table is None:
         for i, rows in enumerate(found):
             print(i, len(rows), "rows", columns(rows))
@@ -67,7 +67,7 @@ def main():
     writer.writerows(rows)
     if a.out:
         a.out.parent.mkdir(parents=True, exist_ok=True)
-        a.out.write_text(buf.getvalue())
+        a.out.write_text(buf.getvalue(), encoding="utf-8", newline="\n")
     else:
         print(buf.getvalue(), end="")
 

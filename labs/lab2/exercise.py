@@ -4,6 +4,11 @@ import argparse
 import os
 from pathlib import Path
 import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "_tools"))
+sys.path.append(str(Path(__file__).resolve().parents[1] / "tools"))
+from platform_tools import cxx_command, cuda_command, executable_path
 
 
 def main():
@@ -21,25 +26,13 @@ def main():
         )
     suffix = ["bench"] if args.mode == "bench" else []
     if args.part in ["A", "C", "all"]:
-        subprocess.run(
-            ["g++", "-std=c++17", "-O2", "quant_test.cpp", "-o", str(build / "quant_test")],
-            check=True,
-        )
-        subprocess.run([str(build / "quant_test"), args.part, *suffix], check=True)
+        exe = executable_path(build / "quant_test")
+        subprocess.run(cxx_command("quant_test.cpp", exe), check=True)
+        subprocess.run([str(exe), args.part, *suffix], check=True)
     if args.device == "cuda" and args.part in ["B", "C", "all"]:
-        subprocess.run(
-            [
-                "nvcc",
-                "-std=c++17",
-                "-O2",
-                "-arch=sm_89",
-                "pipeline.cu",
-                "-o",
-                str(build / "pipeline"),
-            ],
-            check=True,
-        )
-        subprocess.run([str(build / "pipeline"), args.part, *suffix], check=True)
+        exe = executable_path(build / "pipeline")
+        subprocess.run(cuda_command("pipeline.cu", exe), check=True)
+        subprocess.run([str(exe), args.part, *suffix], check=True)
 
 
 if __name__ == "__main__":

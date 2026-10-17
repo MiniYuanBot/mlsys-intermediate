@@ -6,6 +6,10 @@ from pathlib import Path
 import subprocess
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "_tools"))
+sys.path.append(str(Path(__file__).resolve().parents[1] / "tools"))
+from platform_tools import cuda_command, executable_path
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -37,35 +41,13 @@ def main():
         sys.stdout.flush()
         if args.device == "cuda":
             Path("build").mkdir(exist_ok=True)
-            subprocess.run(
-                [
-                    "nvcc",
-                    "-O2",
-                    "-std=c++17",
-                    "-arch=sm_89",
-                    "-Isrc",
-                    "test.cu",
-                    "-o",
-                    "build/fusion_test",
-                ],
-                check=True,
-            )
-            subprocess.run(["build/fusion_test"], check=True)
+            exe = executable_path("build/fusion_test")
+            subprocess.run(cuda_command("test.cu", exe, ["src"]), check=True)
+            subprocess.run([str(exe)], check=True)
             if args.mode == "bench":
-                subprocess.run(
-                    [
-                        "nvcc",
-                        "-O2",
-                        "-std=c++17",
-                        "-arch=sm_89",
-                        "-Isrc",
-                        "bench.cu",
-                        "-o",
-                        "build/fusion_bench",
-                    ],
-                    check=True,
-                )
-                subprocess.run(["build/fusion_bench"], check=True)
+                exe = executable_path("build/fusion_bench")
+                subprocess.run(cuda_command("bench.cu", exe, ["src"]), check=True)
+                subprocess.run([str(exe)], check=True)
         else:
             print(
                 "NOT RUN C5 native CUDA fusion (CPU selected); C1-C4 real CPU Inductor completed."

@@ -43,7 +43,7 @@ def collect_urls():
             if not name.endswith(".md"):
                 continue
             path = Path(directory) / name
-            for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text()):
+            for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text(encoding="utf-8")):
                 urls.setdefault(url, []).append(str(path.relative_to(ROOT)))
     return urls
 
@@ -90,7 +90,9 @@ def main():
             ensure_ascii=False,
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
     print("URLs", len(results), "reachable", sum(r["status"] == "reachable" for r in results))
     for result in results:
