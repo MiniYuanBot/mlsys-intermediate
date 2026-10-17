@@ -1,8 +1,10 @@
 # 上游代码阅读地图
 
-[资料总表](resources.md) · [快照数据](upstream-snapshots.json)
+[资料总表](resources.md) · [阅读资料说明](README.md)
 
 截至 2026-10-17，已通过公开 GitHub API 固定下列 HEAD commit，并核验文件路径。这些链接指向当日工程快照，不一定对应论文的 artifact tag。阅读前需核对论文版本，不能根据 main 分支的变化推断论文原始实验。
+
+可选的本地快照保存在 `results/upstream-snapshots.json`，由 Git 忽略。下文的固定 commit 和源码链接可直接使用。
 
 每项源码阅读完成后，都要记录输入/输出、调用者、状态不变量、对应的论文机制，以及在 8GB 卡上缩小的部分。本项目只引用这些公开代码，没有整段复制其实现。
 

@@ -72,5 +72,6 @@ compile_commands.json
 *.nsys-rep
 *.ncu-rep
 
-# Generated reading-resource link checks
+# Local reading-resource snapshots and generated link checks
+/course/readings/upstream-snapshots.json
 /course/readings/results/

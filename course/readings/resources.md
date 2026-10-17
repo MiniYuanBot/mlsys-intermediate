@@ -61,6 +61,6 @@ checked: 2026-10-17
 
 ## 核验与更新
 
-[upstream-snapshots.json](upstream-snapshots.json) 记录 13 个仓库的 commit 与相关文件路径。需要检查外部链接时，从仓库根目录运行 `python3 course/readings/audit_external_links.py`，结果写入本地 `course/readings/results/external-links.json`；完整用法见[阅读资料说明](README.md)。HTTP 200 仅表示页面可访问，不能证明方法已复现、许可已完整审查或硬件兼容。遇到 403/429 或网络失败时，优先尝试作者 GitHub 或论文入口；限流不代表论文不存在。
+上游仓库的固定 commit 与源码链接见[代码地图](code-map.md)；可选的本地快照位于 `results/upstream-snapshots.json`，由 Git 忽略。需要检查外部链接时，从仓库根目录运行 `python3 course/readings/audit_external_links.py`，结果写入本地 `course/readings/results/external-links.json`；完整用法见[阅读资料说明](README.md)。HTTP 200 仅表示页面可访问，不能证明方法已复现、许可已完整审查或硬件兼容。遇到 403/429 或网络失败时，优先尝试作者 GitHub 或论文入口；限流不代表论文不存在。
 
 重跑某篇论文之前固定模型、数据、代码 commit、依赖和硬件。对外引用使用实际论文版本，实验报告中应说明本课程简化实现与原论文的差异。新论文如果只有标题或新闻，尚未公开全文或代码，就不列为必做实验。

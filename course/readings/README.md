@@ -4,15 +4,15 @@
 
 从当前专题对应的资料开始，先完成讲义指定的阅读任务，再按需要查阅论文全文和源码。
 
-| 文件                                               | 用途                                                 |
-| -------------------------------------------------- | ---------------------------------------------------- |
-| [reading.md](reading.md)                           | 论文筛选、精读、机制复现和查新方法                   |
-| [paper-card.md](paper-card.md)                     | 记录研究问题、证据、源码入口和下一步动作的论文卡模板 |
-| [resources.md](resources.md)                       | 论文、项目、课程和官方文档总表                       |
-| [courses-and-labs.md](courses-and-labs.md)         | 外部课程与开放 lab 的选读任务                        |
-| [code-map.md](code-map.md)                         | 固定版本的源码入口与阅读重点                         |
-| [visualizations.md](visualizations.md)             | 图解、交互资源与性能分析工具                         |
-| [upstream-snapshots.json](upstream-snapshots.json) | 上游仓库的 commit 与文件路径快照                     |
+| 文件                                       | 用途                                                 |
+| ------------------------------------------ | ---------------------------------------------------- |
+| [reading.md](reading.md)                   | 论文筛选、精读、机制复现和查新方法                   |
+| [paper-card.md](paper-card.md)             | 记录研究问题、证据、源码入口和下一步动作的论文卡模板 |
+| [resources.md](resources.md)               | 论文、项目、课程和官方文档总表                       |
+| [courses-and-labs.md](courses-and-labs.md) | 外部课程与开放 lab 的选读任务                        |
+| [code-map.md](code-map.md)                 | 固定版本的源码入口与阅读重点                         |
+| [visualizations.md](visualizations.md)     | 图解、交互资源与性能分析工具                         |
+| `results/upstream-snapshots.json`          | 可选的本地上游 commit 与文件路径快照，由 Git 忽略    |
 
 ## 检查外部链接
 
