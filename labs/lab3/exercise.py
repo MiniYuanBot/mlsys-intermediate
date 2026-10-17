@@ -1,0 +1,76 @@
+"""CPU stages use actual PyTorch Inductor; CUDA C additionally runs native C5."""
+
+import argparse
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", choices=["test", "bench"], default="test")
+    parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
+    parser.add_argument("--part", choices=["all", "A", "B", "C"], default="all")
+    args = parser.parse_args()
+    os.chdir(Path(__file__).parent)
+    if args.device == "cuda":
+        import torch
+
+        if not torch.cuda.is_available():
+            raise SystemExit("CUDA requested but not available")
+    from pipeline_test import run
+
+    if args.part in ["A", "B", "all"]:
+        run(args.part)
+    if args.part in ["B", "all"]:
+        sys.stdout.flush()
+        subprocess.run([sys.executable, "policy_test.py"], check=True)
+    if args.part in ["C", "all"]:
+        from execution_test import run as run_execution
+
+        run_execution(args.device, args.mode == "bench")
+        if args.mode == "bench":
+            from bench_scenarios import run as run_scenarios
+
+            run_scenarios(args.device)
+        sys.stdout.flush()
+        if args.device == "cuda":
+            Path("build").mkdir(exist_ok=True)
+            subprocess.run(
+                [
+                    "nvcc",
+                    "-O2",
+                    "-std=c++17",
+                    "-arch=sm_89",
+                    "-Isrc",
+                    "test.cu",
+                    "-o",
+                    "build/fusion_test",
+                ],
+                check=True,
+            )
+            subprocess.run(["build/fusion_test"], check=True)
+            if args.mode == "bench":
+                subprocess.run(
+                    [
+                        "nvcc",
+                        "-O2",
+                        "-std=c++17",
+                        "-arch=sm_89",
+                        "-Isrc",
+                        "bench.cu",
+                        "-o",
+                        "build/fusion_bench",
+                    ],
+                    check=True,
+                )
+                subprocess.run(["build/fusion_bench"], check=True)
+        else:
+            print(
+                "NOT RUN C5 native CUDA fusion (CPU selected); C1-C4 real CPU Inductor completed."
+            )
+
+
+if __name__ == "__main__":
+    main()

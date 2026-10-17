@@ -1,0 +1,4 @@
+cols,selected_alpha,calibration_mse,heldout_mse,baseline_calibration_mse,baseline_heldout_mse,clipping_calibration_mse,clipping_heldout_mse,budget_group,artifact_bytes,budget_calibration_mse
+7,0.5,0.151075,0.140562,1.42266,0.0293648,1.42266,0.0293648,8,68,0.151075
+31,0.25,0.379967,0.230311,1.09255,0.119653,1.09255,0.119653,8,284,0.379967
+65,0.25,0.539664,0.194209,1.36423,0.403673,1.36423,0.403673,8,605,0.539664

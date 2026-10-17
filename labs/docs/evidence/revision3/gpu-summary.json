@@ -1,0 +1,58 @@
+[
+  {
+    "lab": 2,
+    "mode": "test",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab2-reference-test-cuda.json"
+  },
+  {
+    "lab": 2,
+    "mode": "bench",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab2-reference-bench-cuda.json"
+  },
+  {
+    "lab": 3,
+    "mode": "test",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab3-reference-test-cuda.json"
+  },
+  {
+    "lab": 3,
+    "mode": "bench",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab3-reference-bench-cuda.json"
+  },
+  {
+    "lab": 6,
+    "mode": "test",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab6-reference-test-cuda.json"
+  },
+  {
+    "lab": 6,
+    "mode": "bench",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab6-reference-bench-cuda.json"
+  },
+  {
+    "lab": 7,
+    "mode": "test",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab7-reference-test-cuda.json"
+  },
+  {
+    "lab": 7,
+    "mode": "bench",
+    "device": "cuda",
+    "returncode": 0,
+    "record": "lab7-reference-bench-cuda.json"
+  }
+]

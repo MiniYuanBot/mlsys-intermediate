@@ -1,0 +1,43 @@
+{
+  "lab": 6,
+  "implementation": "reference",
+  "mode": "bench",
+  "device": "cuda",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-17T02:48:17.410160+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "bench.py",
+        "--device",
+        "cuda"
+      ],
+      "returncode": 0,
+      "stdout": "{\"kind\": \"toy_training_measured\", \"policy\": \"retain\", \"seed\": 17, \"keep\": [true, true, true, true, true, true, true, true], \"step_ms\": 8.721814000455197, \"peak_allocated_bytes\": 41485824, \"peak_reserved_bytes\": 46137344, \"final_loss\": 4.640000820159912, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"checkpoint\", \"seed\": 17, \"keep\": [false, false, false, false, false, false, false, false], \"step_ms\": 12.569850700674579, \"peak_allocated_bytes\": 31673856, \"peak_reserved_bytes\": 37748736, \"final_loss\": 4.640000820159912, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"budget_model\", \"seed\": 17, \"keep\": [true, true, true, true, false, false, false, false], \"step_ms\": 13.466558899381198, \"peak_allocated_bytes\": 37252608, \"peak_reserved_bytes\": 41943040, \"final_loss\": 4.640000820159912, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"retain\", \"seed\": 29, \"keep\": [true, true, true, true, true, true, true, true], \"step_ms\": 7.074410900531802, \"peak_allocated_bytes\": 41485824, \"peak_reserved_bytes\": 46137344, \"final_loss\": 4.637524604797363, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"checkpoint\", \"seed\": 29, \"keep\": [false, false, false, false, false, false, false, false], \"step_ms\": 12.946681601169985, \"peak_allocated_bytes\": 31673856, \"peak_reserved_bytes\": 37748736, \"final_loss\": 4.637524604797363, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"budget_model\", \"seed\": 29, \"keep\": [true, true, true, true, false, false, false, false], \"step_ms\": 9.98716100002639, \"peak_allocated_bytes\": 37252608, \"peak_reserved_bytes\": 41943040, \"final_loss\": 4.637524604797363, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"retain\", \"seed\": 43, \"keep\": [true, true, true, true, true, true, true, true], \"step_ms\": 5.983912700321525, \"peak_allocated_bytes\": 41485824, \"peak_reserved_bytes\": 46137344, \"final_loss\": 4.68651008605957, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"checkpoint\", \"seed\": 43, \"keep\": [false, false, false, false, false, false, false, false], \"step_ms\": 12.690895500418264, \"peak_allocated_bytes\": 31673856, \"peak_reserved_bytes\": 37748736, \"final_loss\": 4.68651008605957, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n{\"kind\": \"toy_training_measured\", \"policy\": \"budget_model\", \"seed\": 43, \"keep\": [true, true, true, true, false, false, false, false], \"step_ms\": 9.552858299866784, \"peak_allocated_bytes\": 37252608, \"peak_reserved_bytes\": 41943040, \"final_loss\": 4.68651008605957, \"torch\": \"2.14.1+cu126\", \"device\": \"cuda\"}\n",
+      "stderr": ""
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab6/README.md": "0ec764d35f49d97e56435f069836adb2ec25cf7f7dbbf3f5696672dcdd580924",
+    "labs/lab6/bench.py": "cbe2bc57d982a1e48986ce2ba531a2f23d5f1ec32a21bca37beeafdb0f7c1deb",
+    "labs/lab6/grade.md": "934192c61da2b579fb14c19bcaf8ac6660b5561402a6054c66984719c57b5a26",
+    "labs/lab6/model.py": "980baa208bb80739b408aa85e86d860ff1c190bfd690a9de002d6844e20d427c",
+    "labs/lab6/test.py": "ffbe8916b20705b22792d2abdb9d2ce3d4b12c8099b2a0d9e1684561a10883b2",
+    "labs/lab6/src/train_student.py": "0e18e09d90de92baa4374640d73fe0cefd0a4b1f5de5a96ce86ea16d921d3bdc",
+    "solutions/lab6/src/train_student.py": "2c8b2128240fbb991b6ac080b82d5af801f03ff03ab4cc1e38335e614b91c09e"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 4.798629719007295
+}

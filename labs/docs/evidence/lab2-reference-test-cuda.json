@@ -1,0 +1,58 @@
+{
+  "lab": 2,
+  "implementation": "reference",
+  "mode": "test",
+  "device": "cuda",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:24.390112+00:00",
+  "commands": [
+    {
+      "argv": [
+        "nvcc",
+        "-std=c++17",
+        "-O2",
+        "-lineinfo",
+        "-arch=sm_89",
+        "-I",
+        "src",
+        "test.cu",
+        "-lcublas",
+        "-o",
+        "/tmp/mlsys-lab2-s6curh4q/lab2/lab"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab2-s6curh4q/lab2/lab"
+      ],
+      "returncode": 0,
+      "stdout": "PASS W4A32 GEMV vs independent CPU oracle; odd tails and multiwarp rows\n",
+      "stderr": ""
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab2/README.md": "264d66881c09e902c8b470c4e3c55ec68ac29eb5d46ea9c42ab2d261d24a5443",
+    "labs/lab2/bench.cu": "07dfbebc58fdcd60def7451322ecc7518811415fc5e9b6811986b3223587f1e8",
+    "labs/lab2/common.cuh": "6a4f999092a6cb8a713ef002a2263e5321fe082929ce585148ce0e8639855859",
+    "labs/lab2/grade.md": "17e933e2d38a7f1eff75923ffc691b52324222ee9be98dff1c6b39d161c7fffa",
+    "labs/lab2/src/gemv_student.cuh": "8ce2ae0cff27ca16b0a94600d04835c982e8726a8e874f36eda5faac047ba73b",
+    "labs/lab2/test.cu": "426b36bc1dbd7b4bf85965bed2a27b093bb8bfccecdb755d3a48f8a390fe20c7",
+    "solutions/lab2/src/gemv_student.cuh": "e031e65003c5381813784490345ca476113e8434b654bdab02b0879fc47860b5"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 2.6370689169998514
+}

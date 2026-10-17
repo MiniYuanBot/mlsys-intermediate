@@ -1,0 +1,93 @@
+{
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.associations": {
+    "*.cu": "cuda-cpp",
+    "*.cuh": "cuda-cpp",
+    "*.sbatch": "shellscript"
+  },
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 4,
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never",
+    "source.organizeImports": "never",
+    "source.fixAll.ruff": "never",
+    "source.organizeImports.ruff": "never"
+  },
+  "C_Cpp.formatting": "clangFormat",
+  "C_Cpp.clang_format_path": "${workspaceFolder}/labs/.venv-format/bin/clang-format",
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.clang_format_fallbackStyle": "none",
+  "ruff.path": [
+    "${workspaceFolder}/labs/.venv-format/bin/ruff",
+    "${workspaceFolder}/labs/.venv-format/Scripts/ruff.exe"
+  ],
+  "ruff.lint.enable": false,
+  "ruff.fixAll": false,
+  "ruff.organizeImports": false,
+  "ruff.showSyntaxErrors": false,
+  "prettier.requireConfig": true,
+  "prettier.resolveGlobalModules": true,
+  "shfmt.executablePath": "${workspaceFolder}/labs/.venv-format/bin/shfmt",
+  "shfmt.executableArgs": [],
+  "shfmt.formatIgnored": false,
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true
+  },
+  "[cuda-cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true
+  },
+  "[cmake]": {
+    "editor.defaultFormatter": "loopj.vscode-gersemi",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "mkhl.shfmt",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": false
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "cmake.ignoreCMakeListsMissing": true,
+  "terminal.integrated.cwd": "${workspaceFolder}/labs",
+  "prettier.prettierPath": "${workspaceFolder}/labs/.venv-format/node_modules/prettier",
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  }
+}

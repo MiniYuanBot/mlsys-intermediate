@@ -1,0 +1,54 @@
+{
+  "label": "model-probe-final",
+  "utc": "2026-10-16T19:44:15.089609+00:00",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "labs/tools/capture_model.py",
+        "--model",
+        "/home/miniyuan/models/Qwen3-0.6B",
+        "--output",
+        "results/model-probe-final",
+        "--max-input",
+        "64",
+        "--max-new",
+        "8",
+        "--capture-kv"
+      ],
+      "stdout": "{\"request_id\": 0, \"prompt_tokens\": 13, \"output_tokens\": 8, \"prefill_and_first_argmax_ms\": 837.4293700035196, \"decode_step_ms\": [47.4754229944665, 31.513235007878393, 26.265754000633024, 30.162216004100628, 27.152508992003277, 26.940732001094148, 28.32020100322552], \"peak_allocated_bytes\": 1208232960}\n{\"request_id\": 1, \"prompt_tokens\": 10, \"output_tokens\": 8, \"prefill_and_first_argmax_ms\": 29.726036998908967, \"decode_step_ms\": [27.484073012601584, 28.118247995735146, 28.065523991244845, 27.044055997976102, 28.689249011222273, 27.864306000992656, 26.930196007015184], \"peak_allocated_bytes\": 1206389248}\n{\"request_id\": 2, \"prompt_tokens\": 15, \"output_tokens\": 8, \"prefill_and_first_argmax_ms\": 28.33976699912455, \"decode_step_ms\": [28.31319600227289, 27.174788992851973, 28.341152996290475, 28.601133002666757, 28.506030997959897, 28.024951010593213, 28.00551899417769], \"peak_allocated_bytes\": 1209055744}\n{\"request_id\": 3, \"prompt_tokens\": 20, \"output_tokens\": 8, \"prefill_and_first_argmax_ms\": 50.94732900033705, \"decode_step_ms\": [39.96727599587757, 30.588770998292603, 29.95078099775128, 28.999004993238486, 30.450959005975164, 29.5311829977436, 29.438471989124082], \"peak_allocated_bytes\": 1211804672}\nresults/model-probe-final\n",
+      "stderr": "\nLoading weights:   0%|          | 0/311 [00:00<?, ?it/s]\nLoading weights:  37%|███▋      | 114/311 [00:00<00:00, 1138.61it/s]\nLoading weights: 100%|██████████| 311/311 [00:00<00:00, 1756.64it/s]\n",
+      "returncode": 0
+    }
+  ],
+  "source_sha256": {
+    "labs/lab3/policy_test.py": "6d97daf967e3215a4eade1d04494afcd0ee7e364eb85688c56cddcebb6616185",
+    "labs/lab3/policy_bench.py": "42e93a2a6911ae7a2d68ebf8d0271b66c651082f639ced23a8468198923e3a7e",
+    "labs/lab3/torch_bench.py": "fdc70922c9c2d48322347e486b79087c38bc42569a6049d79a61230994650fc9",
+    "labs/lab6/model.py": "980baa208bb80739b408aa85e86d860ff1c190bfd690a9de002d6844e20d427c",
+    "labs/lab6/bench.py": "cbe2bc57d982a1e48986ce2ba531a2f23d5f1ec32a21bca37beeafdb0f7c1deb",
+    "labs/lab6/test.py": "b4b2da7dbb137bbae62f756bff4fd239f25cbd09de6ca34439a50485efa17853",
+    "labs/tools/check_links.py": "0b7b51fdd75c91a8a9fa5e042f97c6006edc8a47798d2c202c6298be1fe7da81",
+    "labs/tools/record.py": "3cf3a91d42291384eebd70f51a6348c0d226550929dea49f234266beea2714cd",
+    "labs/tools/materialize.py": "6837851c05f4044352ee6756e82650bfae8eb0df0d8d2b6047568588c3428cb8",
+    "labs/tools/audit_external_links.py": "b5663fb334e9c21eae9fa6b25fd408b708ce622e0324fa70b7d8d211d9c195b1",
+    "labs/tools/extract.py": "3a8242b46465dfb0bdf807df316f5489f03eff773c24f5057d06faea3fd2baee",
+    "labs/tools/run.py": "2dc422d339ce813fb43ed05fd47b61a3bc34e208207468c71300d396bea0cf89",
+    "labs/tools/capture_model.py": "c161afe892e2920ca1345363fa33614cda01e5bf22da09a8a246f18a094aa270",
+    "labs/tools/plot.py": "2fc58ab45c97976595051fdf9669c43d2e5b53b19ceab37f74b3b625a505f45e",
+    "labs/tools/doctor.py": "078a98d6c8505ec075b0b098443f8c989fb40210fb665c66fe7facc12bbf86ab",
+    "labs/tools/analyze_kv.py": "3c4ecce2f65ec165b7b5ffe938bd02b8f381c456ed8eedea0210164b85dbd837",
+    "labs/lab3/src/policy_student.py": "fa15b3428df1256b67b19b998f5119bbb86330b2f3a40ab26a8112e1cd87cbbd",
+    "labs/lab6/src/train_student.py": "0e18e09d90de92baa4374640d73fe0cefd0a4b1f5de5a96ce86ea16d921d3bdc"
+  },
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "wall_seconds": 7.840533059992595,
+  "status": "passed"
+}

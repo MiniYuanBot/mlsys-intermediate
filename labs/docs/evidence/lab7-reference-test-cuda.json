@@ -1,0 +1,79 @@
+{
+  "lab": 7,
+  "implementation": "reference",
+  "mode": "test",
+  "device": "cuda",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:47.808835+00:00",
+  "commands": [
+    {
+      "argv": [
+        "c++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-I",
+        "src",
+        "test.cpp",
+        "-o",
+        "/tmp/mlsys-lab7-tmx6nmdw/lab7/lab"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab7-tmx6nmdw/lab7/lab"
+      ],
+      "returncode": 0,
+      "stdout": "PASS stable dispatch, weighted inverse, duplicate routes, capacity, pinning, predictor drift\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "nvcc",
+        "-std=c++17",
+        "-O2",
+        "-arch=sm_89",
+        "transfer_bench.cu",
+        "-o",
+        "/tmp/mlsys-lab7-tmx6nmdw/lab7/transfer"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab7-tmx6nmdw/lab7/transfer"
+      ],
+      "returncode": 0,
+      "stdout": "kind,streams,repeat,bytes,wall_ms\ntransfer_calibration,1,0,134217728,20.2836\ntransfer_calibration,1,1,134217728,13.5894\ntransfer_calibration,1,2,134217728,13.8702\ntransfer_calibration,1,3,134217728,13.9545\ntransfer_calibration,1,4,134217728,13.6559\ntransfer_calibration,2,0,134217728,10.6453\ntransfer_calibration,2,1,134217728,10.6931\ntransfer_calibration,2,2,134217728,10.6943\ntransfer_calibration,2,3,134217728,10.7029\ntransfer_calibration,2,4,134217728,10.7112\n",
+      "stderr": ""
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab7/README.md": "371c5e21cb0f224aa5f54b25a0067e7e96cdea1c904921a409882c74ea5c3f9d",
+    "labs/lab7/bench.cpp": "5949f8b1507e56d2f4af9145fbc9933e666d33f323304e85fda897c1d5adb76c",
+    "labs/lab7/grade.md": "1fd61ef610f2a52cffcd9d3e7625432953d134a41152ad7b9ede53ac74a78c02",
+    "labs/lab7/src/moe_student.hpp": "6cc9f5b3308fc2cef5271bc5652ab3e3936ebd219227de77d091f19386622d98",
+    "labs/lab7/test.cpp": "397c701dcb90eac83c2ad8baef112ad773959899699d72dfbad78cf60b6704e9",
+    "labs/lab7/transfer_bench.cu": "2f06a0d4580fdc18debb3047e7b1fc05c92deb443c91504b50cc44dee8e77505",
+    "solutions/lab7/src/moe_student.hpp": "3f18426e58f361a8099738daab497eef4bdd6e7a73d7efbcb9f876b5e725870f"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 2.726904969997122
+}

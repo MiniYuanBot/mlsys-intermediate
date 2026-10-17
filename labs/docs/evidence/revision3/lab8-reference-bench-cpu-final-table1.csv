@@ -1,0 +1,13 @@
+kind,part,workers,quantum,steal,makespan_token_units,utilization,segments,steals
+synthetic_events,B,2,16,false,1828,0.9442013129102844,241,0
+synthetic_events,B,2,16,true,1728,0.9988425925925926,241,2
+synthetic_events,B,2,64,false,1828,0.9442013129102844,84,0
+synthetic_events,B,2,64,true,1740,0.9919540229885058,84,2
+synthetic_events,B,4,16,false,1066,0.8095684803001876,241,0
+synthetic_events,B,4,16,true,918,0.9400871459694989,241,2
+synthetic_events,B,4,64,false,1066,0.8095684803001876,84,0
+synthetic_events,B,4,64,true,934,0.923982869379015,84,2
+synthetic_events,B,8,16,false,567,0.7610229276895943,241,0
+synthetic_events,B,8,16,true,528,0.8172348484848485,241,8
+synthetic_events,B,8,64,false,567,0.7610229276895943,84,0
+synthetic_events,B,8,64,true,522,0.8266283524904214,84,6

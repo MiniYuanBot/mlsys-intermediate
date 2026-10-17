@@ -1,0 +1,43 @@
+{
+  "lab": 6,
+  "implementation": "student",
+  "mode": "test",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:59.424691+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "test.py",
+        "--device",
+        "cpu"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "EEEE\n======================================================================\nERROR: test_checkpoint_preserves_dropout_gradients (__main__.TrainingTests.test_checkpoint_preserves_dropout_gradients)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/test.py\", line 33, in test_checkpoint_preserves_dropout_gradients\n    loss = (m(x, keep) - target).square().mean()\n            ^^^^^^^^^^\n  File \"/home/miniyuan/venvs/mlsys/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1783, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/miniyuan/venvs/mlsys/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1794, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/model.py\", line 24, in forward\n    return run_blocks(self.blocks, x, keep)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/src/train_student.py\", line 30, in run_blocks\n    raise NotImplementedError(\"Complete this task\")\nNotImplementedError: Complete this task\n\n======================================================================\nERROR: test_empty_and_invalid (__main__.TrainingTests.test_empty_and_invalid)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/test.py\", line 58, in test_empty_and_invalid\n    self.assertEqual(plan_keep([], [], 0), [])\n                     ^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/src/train_student.py\", line 36, in plan_keep\n    raise NotImplementedError(\"Complete this task\")\nNotImplementedError: Complete this task\n\n======================================================================\nERROR: test_knapsack_matches_exhaustive (__main__.TrainingTests.test_knapsack_matches_exhaustive)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/test.py\", line 47, in test_knapsack_matches_exhaustive\n    chosen = plan_keep(sizes, costs, budget)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/src/train_student.py\", line 36, in plan_keep\n    raise NotImplementedError(\"Complete this task\")\nNotImplementedError: Complete this task\n\n======================================================================\nERROR: test_lora_initial_identity_and_frozen_weight (__main__.TrainingTests.test_lora_initial_identity_and_frozen_weight)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/test.py\", line 18, in test_lora_initial_identity_and_frozen_weight\n    torch.testing.assert_close(layer(x), x @ layer.weight.T)\n                               ^^^^^^^^\n  File \"/home/miniyuan/venvs/mlsys/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1783, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/miniyuan/venvs/mlsys/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1794, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/mlsys-lab6-mvnfrrxu/lab6/src/train_student.py\", line 21, in forward\n    raise NotImplementedError(\"Complete this task\")\nNotImplementedError: Complete this task\n\n----------------------------------------------------------------------\nRan 4 tests in 0.013s\n\nFAILED (errors=4)\n"
+    }
+  ],
+  "status": "failed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab6/README.md": "dd4a8d5ae521a89625b21af9d839e8f9c79a4dba882ceb02187924681a58f516",
+    "labs/lab6/bench.py": "019a2d372d4fde834ccfe1d6e4d81c06c30890494d656ad908178b8fee1e0733",
+    "labs/lab6/grade.md": "934192c61da2b579fb14c19bcaf8ac6660b5561402a6054c66984719c57b5a26",
+    "labs/lab6/model.py": "6630cd1e3e3880977f99efa1db6fe784517b90436eb10ca71bf0bb3ba36277f8",
+    "labs/lab6/src/train_student.py": "2c4b9128a5860c0db7895cd413ac27acf8de6620c3e322709c7da8d131133a60",
+    "labs/lab6/test.py": "4b5c60fce731937c4bd64fe8f06c0d42bf41c2aee67c83d62844b7882f7da2b6"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "error": "command failed with exit 1",
+  "wall_seconds": 1.06332760299847
+}

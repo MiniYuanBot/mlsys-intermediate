@@ -1,0 +1,74 @@
+[
+  {
+    "tensor": "k",
+    "layer": 0,
+    "head": 0,
+    "axis": "token",
+    "group": 16,
+    "relative_l2": 0.04856688529253006,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "k",
+    "layer": 0,
+    "head": 0,
+    "axis": "channel",
+    "group": 16,
+    "relative_l2": 0.021504970267415047,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "k",
+    "layer": 0,
+    "head": 0,
+    "axis": "token",
+    "group": 64,
+    "relative_l2": 0.15034861862659454,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "k",
+    "layer": 0,
+    "head": 0,
+    "axis": "channel",
+    "group": 64,
+    "relative_l2": 0.021504970267415047,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "v",
+    "layer": 0,
+    "head": 0,
+    "axis": "token",
+    "group": 16,
+    "relative_l2": 0.06502737104892731,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "v",
+    "layer": 0,
+    "head": 0,
+    "axis": "channel",
+    "group": 16,
+    "relative_l2": 0.06333315372467041,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "v",
+    "layer": 0,
+    "head": 0,
+    "axis": "token",
+    "group": 64,
+    "relative_l2": 0.09066171199083328,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  },
+  {
+    "tensor": "v",
+    "layer": 0,
+    "head": 0,
+    "axis": "channel",
+    "group": 64,
+    "relative_l2": 0.06333315372467041,
+    "scope": "offline fake quantization, not model quality or storage saving"
+  }
+]

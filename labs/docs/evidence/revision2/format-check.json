@@ -1,0 +1,229 @@
+{
+  "operation": "check",
+  "groups": [
+    {
+      "group": "C/C++/CUDA",
+      "files": 19,
+      "commands": [
+        {
+          "argv": [
+            "/tmp/mlsys-format-env/bin/clang-format",
+            "--style=file:/home/miniyuan/github/mlsys-intermediate/labs/format/.clang-format",
+            "--dry-run",
+            "--Werror",
+            "labs/lab1/bench.cpp",
+            "labs/lab1/src/kv_student.hpp",
+            "labs/lab1/test.cpp",
+            "labs/lab2/bench.cu",
+            "labs/lab2/common.cuh",
+            "labs/lab2/src/gemv_student.cuh",
+            "labs/lab2/test.cu",
+            "labs/lab3/bench.cu",
+            "labs/lab3/common.cuh",
+            "labs/lab3/src/fusion_student.cuh",
+            "labs/lab3/test.cu",
+            "labs/lab7/bench.cpp",
+            "labs/lab7/src/moe_student.hpp",
+            "labs/lab7/test.cpp",
+            "labs/lab7/transfer_bench.cu",
+            "solutions/lab1/src/kv_student.hpp",
+            "solutions/lab2/src/gemv_student.cuh",
+            "solutions/lab3/src/fusion_student.cuh",
+            "solutions/lab7/src/moe_student.hpp"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "version": "clang-format version 20.1.8",
+      "status": "passed"
+    },
+    {
+      "group": "Python",
+      "files": 22,
+      "commands": [
+        {
+          "argv": [
+            "/tmp/mlsys-format-env/bin/ruff",
+            "format",
+            "--config",
+            "/home/miniyuan/github/mlsys-intermediate/labs/format/pyproject.toml",
+            "--no-cache",
+            "--check",
+            "labs/lab3/policy_bench.py",
+            "labs/lab3/policy_test.py",
+            "labs/lab3/src/policy_student.py",
+            "labs/lab3/torch_bench.py",
+            "labs/lab6/bench.py",
+            "labs/lab6/model.py",
+            "labs/lab6/src/train_student.py",
+            "labs/lab6/test.py",
+            "labs/tools/analyze_kv.py",
+            "labs/tools/audit_external_links.py",
+            "labs/tools/capture_model.py",
+            "labs/tools/check_links.py",
+            "labs/tools/doctor.py",
+            "labs/tools/extract.py",
+            "labs/tools/format_check.py",
+            "labs/tools/materialize.py",
+            "labs/tools/plot.py",
+            "labs/tools/record.py",
+            "labs/tools/run.py",
+            "labs/tools/source_files.py",
+            "solutions/lab3/src/policy_student.py",
+            "solutions/lab6/src/train_student.py"
+          ],
+          "returncode": 0,
+          "stdout": "22 files already formatted\n",
+          "stderr": ""
+        }
+      ],
+      "version": "ruff 0.17.0",
+      "status": "passed"
+    },
+    {
+      "group": "CMake",
+      "files": 0,
+      "commands": [],
+      "status": "skipped_no_files"
+    },
+    {
+      "group": "Markdown/JSON/YAML/HTML/JS",
+      "files": 65,
+      "commands": [
+        {
+          "argv": [
+            "/home/miniyuan/.local/bin/prettier",
+            "--config",
+            "/home/miniyuan/github/mlsys-intermediate/labs/format/.prettierrc.json",
+            "--no-editorconfig",
+            "--check",
+            "course/README.md",
+            "course/guides/directions.md",
+            "course/guides/experiments.md",
+            "course/guides/pytorch-bridge.md",
+            "course/guides/reading.md",
+            "course/guides/roadmap.md",
+            "course/index.md",
+            "course/modules/01-kv-cache.md",
+            "course/modules/02-low-bit-kernels.md",
+            "course/modules/03-dynamic-compilation.md",
+            "course/modules/04-speculative-slo.md",
+            "course/modules/05-prefix-cache.md",
+            "course/modules/06-memory-efficient-training.md",
+            "course/modules/07-moe-offload.md",
+            "course/modules/08-rollout-scheduling.md",
+            "course/readings/code-map.md",
+            "course/readings/courses-and-labs.md",
+            "course/readings/link-audit.json",
+            "course/readings/resources.md",
+            "course/readings/upstream-snapshots.json",
+            "course/readings/visualizations.md",
+            "course/templates/experiment.md",
+            "course/templates/paper-card.md",
+            "course/templates/proposal.md",
+            "course/templates/weekly-report.md",
+            "course/visuals/index.html",
+            "labs/README.md",
+            "labs/docs/editorial-review.md",
+            "labs/docs/evidence/README.md",
+            "labs/docs/evidence/revision2/README.md",
+            "labs/docs/formatting.md",
+            "labs/docs/validation.md",
+            "labs/format/.prettierrc.json",
+            "labs/format/README.md",
+            "labs/index.md",
+            "labs/lab1/README.md",
+            "labs/lab1/grade.md",
+            "labs/lab2/README.md",
+            "labs/lab2/grade.md",
+            "labs/lab3/README.md",
+            "labs/lab3/grade.md",
+            "labs/lab4/README.md",
+            "labs/lab4/grade.md",
+            "labs/lab5/README.md",
+            "labs/lab5/grade.md",
+            "labs/lab6/README.md",
+            "labs/lab6/grade.md",
+            "labs/lab7/README.md",
+            "labs/lab7/grade.md",
+            "labs/lab8/README.md",
+            "labs/lab8/grade.md",
+            "labs/reports/README.md",
+            "labs/setup.md",
+            "labs/templates/report.md",
+            "labs/tools/README.md",
+            "solutions/README.md",
+            "solutions/index.md",
+            "solutions/lab1/README.md",
+            "solutions/lab2/README.md",
+            "solutions/lab3/README.md",
+            "solutions/lab4/README.md",
+            "solutions/lab5/README.md",
+            "solutions/lab6/README.md",
+            "solutions/lab7/README.md",
+            "solutions/lab8/README.md"
+          ],
+          "returncode": 0,
+          "stdout": "Checking formatting...\nAll matched files use Prettier code style!\n",
+          "stderr": ""
+        }
+      ],
+      "version": "3.9.10",
+      "status": "passed"
+    },
+    {
+      "group": "Shell",
+      "files": 1,
+      "commands": [
+        {
+          "argv": [
+            "/home/miniyuan/.local/bin/shfmt",
+            "-i",
+            "4",
+            "-bn",
+            "-ci",
+            "-sr",
+            "-d",
+            "labs/tools/setup-format.sh"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "version": "v3.12.0",
+      "status": "passed"
+    },
+    {
+      "group": "Rust",
+      "files": 9,
+      "commands": [
+        {
+          "argv": [
+            "/home/miniyuan/.cargo/bin/rustfmt",
+            "--edition",
+            "2021",
+            "--check",
+            "labs/lab4/src/main.rs",
+            "labs/lab4/src/policy_student.rs",
+            "labs/lab5/src/cache_student.rs",
+            "labs/lab5/src/main.rs",
+            "labs/lab8/src/main.rs",
+            "labs/lab8/src/rollout_student.rs",
+            "solutions/lab4/src/policy_student.rs",
+            "solutions/lab5/src/cache_student.rs",
+            "solutions/lab8/src/rollout_student.rs"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+      "status": "passed"
+    }
+  ],
+  "status": "passed"
+}

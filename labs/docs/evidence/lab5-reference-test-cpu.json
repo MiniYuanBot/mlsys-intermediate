@@ -1,0 +1,42 @@
+{
+  "lab": 5,
+  "implementation": "reference",
+  "mode": "test",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:36.601217+00:00",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline"
+      ],
+      "returncode": 0,
+      "stdout": "\nrunning 6 tests\ntest tests::full_prefix_only ... ok\ntest tests::empty_and_zero_capacity ... ok\ntest tests::namespace_isolation ... ok\ntest tests::transactional_failure ... ok\ntest tests::shared_lease_counts ... ok\ntest tests::no_evict_active_lease ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "stderr": "   Compiling prefix-cache v0.1.0 (/tmp/mlsys-lab5-hya1vpqi/lab5)\n    Finished `release` profile [optimized] target(s) in 0.43s\n     Running unittests src/cache_student.rs (target/release/deps/prefix_cache-3ddccdde1039c105)\n     Running unittests src/main.rs (target/release/deps/bench-d7efaeb54170bb11)\n   Doc-tests prefix_cache\n"
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab5/Cargo.toml": "084b9a69cb2410c1874dff8a17d35bad4abf693044e8166c9964676c690e8850",
+    "labs/lab5/README.md": "c24854df0e8226a64a98ce8beb77867c023d99dab8fbcb224aaee7fa6eee247e",
+    "labs/lab5/grade.md": "7e6bee19e5f281a545ef8200e127f38a25aca791ac576d2d3d10e7c58b904453",
+    "labs/lab5/src/cache_student.rs": "7748a5b50172972c262a9b5eabedf20767477a9805836f3266d95ae062516b7f",
+    "labs/lab5/src/main.rs": "48d65a1533113815e7a17bc61adfbc168d5c471426a680ac7b333a4dd605463a",
+    "solutions/lab5/src/cache_student.rs": "ae4d95cef1c80e1a259879aca87e4145bb10e052c188124a1b2087539e4d69d8"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 0.4613572730013402
+}

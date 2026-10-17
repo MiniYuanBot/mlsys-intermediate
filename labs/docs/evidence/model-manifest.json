@@ -1,0 +1,14 @@
+{
+  "model_path": "/home/miniyuan/models/Qwen3-0.6B",
+  "config_sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd",
+  "weight_identity": "local files; config hash alone is NOT a weight checksum",
+  "torch": "2.14.1+cu126",
+  "transformers": "5.18.0",
+  "dtype": "torch.bfloat16",
+  "device": "cuda",
+  "prompt_sha256": "561920ed1fb22c93ab86a0a8305ba90692eee786d4da9a9e04832d948ef597e5",
+  "max_input": 64,
+  "max_new": 8,
+  "chat_template": false,
+  "scope": "single request; per-token synchronization; KV capture outside token timing; cold first prompt included"
+}

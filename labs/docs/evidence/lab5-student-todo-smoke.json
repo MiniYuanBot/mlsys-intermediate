@@ -1,0 +1,42 @@
+{
+  "lab": 5,
+  "implementation": "student",
+  "mode": "test",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:58.990125+00:00",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline"
+      ],
+      "returncode": 101,
+      "stdout": "\nrunning 6 tests\ntest tests::empty_and_zero_capacity ... FAILED\ntest tests::namespace_isolation ... FAILED\ntest tests::shared_lease_counts ... FAILED\ntest tests::transactional_failure ... FAILED\ntest tests::no_evict_active_lease ... FAILED\ntest tests::full_prefix_only ... FAILED\n\nfailures:\n\n---- tests::empty_and_zero_capacity stdout ----\n\nthread 'tests::empty_and_zero_capacity' (32103) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n---- tests::namespace_isolation stdout ----\n\nthread 'tests::namespace_isolation' (32105) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\n\n---- tests::shared_lease_counts stdout ----\n\nthread 'tests::shared_lease_counts' (32107) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\n\n---- tests::transactional_failure stdout ----\n\nthread 'tests::transactional_failure' (32108) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\n\n---- tests::no_evict_active_lease stdout ----\n\nthread 'tests::no_evict_active_lease' (32106) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\n\n---- tests::full_prefix_only stdout ----\n\nthread 'tests::full_prefix_only' (32104) panicked at src/cache_student.rs:67:9:\nnot yet implemented: Complete this task\n\n\nfailures:\n    tests::empty_and_zero_capacity\n    tests::full_prefix_only\n    tests::namespace_isolation\n    tests::no_evict_active_lease\n    tests::shared_lease_counts\n    tests::transactional_failure\n\ntest result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "stderr": "   Compiling prefix-cache v0.1.0 (/tmp/mlsys-lab5-ycmljv8f/lab5)\nwarning: unused variable: `ns`\n  --> src/cache_student.rs:60:34\n   |\n60 |     pub fn matched_tokens(&self, ns: &Namespace, tokens: &[u32]) -> usize {\n   |                                  ^^ help: if this is intentional, prefix it with an underscore: `_ns`\n   |\n   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `tokens`\n  --> src/cache_student.rs:60:50\n   |\n60 |     pub fn matched_tokens(&self, ns: &Namespace, tokens: &[u32]) -> usize {\n   |                                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_tokens`\n\nwarning: unused variable: `ns`\n  --> src/cache_student.rs:65:30\n   |\n65 |     pub fn insert(&mut self, ns: &Namespace, tokens: &[u32]) -> bool {\n   |                              ^^ help: if this is intentional, prefix it with an underscore: `_ns`\n\nwarning: unused variable: `tokens`\n  --> src/cache_student.rs:65:46\n   |\n65 |     pub fn insert(&mut self, ns: &Namespace, tokens: &[u32]) -> bool {\n   |                                              ^^^^^^ help: if this is intentional, prefix it with an underscore: `_tokens`\n\nwarning: unused variable: `ns`\n  --> src/cache_student.rs:69:31\n   |\n69 |     pub fn acquire(&mut self, ns: &Namespace, tokens: &[u32]) -> Lease {\n   |                               ^^ help: if this is intentional, prefix it with an underscore: `_ns`\n\nwarning: unused variable: `tokens`\n  --> src/cache_student.rs:69:47\n   |\n69 |     pub fn acquire(&mut self, ns: &Namespace, tokens: &[u32]) -> Lease {\n   |                                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_tokens`\n\nwarning: unused variable: `lease`\n  --> src/cache_student.rs:74:31\n   |\n74 |     pub fn release(&mut self, lease: Lease) {\n   |                               ^^^^^ help: if this is intentional, prefix it with an underscore: `_lease`\n\nwarning: fields `clock` and `policy` are never read\n  --> src/cache_student.rs:33:5\n   |\n29 | pub struct Cache {\n   |            ----- fields in this struct\n...\n33 |     clock: u64,\n   |     ^^^^^\n34 |     policy: Policy,\n   |     ^^^^^^\n   |\n   = note: `Cache` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: field `keys` is never read\n  --> src/cache_student.rs:38:5\n   |\n37 | pub struct Lease {\n   |            ----- field in this struct\n38 |     keys: Vec<Key>,\n   |     ^^^^\n   |\n   = note: `Lease` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis\n\nwarning: method `keys` is never used\n  --> src/cache_student.rs:51:8\n   |\n40 | impl Cache {\n   | ---------- method in this implementation\n...\n51 |     fn keys(&self, ns: &Namespace, tokens: &[u32]) -> Vec<Key> {\n   |        ^^^^\n\nwarning: `prefix-cache` (lib) generated 10 warnings (run `cargo fix --lib -p prefix-cache` to apply 7 suggestions)\nwarning: `prefix-cache` (lib test) generated 10 warnings (10 duplicates)\n    Finished `release` profile [optimized] target(s) in 0.28s\n     Running unittests src/cache_student.rs (target/release/deps/prefix_cache-3ddccdde1039c105)\nerror: test failed, to rerun pass `--lib`\n"
+    }
+  ],
+  "status": "failed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab5/Cargo.toml": "084b9a69cb2410c1874dff8a17d35bad4abf693044e8166c9964676c690e8850",
+    "labs/lab5/README.md": "c24854df0e8226a64a98ce8beb77867c023d99dab8fbcb224aaee7fa6eee247e",
+    "labs/lab5/grade.md": "7e6bee19e5f281a545ef8200e127f38a25aca791ac576d2d3d10e7c58b904453",
+    "labs/lab5/src/cache_student.rs": "7748a5b50172972c262a9b5eabedf20767477a9805836f3266d95ae062516b7f",
+    "labs/lab5/src/main.rs": "48d65a1533113815e7a17bc61adfbc168d5c471426a680ac7b333a4dd605463a"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "error": "command failed with exit 101",
+  "wall_seconds": 0.29291512099734973
+}

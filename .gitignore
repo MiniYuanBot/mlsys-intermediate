@@ -1,0 +1,73 @@
+# Share formatter settings; other VS Code files remain personal.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Environments, caches, local secrets
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.env
+.env.*
+!.env.example
+# Generated measurements: preserve locally; publish selected evidence intentionally.
+artifacts/
+build/
+external/
+*.o
+*.obj
+*.exe
+*.so
+*.dylib
+*.dll
+*.pt
+*.pth
+*.safetensors
+*.onnx
+*.log
+.DS_Store
+Thumbs.db
+
+# Build/generated files and tool environments (also used by gersemi discovery).
+build-*/
+cmake-build-*/
+CMakeFiles/
+out/
+dist/
+target/
+_deps/
+third_party/
+third-party/
+vendor/
+node_modules/
+env/
+.tox/
+.nox/
+generated/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+compile_commands.json
+*.generated.*
+*.min.*
+
+# Obsidian runtime state and plugin binaries/data
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache/
+.obsidian/plugins/
+
+# Local measurements and reports; keep their checked-in entry documents.
+/labs/results/*
+!/labs/results/README.md
+/labs/reports/*
+!/labs/reports/README.md
+*.nsys-rep
+*.ncu-rep

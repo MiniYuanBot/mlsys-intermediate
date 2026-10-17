@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MLSys 机制实验台</title>
+    <style>
+      :root{color-scheme:light;--ink:#173448;--muted:#566d7c;--accent:#087e8b;--line:#d9e3e9;--paper:#fff;--bg:#f3f6f8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}header,main,footer{max-width:1150px;margin:auto;padding:28px}header{padding-bottom:8px}h1{font-size:34px;margin:4px 0}h2{margin:0 0 10px;font-size:22px}p{margin:8px 0}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.08em}.intro{max-width:850px;color:var(--muted)}main{display:grid;grid-template-columns:1fr 1fr;gap:20px}section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;min-width:0}label{display:block;margin:14px 0 3px;font-size:14px}input[type=range]{width:100%;accent-color:var(--accent)}output{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:650}.result{padding:12px;background:#edf7f8;border-radius:8px;margin-top:14px}small,.note{font-size:13px;color:var(--muted)}svg{width:100%;height:auto;display:block}.legend{display:flex;gap:20px;font-size:13px}.swatch{display:inline-block;width:12px;height:12px;margin-right:5px}table{width:100%;font-size:13px;border-collapse:collapse}td,th{text-align:left;padding:5px;border-bottom:1px solid var(--line)}a{color:var(--accent)}footer{padding-top:0}@media(max-width:800px){main{grid-template-columns:1fr}header,main,footer{padding:18px}h1{font-size:27px}}
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">MLSys INTERMEDIATE / MECHANISM LAB</div>
+      <h1>先作预测，再测系统</h1>
+      <p class="intro">
+        四个可以调整的简化模型，帮助你形成可检验的直觉。这里显示的是公式推导与模拟值，<strong
+          >不是 GPU 实测或论文结果</strong
+        >。全部计算在本地浏览器中完成。
+      </p>
+    </header>
+    <main>
+      <section>
+        <h2>01 / KV 的每一字节去了哪里</h2>
+        <p class="note">
+          固定 24 层、8 个 KV heads、head dim 64、1 个请求；每组 8B
+          scale+offset。忽略残余窗口、对齐、页表与框架开销。
+        </p>
+        <label for="context">上下文 token 数 <output id="contextOut"></output></label
+        ><input id="context" type="range" min="512" max="32768" step="512" value="4096" />
+        <label for="bits">位宽 <output id="bitsOut"></output></label
+        ><input id="bits" type="range" min="2" max="8" step="2" value="4" />
+        <label for="group">分组大小 <output id="groupOut"></output></label
+        ><input id="group" type="range" min="4" max="256" step="4" value="64" />
+        <svg
+          id="kvPlot"
+          viewBox="0 0 450 110"
+          role="img"
+          aria-label="KV payload 与元数据字节数"
+        ></svg>
+        <div class="legend">
+          <span><i class="swatch" style="background:#087e8b"></i>payload</span
+          ><span><i class="swatch" style="background:#f2af51"></i>metadata</span>
+        </div>
+        <div class="result" id="kvText" aria-live="polite"></div>
+        <p class="note">
+          思考：分组变大减少了元数据，为什么量化误差可能增加？真实 D1 实验要同时测误差。
+        </p>
+      </section>
+      <section>
+        <h2>02 / 推测得越多越好吗</h2>
+        <p class="note">
+          假设独立且同一接受率 α，E[N]=Σαⁱ；target 时间=1+βk²，draft
+          成本=ck。时间单位任意，忽略控制成本。
+        </p>
+        <label for="alpha">接受率 α <output id="alphaOut"></output></label
+        ><input id="alpha" type="range" min="0" max="100" value="80" />
+        <label for="draft">每草稿 token 成本 c <output id="draftOut"></output></label
+        ><input id="draft" type="range" min="0" max="100" value="15" />
+        <label for="beta">验证非线性 β <output id="betaOut"></output></label
+        ><input id="beta" type="range" min="0" max="20" value="3" />
+        <label for="bound">每轮上界 <output id="boundOut"></output></label
+        ><input id="bound" type="range" min="5" max="100" value="30" />
+        <svg
+          id="specPlot"
+          viewBox="0 0 450 190"
+          role="img"
+          aria-label="不同推测长度的速率，不可行候选用灰色"
+        ></svg>
+        <div class="result" id="specText" aria-live="polite"></div>
+        <p class="note">
+          青色是最优可行候选，灰色不可行。这里的 round bound 不是线上
+          ITL；真实接受率通常是逐位置条件概率。
+        </p>
+      </section>
+      <section>
+        <h2>03 / 编译什么时候回本</h2>
+        <p class="note">
+          固定 eager=0.12ms/次、compiled=0.08ms/次；只有一次编译，无缓存淘汰/重编译。
+        </p>
+        <label for="compile">编译成本 C（ms） <output id="compileOut"></output></label
+        ><input id="compile" type="range" min="0" max="2000" step="20" value="800" />
+        <label for="calls">调用次数 N <output id="callsOut"></output></label
+        ><input id="calls" type="range" min="100" max="60000" step="100" value="5000" />
+        <svg
+          id="compilePlot"
+          viewBox="0 0 450 120"
+          role="img"
+          aria-label="eager 和含编译成本的累计耗时"
+        ></svg>
+        <div class="result" id="compileText" aria-live="polite"></div>
+        <p class="note">
+          D3 中加入多 shape、分布漂移和 padding 后，这个单次回本公式为什么不够用了？
+        </p>
+      </section>
+      <section>
+        <h2>04 / 保存激活，还是重新计算</h2>
+        <p class="note">
+          8 个独立 block；保存成本 [2,3,2,3,2,3,2,3]，避免重计算收益
+          [1,2,1,2,1,2,1,2]。单位是模型单位，不是实际 MiB/ms。
+        </p>
+        <label for="budget">保存预算 <output id="budgetOut"></output></label
+        ><input id="budget" type="range" min="0" max="20" step="1" value="10" />
+        <svg
+          id="keepPlot"
+          viewBox="0 0 450 85"
+          role="img"
+          aria-label="各 block 的保存或重计算选择"
+        ></svg>
+        <table>
+          <thead>
+            <tr>
+              <th>量</th>
+              <th>数值</th>
+            </tr>
+          </thead>
+          <tbody id="keepTable"></tbody>
+        </table>
+        <div class="result" id="keepText" aria-live="polite"></div>
+        <p class="note">
+          青色保留，灰色重计算。真实显存还包含边界张量、权重与优化器，且生命周期会重叠，需在 D6
+          测峰值。
+        </p>
+      </section>
+    </main>
+    <footer>
+      <p>
+        对应 <a href="../modules/01-kv-cache.md">D1</a> /
+        <a href="../modules/03-dynamic-compilation.md">D3</a> /
+        <a href="../modules/04-speculative-slo.md">D4</a> /
+        <a href="../modules/06-memory-efficient-training.md">D6</a
+        >。源码与公式可直接检查；浏览器若不渲染 Markdown，请回到 Obsidian/编辑器阅读。
+      </p>
+    </footer>
+    <script>
+      const $=id=>document.getElementById(id),num=id=>Number($(id).value);
+      const bar=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${Math.max(0,w)}" height="${h}" rx="3" fill="${c}"/>`;
+      const text=(x,y,s,c='#173448')=>`<text x="${x}" y="${y}" font-size="13" fill="${c}">${s}</text>`;
+      function update(){
+       for(const id of ['context','bits','group','compile','calls','budget'])$(id+'Out').textContent=num(id).toLocaleString();
+       const elems=2*24*num('context')*8*64,payload=elems*num('bits')/8,meta=8*Math.ceil(elems/num('group')),fp16=elems*2,total=payload+meta,scale=330/Math.max(fp16,total),mib=n=>(n/1048576).toFixed(2);
+       $('kvPlot').innerHTML=text(0,27,'FP16')+bar(65,10,fp16*scale,24,'#bdcbd4')+text(0,79,'量化')+bar(65,62,payload*scale,24,'#087e8b')+bar(65+payload*scale,62,meta*scale,24,'#f2af51');
+       $('kvText').textContent=`FP16 ${mib(fp16)} MiB；量化总计 ${mib(total)} MiB，其中元数据 ${mib(meta)} MiB。理想压缩 ${ (fp16/total).toFixed(2)}×。实际布局逐行/列尾组可能更大。`;
+       const a=num('alpha')/100,c=num('draft')/100,beta=num('beta')/100,bound=num('bound')/10;
+       $('alphaOut').textContent=a.toFixed(2);$('draftOut').textContent=c.toFixed(2);$('betaOut').textContent=beta.toFixed(2);$('boundOut').textContent=bound.toFixed(1);
+       const opts=Array.from({length:9},(_,k)=>{let e=0;for(let j=0;j<=k;j++)e+=a**j;let time=1+beta*k*k+c*k;return {k,rate:e/time,time,feasible:time<=bound};});
+       const feasible=opts.filter(x=>x.feasible),best=feasible.reduce((b,x)=>!b||x.rate>b.rate?x:b,null),max=Math.max(...opts.map(x=>x.rate)),height=125;
+       $('specPlot').innerHTML=opts.map(x=>{let h=x.rate/max*height;return bar(14+x.k*48,145-h,31,h,!x.feasible?'#d5dce1':best&&x.k===best.k?'#087e8b':'#8ebbc5')+text(23+x.k*48,166,x.k)+text(12+x.k*48,137-h,x.rate.toFixed(2));}).join('')+text(4,187,'横轴 k；纵轴为期望输出 token / 时间单位');
+       $('specText').textContent=best?`最优可行 k=${best.k}，速率 ${best.rate.toFixed(3)}，每轮时间 ${best.time.toFixed(2)}。k=0 是普通解码。`:'所有候选都违反上界：应显式处理过载，不能记为成功。';
+       const C=num('compile'),N=num('calls'),eager=N*.12,compiled=C+N*.08,s=330/Math.max(1,eager,compiled),breakeven=C/.04;
+       $('compilePlot').innerHTML=text(0,29,'eager')+bar(85,12,eager*s,24,'#bdcbd4')+text(0,82,'compiled')+bar(85,65,C*s,24,'#f2af51')+bar(85+C*s,65,N*.08*s,24,'#087e8b');
+       $('compileText').textContent=`eager ${eager.toFixed(0)}ms，含编译 ${compiled.toFixed(0)}ms；严格回本需要 N > ${breakeven.toFixed(0)}。当前 ${compiled<eager?'已回本':compiled===eager?'打平':'尚未回本'}。`;
+       const sizes=[2,3,2,3,2,3,2,3],values=[1,2,1,2,1,2,1,2],budget=num('budget');let chosen=0,gain=-1,used=0;
+       for(let mask=0;mask<256;mask++){let size=0,v=0;for(let i=0;i<8;i++)if(mask&(1<<i)){size+=sizes[i];v+=values[i];}if(size<=budget&&v>gain){chosen=mask;gain=v;used=size;}}
+       $('keepPlot').innerHTML=sizes.map((_,i)=>bar(i*56,15,43,35,chosen&(1<<i)?'#087e8b':'#c5d0d8')+text(i*56+12,72,i+1)).join('');
+       $('keepTable').innerHTML=`<tr><td>实际选择的模型保存成本</td><td>${used} / ${budget}</td></tr><tr><td>避免的重计算成本</td><td>${gain} / 12</td></tr><tr><td>剩余重计算成本</td><td>${12-gain}</td></tr>`;
+       $('keepText').textContent='这是独立 block 的 0/1 knapsack；它不能预测真实模型的全部显存峰值。';
+      }
+      document.querySelectorAll('input').forEach(x=>x.addEventListener('input',update));update();
+    </script>
+  </body>
+</html>

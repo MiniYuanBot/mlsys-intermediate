@@ -1,0 +1,150 @@
+{
+  "scope": "Reference core implementations and supplied tests/benchmarks after revision; student extensions and manual reports are not verified by this run.",
+  "runs": [
+    {
+      "lab": 1,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 1.326,
+      "record": "lab1-reference-test-cpu.json"
+    },
+    {
+      "lab": 1,
+      "mode": "bench",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 1.073,
+      "record": "lab1-reference-bench-cpu.json"
+    },
+    {
+      "lab": 2,
+      "mode": "test",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 3.145,
+      "record": "lab2-reference-test-cuda.json"
+    },
+    {
+      "lab": 2,
+      "mode": "bench",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 4.168,
+      "record": "lab2-reference-bench-cuda.json"
+    },
+    {
+      "lab": 3,
+      "mode": "test",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 1.754,
+      "record": "lab3-reference-test-cuda.json"
+    },
+    {
+      "lab": 3,
+      "mode": "bench",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 3.366,
+      "record": "lab3-reference-bench-cuda.json"
+    },
+    {
+      "lab": 4,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.404,
+      "record": "lab4-reference-test-cpu.json"
+    },
+    {
+      "lab": 4,
+      "mode": "bench",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.526,
+      "record": "lab4-reference-bench-cpu.json"
+    },
+    {
+      "lab": 5,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.611,
+      "record": "lab5-reference-test-cpu.json"
+    },
+    {
+      "lab": 5,
+      "mode": "bench",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.782,
+      "record": "lab5-reference-bench-cpu.json"
+    },
+    {
+      "lab": 6,
+      "mode": "test",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 4.738,
+      "record": "lab6-reference-test-cuda.json"
+    },
+    {
+      "lab": 6,
+      "mode": "bench",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 4.905,
+      "record": "lab6-reference-bench-cuda.json"
+    },
+    {
+      "lab": 7,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 1.157,
+      "record": "lab7-reference-test-cpu.json"
+    },
+    {
+      "lab": 7,
+      "mode": "bench",
+      "device": "cuda",
+      "returncode": 0,
+      "seconds": 2.939,
+      "record": "lab7-reference-bench-cuda.json"
+    },
+    {
+      "lab": 8,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.635,
+      "record": "lab8-reference-test-cpu.json"
+    },
+    {
+      "lab": 8,
+      "mode": "bench",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.712,
+      "record": "lab8-reference-bench-cpu.json"
+    },
+    {
+      "lab": 3,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 0.135,
+      "record": "lab3-reference-test-cpu.json"
+    },
+    {
+      "lab": 6,
+      "mode": "test",
+      "device": "cpu",
+      "returncode": 0,
+      "seconds": 2.353,
+      "record": "lab6-reference-test-cpu.json"
+    }
+  ],
+  "status": "passed"
+}

@@ -1,0 +1,56 @@
+{
+  "lab": 1,
+  "implementation": "student",
+  "mode": "test",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:57.725336+00:00",
+  "commands": [
+    {
+      "argv": [
+        "c++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-I",
+        "src",
+        "test.cpp",
+        "-o",
+        "/tmp/mlsys-lab1-jnlxz2mz/lab1/lab"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "In file included from test.cpp:1:\nsrc/kv_student.hpp: In function ‘kv::Packed kv::quantize(const std::vector<float>&, size_t, size_t, size_t, Axis)’:\nsrc/kv_student.hpp:25:50: warning: unused parameter ‘x’ [-Wunused-parameter]\n   25 | inline Packed quantize(const std::vector<float> &x, size_t rows, size_t cols, size_t g, Axis axis) {\n      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~^\nsrc/kv_student.hpp:25:60: warning: unused parameter ‘rows’ [-Wunused-parameter]\n   25 | inline Packed quantize(const std::vector<float> &x, size_t rows, size_t cols, size_t g, Axis axis) {\n      |                                                     ~~~~~~~^~~~\nsrc/kv_student.hpp:25:73: warning: unused parameter ‘cols’ [-Wunused-parameter]\n   25 | inline Packed quantize(const std::vector<float> &x, size_t rows, size_t cols, size_t g, Axis axis) {\n      |                                                                  ~~~~~~~^~~~\nsrc/kv_student.hpp:25:86: warning: unused parameter ‘g’ [-Wunused-parameter]\n   25 | inline Packed quantize(const std::vector<float> &x, size_t rows, size_t cols, size_t g, Axis axis) {\n      |                                                                               ~~~~~~~^\nsrc/kv_student.hpp:25:94: warning: unused parameter ‘axis’ [-Wunused-parameter]\n   25 | inline Packed quantize(const std::vector<float> &x, size_t rows, size_t cols, size_t g, Axis axis) {\n      |                                                                                         ~~~~~^~~~\nsrc/kv_student.hpp: In function ‘std::vector<float> kv::dequantize(const Packed&)’:\nsrc/kv_student.hpp:29:52: warning: unused parameter ‘p’ [-Wunused-parameter]\n   29 | inline std::vector<float> dequantize(const Packed &p) {\n      |                                      ~~~~~~~~~~~~~~^\nsrc/kv_student.hpp: In function ‘std::vector<long unsigned int> kv::select_tokens(const std::vector<float>&, size_t, size_t, size_t)’:\nsrc/kv_student.hpp:33:68: warning: unused parameter ‘scores’ [-Wunused-parameter]\n   33 | inline std::vector<size_t> select_tokens(const std::vector<float> &scores, size_t budget,\n      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~\nsrc/kv_student.hpp:33:83: warning: unused parameter ‘budget’ [-Wunused-parameter]\n   33 | inline std::vector<size_t> select_tokens(const std::vector<float> &scores, size_t budget,\n      |                                                                            ~~~~~~~^~~~~~\nsrc/kv_student.hpp:34:49: warning: unused parameter ‘sink’ [-Wunused-parameter]\n   34 |                                          size_t sink, size_t recent) {\n      |                                          ~~~~~~~^~~~\nsrc/kv_student.hpp:34:62: warning: unused parameter ‘recent’ [-Wunused-parameter]\n   34 |                                          size_t sink, size_t recent) {\n      |                                                       ~~~~~~~^~~~~~\n"
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab1-jnlxz2mz/lab1/lab"
+      ],
+      "returncode": -6,
+      "stdout": "",
+      "stderr": "terminate called after throwing an instance of 'std::logic_error'\n  what():  Complete this task\n"
+    }
+  ],
+  "status": "failed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab1/README.md": "889728eed0ffd6702003b10968a6ff6d2ea8bbcf0750635fbd14d4ebd659da6b",
+    "labs/lab1/bench.cpp": "3e951102887459d88326d9859c6e1374bb7b48b6f5317c96762235ab4a3d0ba0",
+    "labs/lab1/grade.md": "9380dc06663ee561fdbfc56365e6ac608020d6c3890062c6467b507f6a014f9a",
+    "labs/lab1/src/kv_student.hpp": "a56deeda4326ee6f3295d1bf84bbc64e71b3d0e4c7f4a6ef1c48d0e8ec13be1c",
+    "labs/lab1/test.cpp": "7ba716e042d9f79c7d8a89cb0ad4c083d7212ed5d41348b6abcec707388c1ea9"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "error": "command failed with exit -6",
+  "wall_seconds": 0.5276056539878482
+}

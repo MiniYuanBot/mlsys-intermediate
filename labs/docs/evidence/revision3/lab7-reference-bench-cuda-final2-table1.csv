@@ -1,0 +1,7 @@
+kind,part,capacity,prefetch,finish_us,transferred_bytes,wasted_bytes,misses,blocked,oracle_misses
+synthetic_event,B,4096,0,4320,245760,0,120,0,72
+synthetic_event,B,4096,1,2544,249856,2048,9,0,72
+synthetic_event,B,8192,0,2512,14336,0,7,0,7
+synthetic_event,B,8192,1,2512,14336,0,7,0,7
+synthetic_event,B,12288,0,2512,14336,0,7,0,7
+synthetic_event,B,12288,1,2512,14336,0,7,0,7

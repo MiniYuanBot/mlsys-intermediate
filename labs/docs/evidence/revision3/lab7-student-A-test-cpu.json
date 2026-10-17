@@ -1,0 +1,53 @@
+{
+  "lab": 7,
+  "implementation": "student",
+  "mode": "test",
+  "device": "cpu",
+  "part": "A",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-17T03:17:27.674367+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "exercise.py",
+        "--mode",
+        "test",
+        "--device",
+        "cpu",
+        "--part",
+        "A"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "terminate called after throwing an instance of 'std::logic_error'\n  what():  TODO A1\nTraceback (most recent call last):\n  File \"/tmp/mlsys-lab7-033y4bbf/lab7/exercise.py\", line 23, in <module>\n    run([exe, a.part])\n  File \"/tmp/mlsys-lab7-033y4bbf/lab7/exercise.py\", line 18, in run\n    subprocess.run(list(map(str, command)), cwd=work, check=True)\n  File \"/usr/lib/python3.12/subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['/tmp/mlsys-lab7-033y4bbf/lab7/build/test', 'A']' died with <Signals.SIGABRT: 6>.\n"
+    }
+  ],
+  "status": "failed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab7/README.md": "44d2a23c524fdf4ce2fd96262df8add862a69b7e92e855dfd50ec412e2c67ec9",
+    "labs/lab7/bench.cpp": "c177aa8e007a908b820e48355ba3ee347fdfbc4972356a4d212ac757d42ffaf8",
+    "labs/lab7/cuda_exercise.cu": "f7f963fd0104a6461f2514f2596e92e558e1f644bb969574672a2ac445dc13ec",
+    "labs/lab7/exercise.py": "6937ffb6bbf7247caa0ed724d7c36f8e33cc3e23b4ba2e844530da2772a9d43e",
+    "labs/lab7/fixture.hpp": "dfdfd265cb713bee14046bef285b8e149e8ef273a8eab8507392e699e3bcd305",
+    "labs/lab7/grade.md": "57ffaf001afdf64220f65e557691624bde8dd51ee987d52e68c0f7ca783fab87",
+    "labs/lab7/resources.md": "68f1abdf6c67c6bc14596f1dc80c8aa66aa4467f87bbbe971325b3551ca75911",
+    "labs/lab7/test.cpp": "9be91f8d3a0b0a8e2b6e349e3dbed10c28fed1d4d213dc02b6108cd62850cdf6",
+    "labs/lab7/transfer_bench.cu": "751b74dcd7179b2bb96e7cd195cf4c15ee5cbcd162f26882b33a0365e9bcf2b0",
+    "labs/lab7/src/moe_student.hpp": "cb6dfe4c09a937c95dc0eea6e2c2beb4d2c85f16b93baf39d3429dc67e2976b3",
+    "labs/lab7/src/pipeline_student.cuh": "b626358878ae3bf38cb8df18ba3602671116ac2c5a5de1a85b2558bf74a887f1"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "error": "command failed with exit 1",
+  "wall_seconds": 0.6417764549987623
+}

@@ -1,0 +1,56 @@
+{
+  "lab": 5,
+  "implementation": "reference",
+  "mode": "test",
+  "device": "cpu",
+  "part": "all",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-17T03:16:01.394494+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "exercise.py",
+        "--mode",
+        "test",
+        "--device",
+        "cpu",
+        "--part",
+        "all"
+      ],
+      "returncode": 0,
+      "stdout": "\nrunning 15 tests\ntest a_accounting_multiple_leases ... ok\ntest a_invariants_detect_corruption ... ok\ntest a_leaf_victims ... ok\ntest a_keys_namespace_and_tail ... ok\ntest a_match_stops_at_gap ... ok\ntest b_namespace_invalidation ... ok\ntest b_release_preserves_reuse ... ok\ntest b_resize_transaction_with_pins ... ok\ntest b_shared_leases ... ok\ntest b_transaction_rollback_and_leaf_order ... ok\ntest c_admission_pollution_and_bound ... ok\ntest c_metrics_weighting_and_empty ... ok\ntest c_replay_hand_timeline ... ok\ntest c_scheduler_age_and_prefix ... ok\ntest c_conservation_isolation_and_capacity ... ok\n\ntest result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "stderr": "   Compiling prefix-cache v0.2.0 (/tmp/mlsys-lab5-jtkbr9ab/lab5)\n    Finished `release` profile [optimized] target(s) in 1.14s\n     Running tests/exercises.rs (target/release/deps/exercises-d9f25c08a995854a)\n"
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab5/Cargo.lock": "2a8ecd95d609ccc961aba2b3bbe3cb6e187afc45c37f78279ef7086c0c624262",
+    "labs/lab5/Cargo.toml": "5539956bbea80bd731152974f899e4824ca33874c6a3ff8cab38af17b69f2a4c",
+    "labs/lab5/README.md": "74450334df36737ffdb439728b48eac51421f8654afccadc6f1bdb8d235276a8",
+    "labs/lab5/exercise.py": "da23a0c4e6b39035f0d36b74d2b74bb73833f650b7588e3377f4fafbd3be6dad",
+    "labs/lab5/grade.md": "10114b075774d6ad7ae2a025e4dbceaa3df3a78f330327f15c7904333ea0bb19",
+    "labs/lab5/resources.md": "738ae4fdb39d67b3230305c17a76fe5b5d73ff86b592673c5454bb902fc84e05",
+    "labs/lab5/src/cache_student.rs": "e2903f3404131d8523d362770c99e6b3aa3e2058a43353d99c02878fb3df6645",
+    "labs/lab5/src/lib.rs": "50bde5907e468d923cb95e417224967a45f736e9e208e8d5b8ecd63995b12f90",
+    "labs/lab5/src/main.rs": "b4e60f12a24142c1c8ae13034103e65ed27351cb7a3c464fae254571c69a2ccf",
+    "labs/lab5/src/replay_student.rs": "9f46a64fad7926f941b0c91936bea816eeb6a8a8e77bff85d457cf191abc8375",
+    "labs/lab5/tests/exercises.rs": "65529d53ebe8cb6fb0dc13365bb1f78881bb5284249783d538dd154d407d867d",
+    "solutions/lab5/README.md": "c8950f02d20d2774becddd636c99c184bc07ad5c13dafc28df1c72bd8167cd44",
+    "solutions/lab5/validation.json": "e48f8ad17f10738fa74e0815bd8bb97b3364b5b4090a2a0c83de36d7e93e7e0c",
+    "solutions/lab5/src/cache_student.rs": "81d35952558fffdb4689c90da1322a0ad4f2f40024f19bbbc9959576996014a9",
+    "solutions/lab5/src/replay_student.rs": "e6763c35ca9461ebbeb6f5337c4baeca9e9e82445ec97f7d568956351c5a3455"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 1.1881039750005584
+}

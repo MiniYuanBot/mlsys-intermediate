@@ -1,0 +1,4 @@
+Explain why a cache can improve latency but increase memory usage.
+Give a short example of a biased statistical estimator.
+用三句话解释 GPU 带宽与计算吞吐的区别。
+A task takes 8 ms and a transfer takes 3 ms. Explain when overlapping them helps.

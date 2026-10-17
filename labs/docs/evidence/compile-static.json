@@ -1,0 +1,49 @@
+{
+  "label": "compile-static",
+  "utc": "2026-10-16T19:46:30.201697+00:00",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "commands": [
+    {
+      "argv": [
+        "/home/miniyuan/venvs/mlsys/bin/python",
+        "labs/lab3/torch_bench.py",
+        "--mode",
+        "static",
+        "--device",
+        "cuda"
+      ],
+      "stdout": "{\"mode\": \"static\", \"rows\": 1, \"padded_rows\": 1, \"first_call_ms\": 566.2363939918578, \"warm_ms\": 0.04465538004296832, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 4, \"padded_rows\": 4, \"first_call_ms\": 42.2502169967629, \"warm_ms\": 0.04275197992683388, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 8, \"padded_rows\": 8, \"first_call_ms\": 32.7439270040486, \"warm_ms\": 0.042318040068494156, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 17, \"padded_rows\": 17, \"first_call_ms\": 32.347790998755954, \"warm_ms\": 0.039948000048752874, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 32, \"padded_rows\": 32, \"first_call_ms\": 32.59439500106964, \"warm_ms\": 0.04298211992136203, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 64, \"padded_rows\": 64, \"first_call_ms\": 31.148844995186664, \"warm_ms\": 0.04700038000009954, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 9, \"padded_rows\": 9, \"first_call_ms\": 31.371193006634712, \"warm_ms\": 0.039817470096750185, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 33, \"padded_rows\": 33, \"first_call_ms\": 33.78175699617714, \"warm_ms\": 0.04037464008433744, \"torch\": \"2.14.1+cu126\"}\n{\"mode\": \"static\", \"rows\": 80, \"padded_rows\": 80, \"first_call_ms\": 3.5353700077394024, \"warm_ms\": 0.10746229003416374, \"torch\": \"2.14.1+cu126\"}\n",
+      "stderr": "W1017 03:46:33.850000 2729 torch/_dynamo/convert_frame.py:2008] [0/8] torch._dynamo hit config.recompile_limit (8)\nW1017 03:46:33.850000 2729 torch/_dynamo/convert_frame.py:2008] [0/8]    function: 'model' (/home/miniyuan/github/mlsys-intermediate/labs/lab3/torch_bench.py:16)\nW1017 03:46:33.850000 2729 torch/_dynamo/convert_frame.py:2008] [0/8]    last reason: 0/7: tensor 'r' size mismatch at index 0. expected 33, actual 80\nW1017 03:46:33.850000 2729 torch/_dynamo/convert_frame.py:2008] [0/8] To log all recompilation reasons, use TORCH_LOGS=\"recompiles\".\nW1017 03:46:33.850000 2729 torch/_dynamo/convert_frame.py:2008] [0/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html\n",
+      "returncode": 0
+    }
+  ],
+  "source_sha256": {
+    "labs/lab3/policy_test.py": "6d97daf967e3215a4eade1d04494afcd0ee7e364eb85688c56cddcebb6616185",
+    "labs/lab3/policy_bench.py": "42e93a2a6911ae7a2d68ebf8d0271b66c651082f639ced23a8468198923e3a7e",
+    "labs/lab3/torch_bench.py": "52a985bd4ca9e1216a5b59981b221b884c9f99fbf4eec7bfbe95df15c6f799ba",
+    "labs/lab6/model.py": "980baa208bb80739b408aa85e86d860ff1c190bfd690a9de002d6844e20d427c",
+    "labs/lab6/bench.py": "cbe2bc57d982a1e48986ce2ba531a2f23d5f1ec32a21bca37beeafdb0f7c1deb",
+    "labs/lab6/test.py": "b4b2da7dbb137bbae62f756bff4fd239f25cbd09de6ca34439a50485efa17853",
+    "labs/tools/check_links.py": "0b7b51fdd75c91a8a9fa5e042f97c6006edc8a47798d2c202c6298be1fe7da81",
+    "labs/tools/record.py": "3cf3a91d42291384eebd70f51a6348c0d226550929dea49f234266beea2714cd",
+    "labs/tools/materialize.py": "6837851c05f4044352ee6756e82650bfae8eb0df0d8d2b6047568588c3428cb8",
+    "labs/tools/audit_external_links.py": "b5663fb334e9c21eae9fa6b25fd408b708ce622e0324fa70b7d8d211d9c195b1",
+    "labs/tools/extract.py": "3a8242b46465dfb0bdf807df316f5489f03eff773c24f5057d06faea3fd2baee",
+    "labs/tools/run.py": "2dc422d339ce813fb43ed05fd47b61a3bc34e208207468c71300d396bea0cf89",
+    "labs/tools/capture_model.py": "c161afe892e2920ca1345363fa33614cda01e5bf22da09a8a246f18a094aa270",
+    "labs/tools/plot.py": "2fc58ab45c97976595051fdf9669c43d2e5b53b19ceab37f74b3b625a505f45e",
+    "labs/tools/doctor.py": "078a98d6c8505ec075b0b098443f8c989fb40210fb665c66fe7facc12bbf86ab",
+    "labs/tools/analyze_kv.py": "3c4ecce2f65ec165b7b5ffe938bd02b8f381c456ed8eedea0210164b85dbd837",
+    "labs/lab3/src/policy_student.py": "fa15b3428df1256b67b19b998f5119bbb86330b2f3a40ab26a8112e1cd87cbbd",
+    "labs/lab6/src/train_student.py": "0e18e09d90de92baa4374640d73fe0cefd0a4b1f5de5a96ce86ea16d921d3bdc"
+  },
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "wall_seconds": 6.007233402997372,
+  "status": "passed"
+}

@@ -1,0 +1,49 @@
+{
+  "label": "cuda-memcheck",
+  "utc": "2026-10-16T19:42:28.999461+00:00",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "commands": [
+    {
+      "argv": [
+        "compute-sanitizer",
+        "--tool",
+        "memcheck",
+        "--error-exitcode",
+        "1",
+        "/tmp/mlsys-intermediate-lab2-memcheck/test"
+      ],
+      "stdout": "========= COMPUTE-SANITIZER\nPASS W4A32 GEMV vs independent CPU oracle; odd tails and multiwarp rows\n========= ERROR SUMMARY: 0 errors\n",
+      "stderr": "",
+      "returncode": 0
+    }
+  ],
+  "source_sha256": {
+    "labs/lab3/policy_test.py": "6d97daf967e3215a4eade1d04494afcd0ee7e364eb85688c56cddcebb6616185",
+    "labs/lab3/policy_bench.py": "42e93a2a6911ae7a2d68ebf8d0271b66c651082f639ced23a8468198923e3a7e",
+    "labs/lab3/torch_bench.py": "fdc70922c9c2d48322347e486b79087c38bc42569a6049d79a61230994650fc9",
+    "labs/lab6/model.py": "980baa208bb80739b408aa85e86d860ff1c190bfd690a9de002d6844e20d427c",
+    "labs/lab6/bench.py": "cbe2bc57d982a1e48986ce2ba531a2f23d5f1ec32a21bca37beeafdb0f7c1deb",
+    "labs/lab6/test.py": "b4b2da7dbb137bbae62f756bff4fd239f25cbd09de6ca34439a50485efa17853",
+    "labs/tools/check_links.py": "0b7b51fdd75c91a8a9fa5e042f97c6006edc8a47798d2c202c6298be1fe7da81",
+    "labs/tools/record.py": "3cf3a91d42291384eebd70f51a6348c0d226550929dea49f234266beea2714cd",
+    "labs/tools/materialize.py": "6837851c05f4044352ee6756e82650bfae8eb0df0d8d2b6047568588c3428cb8",
+    "labs/tools/audit_external_links.py": "b5663fb334e9c21eae9fa6b25fd408b708ce622e0324fa70b7d8d211d9c195b1",
+    "labs/tools/extract.py": "3a8242b46465dfb0bdf807df316f5489f03eff773c24f5057d06faea3fd2baee",
+    "labs/tools/run.py": "2dc422d339ce813fb43ed05fd47b61a3bc34e208207468c71300d396bea0cf89",
+    "labs/tools/capture_model.py": "a4829318190080957ddd1fc3188b6851013aacc4fe7b3bce3412be358ee66ffe",
+    "labs/tools/plot.py": "a2c8034d72485a88146784ec5eb5bb076f750c6b1dc3cebd2eb291b343ae0ae4",
+    "labs/tools/doctor.py": "078a98d6c8505ec075b0b098443f8c989fb40210fb665c66fe7facc12bbf86ab",
+    "labs/tools/analyze_kv.py": "6df7c24d41af9ae719dce62c51d3cf7c518330d73df0b46216b105adc9aa8f59",
+    "labs/lab3/src/policy_student.py": "fa15b3428df1256b67b19b998f5119bbb86330b2f3a40ab26a8112e1cd87cbbd",
+    "labs/lab6/src/train_student.py": "0e18e09d90de92baa4374640d73fe0cefd0a4b1f5de5a96ce86ea16d921d3bdc"
+  },
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "wall_seconds": 0.6098601810081163,
+  "status": "passed"
+}

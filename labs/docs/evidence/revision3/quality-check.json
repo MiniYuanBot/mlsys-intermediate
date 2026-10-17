@@ -1,0 +1,224 @@
+{
+  "status": "passed",
+  "top_level": [
+    "course",
+    "labs",
+    "solutions"
+  ],
+  "reference_runs_passed": 21,
+  "student_todo_failures_expected": 8,
+  "exports": [
+    {
+      "file": "lab1-reference-bench-cpu-table0.csv",
+      "rows": 18,
+      "columns": 15
+    },
+    {
+      "file": "lab2-reference-bench-cuda-table0.csv",
+      "rows": 3,
+      "columns": 11
+    },
+    {
+      "file": "lab2-reference-bench-cuda-table1.csv",
+      "rows": 40,
+      "columns": 7
+    },
+    {
+      "file": "lab3-reference-bench-cuda-clean-table0.csv",
+      "rows": 19,
+      "columns": 22
+    },
+    {
+      "file": "lab3-reference-bench-cuda-clean-table1.csv",
+      "rows": 120,
+      "columns": 5
+    },
+    {
+      "file": "lab4-reference-all-bench-cpu-table0.csv",
+      "rows": 20,
+      "columns": 7
+    },
+    {
+      "file": "lab4-reference-all-bench-cpu-table1.csv",
+      "rows": 120,
+      "columns": 7
+    },
+    {
+      "file": "lab4-reference-all-bench-cpu-table2.csv",
+      "rows": 60,
+      "columns": 13
+    },
+    {
+      "file": "lab5-reference-all-bench-cpu-table0.csv",
+      "rows": 12,
+      "columns": 6
+    },
+    {
+      "file": "lab5-reference-all-bench-cpu-table1.csv",
+      "rows": 8,
+      "columns": 8
+    },
+    {
+      "file": "lab5-reference-all-bench-cpu-table2.csv",
+      "rows": 36,
+      "columns": 13
+    },
+    {
+      "file": "lab6-reference-bench-cuda-table0.csv",
+      "rows": 24,
+      "columns": 18
+    },
+    {
+      "file": "lab7-reference-test-cuda-table0.csv",
+      "rows": 12,
+      "columns": 8
+    },
+    {
+      "file": "lab7-reference-bench-cuda-final2-table0.csv",
+      "rows": 9,
+      "columns": 7
+    },
+    {
+      "file": "lab7-reference-bench-cuda-final2-table1.csv",
+      "rows": 6,
+      "columns": 10
+    },
+    {
+      "file": "lab7-reference-bench-cuda-final2-table2.csv",
+      "rows": 6,
+      "columns": 7
+    },
+    {
+      "file": "lab7-reference-bench-cuda-final2-table3.csv",
+      "rows": 12,
+      "columns": 8
+    },
+    {
+      "file": "lab8-reference-bench-cpu-final-table0.csv",
+      "rows": 3,
+      "columns": 6
+    },
+    {
+      "file": "lab8-reference-bench-cpu-final-table1.csv",
+      "rows": 12,
+      "columns": 9
+    },
+    {
+      "file": "lab8-reference-bench-cpu-final-table2.csv",
+      "rows": 108,
+      "columns": 12
+    },
+    {
+      "file": "lab6-reference-bench-cpu-table0.csv",
+      "rows": 24,
+      "columns": 18
+    }
+  ],
+  "python_syntax": "passed",
+  "format_status": "passed",
+  "todo_audit_errors": [],
+  "source_sha256": {
+    "labs/lab5/exercise.py": "da23a0c4e6b39035f0d36b74d2b74bb73833f650b7588e3377f4fafbd3be6dad",
+    "labs/lab3/common.cuh": "aaf773d1be6c7972a0d221c37f991242c54b43b08cbd16b77ab9f4426974970f",
+    "labs/lab3/bench_scenarios.py": "b3d89a97799c8a8f111c73609966a71cfd1d9d269e3af28fe16e8b94f1e9d190",
+    "labs/lab3/test.cu": "edb12bf0ab957662343ecbb257cc43e5ed69de9b5378cdccbd6757f4e812d487",
+    "labs/lab3/policy_test.py": "6d97daf967e3215a4eade1d04494afcd0ee7e364eb85688c56cddcebb6616185",
+    "labs/lab3/policy_bench.py": "42e93a2a6911ae7a2d68ebf8d0271b66c651082f639ced23a8468198923e3a7e",
+    "labs/lab3/torch_bench.py": "52a985bd4ca9e1216a5b59981b221b884c9f99fbf4eec7bfbe95df15c6f799ba",
+    "labs/lab3/pipeline_test.py": "dacc42cb5371a2efde29a2405dd764dbf97abb1878d0b96aeaba066b401fda76",
+    "labs/lab3/exercise.py": "91f918d3796818e82db7910660572fc5c70123d399c96e5a49a977fac7b83ec4",
+    "labs/lab3/bench.cu": "900c8d72a49259db94f258836bfc735277a2fd54458908f122aa60818ffe8379",
+    "labs/lab3/execution_test.py": "5c1c66f7423c7dd51e6002f24f8b13e8ec7b5f7ffe4ceda95df3ec6f58254d0e",
+    "labs/lab6/model.py": "980baa208bb80739b408aa85e86d860ff1c190bfd690a9de002d6844e20d427c",
+    "labs/lab6/bench.py": "ba02aebcdbb9c063b06bee3d1be008fefa11afd6a4b9aaa0cdb18823be4b2ea7",
+    "labs/lab6/exercise.py": "957285c8dcb6b24da610ebc0d5e5cbe04e68aa67aecd6f6af224caef8cf4486b",
+    "labs/lab6/test.py": "521762f41df7005cc3a9094dd102fe4abb68ea791ef1af045fda0df3b68fccba",
+    "labs/lab4/exercise.py": "da23a0c4e6b39035f0d36b74d2b74bb73833f650b7588e3377f4fafbd3be6dad",
+    "labs/lab7/cuda_exercise.cu": "2c714d8c477a5b67a9316cc2977b2625d2ec7a933e507f05cce4f29ac642135e",
+    "labs/lab7/fixture.hpp": "dfdfd265cb713bee14046bef285b8e149e8ef273a8eab8507392e699e3bcd305",
+    "labs/lab7/test.cpp": "9be91f8d3a0b0a8e2b6e349e3dbed10c28fed1d4d213dc02b6108cd62850cdf6",
+    "labs/lab7/transfer_bench.cu": "751b74dcd7179b2bb96e7cd195cf4c15ee5cbcd162f26882b33a0365e9bcf2b0",
+    "labs/lab7/exercise.py": "6937ffb6bbf7247caa0ed724d7c36f8e33cc3e23b4ba2e844530da2772a9d43e",
+    "labs/lab7/bench.cpp": "3d2796ee4682853e42600134da3c358b1f2e40cc804ef34c5e7786c0479480ea",
+    "labs/tools/check_links.py": "1f7c0788be1e6d2516c5f98ef2ceb6462dd629d87bb3c15a6557644b596be89f",
+    "labs/tools/record.py": "c8f86acb005ddff640a93964c37bb2b0a16bb11e031c7832f5b8a8e8030c5d6d",
+    "labs/tools/source_files.py": "bca803b8c21c3481271720e0e080845a4f8566a877ad93ef304c0c892e3e3b1d",
+    "labs/tools/materialize.py": "3ef0510db7773f4be025a7d44b566a139aa605ef1e9742538e3329e118b5f9fa",
+    "labs/tools/audit_external_links.py": "dcd8cdba444b6fdc52991434880e1efd06208fc1f70b2f01a3814ccdfd32d45b",
+    "labs/tools/setup-format.sh": "03710dea243e99f8084d17fd44bb8b3e01595754eef2b531ed206c8c21fc19ce",
+    "labs/tools/extract.py": "47c1816431fb77b8da85d36fba088e7d86461c3302e8f80bc71c88c8d7aa978f",
+    "labs/tools/run.py": "7e95fb5f240fda96e64eef93da3e4efb20f5f5abf416a6820c44afc3492c0c52",
+    "labs/tools/capture_model.py": "57b57a64dc5c94077c90fe18be43391798f5f36faacb3ddb73603df8217f80e4",
+    "labs/tools/plot.py": "2fc58ab45c97976595051fdf9669c43d2e5b53b19ceab37f74b3b625a505f45e",
+    "labs/tools/doctor.py": "078a98d6c8505ec075b0b098443f8c989fb40210fb665c66fe7facc12bbf86ab",
+    "labs/tools/format_check.py": "0a295ac1c6d57609fd53c9d485a6f1824bce8b0cb9e95ea714784be7e16dd25c",
+    "labs/tools/analyze_kv.py": "3c4ecce2f65ec165b7b5ffe938bd02b8f381c456ed8eedea0210164b85dbd837",
+    "labs/tools/workload_audit.py": "e45e5d5f815f1fa4377100af72090d599f66684742fb4b16ad1b6ca77810a0dd",
+    "labs/lab8/exercise.py": "54bcfc286c7aaf790aefd8cde658533a5737373662526cc7c56fa564ca8ba624",
+    "labs/lab2/quant_test.cpp": "e25b0c085543eb25b9077ca2be941e81b53de4fec4b583f09c2b744819ccb554",
+    "labs/lab2/common.cuh": "eefdcc18b57ea986820ba946dce2167ebdc8b115b32c4c285f90b4a43c546494",
+    "labs/lab2/test.cu": "426b36bc1dbd7b4bf85965bed2a27b093bb8bfccecdb755d3a48f8a390fe20c7",
+    "labs/lab2/exercise.py": "4f906dbc458705b0838b262316b7376f6dd76a03fb476b832635b1488727a2ee",
+    "labs/lab2/bench.cu": "07dfbebc58fdcd60def7451322ecc7518811415fc5e9b6811986b3223587f1e8",
+    "labs/lab2/pipeline.cu": "3ad4959c52bebae7a5c3ff51ecd3242bb4c40ac8dac1eae7eb607b0dda4c3f85",
+    "labs/lab1/test.cpp": "81dfe93ab6e5a0f0cf2862ba3d885198aea5a9c662dedf2c7c76026f90a4ed5a",
+    "labs/lab1/exercise.py": "67fda402ff83646b526087923b22ce5cf3b9d83cc1ef69caefd2721ad00153a4",
+    "labs/lab1/bench.cpp": "6d00a96be7fcbeda99aac8fe125e2c882fb1cef8e03294f997c713ac33d10acf",
+    "labs/lab5/src/cache_student.rs": "e2903f3404131d8523d362770c99e6b3aa3e2058a43353d99c02878fb3df6645",
+    "labs/lab5/src/replay_student.rs": "9f46a64fad7926f941b0c91936bea816eeb6a8a8e77bff85d457cf191abc8375",
+    "labs/lab5/src/lib.rs": "50bde5907e468d923cb95e417224967a45f736e9e208e8d5b8ecd63995b12f90",
+    "labs/lab5/src/main.rs": "b4e60f12a24142c1c8ae13034103e65ed27351cb7a3c464fae254571c69a2ccf",
+    "labs/lab5/tests/exercises.rs": "34ca179412d95015501ae59af48012f5ce4670b133ee0d4ea00fa5d302c4eef0",
+    "labs/lab3/src/execution_student.py": "c3f7b3f907c591f89bb2973c1ca831a8f4925b17675303aee9964e5f3fae1fb6",
+    "labs/lab3/src/pipeline_student.py": "186da035ba259f919704448c36cca53a3777b45d6621e05b048811e52970255e",
+    "labs/lab3/src/fusion_student.cuh": "0084ab1dcb86ac8e1a0218f44fe00a236b7f9d185b075fa841633f1fc0cf3970",
+    "labs/lab3/src/policy_student.py": "2b273a1797a0bdb568db15aafc8511b305d28e74a35fe5d974ebbdf9ce401cb1",
+    "labs/lab6/src/train_student.py": "8f61731e0bd9d725f18a2528554c8c57d666cdb0f05bbf59e1a834cc8d49ac22",
+    "labs/lab4/src/engine_student.rs": "748b044c91ad8e51e1f6f53b39a09ac6cdabf20721e0d13dcd5a9280cd365103",
+    "labs/lab4/src/lib.rs": "2118e2a0c5e75ce59e476f7fe3cb3ac7fa06324e1fff9e9301f9de8a1b375ba5",
+    "labs/lab4/src/policy_student.rs": "d8d0ca2d2e5414cc8c35e90c5fdefcb0d566bdedb3b0b895fe45a6f8ff0728b5",
+    "labs/lab4/src/main.rs": "c12b171e858e2fd5ec2da7f42a6582357feea21d0aea59425aa3e3e2977bd727",
+    "labs/lab4/tests/exercises.rs": "9b137c5c1e6a5e1aeafd611bb63c1aa0aa251d35cd8ecf4abb38fffb16f6b5e8",
+    "labs/lab7/src/pipeline_student.cuh": "b626358878ae3bf38cb8df18ba3602671116ac2c5a5de1a85b2558bf74a887f1",
+    "labs/lab7/src/moe_student.hpp": "0e5790dfb76163a0a21b6a80f22ce2bf0d7f92999469becc9edc8ad3c9bfdf00",
+    "labs/lab8/src/rollout_student.rs": "2230ea461b8ce7497db090ebe653ba38cff21f6d6669ef2f02d937f3a72f5ea2",
+    "labs/lab8/src/main.rs": "b4775cebba3908e5428f26699c8687e12c078e82107f26d272846a28064f03cc",
+    "labs/lab8/tests/contracts.rs": "7bc80350904b5650bef5fb3ac9deb4605b2136eb041dd7ecff7323af10bb71c2",
+    "labs/lab2/src/gemv_student.cuh": "05bc55e40d99db89748c011c35032323dd91fc2f0822c77934370df97417d77d",
+    "labs/lab2/src/quant_student.hpp": "1645df12c9aac424aad95bb28195976a36403449ada189e60e866ceab19b19ca",
+    "labs/lab1/src/cache_student.hpp": "c1dc45fa1e9e9c74c31f199715f6a163625bbbaa690817a29ab244588c1d1918",
+    "labs/lab1/src/kv_student.hpp": "bc385e9d6820f8dbcfd849059e12929c9cd443b8eb609f0017d89cfc251d75fc",
+    "labs/lab1/src/pq_student.hpp": "c0ca1bd3b19483f1d3a0023cfe723d131458c0d63a85f6ab180c31659e9f7545",
+    "solutions/lab5/src/cache_student.rs": "81d35952558fffdb4689c90da1322a0ad4f2f40024f19bbbc9959576996014a9",
+    "solutions/lab5/src/replay_student.rs": "e6763c35ca9461ebbeb6f5337c4baeca9e9e82445ec97f7d568956351c5a3455",
+    "solutions/lab3/src/execution_student.py": "3831198711ec31fbbfd5e2ea9974525657404bcabeb9374f666511bab5e45d5d",
+    "solutions/lab3/src/pipeline_student.py": "816d10c244e1bef6df2d4e498a5197518c32049705e930b9b31c99561f185f5f",
+    "solutions/lab3/src/fusion_student.cuh": "617d50e9b2e7547c2699a6c2b2695b8c89fe13a0920e96d00406154848e7ac38",
+    "solutions/lab3/src/policy_student.py": "2b273a1797a0bdb568db15aafc8511b305d28e74a35fe5d974ebbdf9ce401cb1",
+    "solutions/lab6/src/train_student.py": "3e6d99d7bdf2f862fae04e19095c888d83c60a88d1bfefadc7317c4fa0fbee24",
+    "solutions/lab4/src/engine_student.rs": "9cc54a35ede6dca8dadc86f0e85e73706643c02af178e98603f2775480d3814a",
+    "solutions/lab4/src/policy_student.rs": "b98ee3952fa8856bbd2f46ad12d4a8a85a72a54caf42a07e96d1e4b86b727396",
+    "solutions/lab7/src/pipeline_student.cuh": "4548db3052170fce40149d8e4385a1419763f14e50c7a4ec315cca86b6e942df",
+    "solutions/lab7/src/moe_student.hpp": "598a6103ae4b1450e40307f6ac297bbc21fc43326e7cca37e6ae040a3393c84c",
+    "solutions/lab8/src/rollout_student.rs": "0eb68b17c667d45c4f67c6bcb4e37906200005b8447bd2cdf7b02a61fdc975db",
+    "solutions/lab2/src/gemv_student.cuh": "c38a3d166724b808ec26d12140c8174860cb5e47b864efa90e77edb6f1404b4a",
+    "solutions/lab2/src/quant_student.hpp": "c39d64ea97a187b4bda1c76757474868b061e1afb055c441e4c4c2d808560c63",
+    "solutions/lab1/src/cache_student.hpp": "a18f3f52e3d07b955f4ecd505cf2e2e24e718444db44f67bcb1ef703182917b4",
+    "solutions/lab1/src/kv_student.hpp": "382703f0dc0acd4ea31a16d417e570441ff584c7a7181463b690278fc5b20ca6",
+    "solutions/lab1/src/pq_student.hpp": "4ef80ada7f787c4044493d3250d9b446bf4f8781d6b6fc74f037ec16caf88cc7"
+  },
+  "local_links": {
+    "returncode": 0,
+    "stdout": "Checked 436 local links; 0 broken\n\n"
+  },
+  "grading_totals": {
+    "1": 100,
+    "2": 100,
+    "3": 100,
+    "4": 100,
+    "5": 100,
+    "6": 100,
+    "7": 100,
+    "8": 100
+  }
+}

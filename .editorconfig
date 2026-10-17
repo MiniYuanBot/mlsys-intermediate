@@ -1,0 +1,40 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+tab_width = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 100
+
+[{CMakeLists.txt,*.cmake,*.cmake.in,*.json,*.jsonc,*.yaml,*.yml,.clang-format,.gersemirc}]
+indent_size = 2
+tab_width = 2
+
+[*.md]
+indent_size = 2
+tab_width = 2
+trim_trailing_whitespace = false
+
+[{Makefile,makefile,GNUmakefile,*.mk}]
+indent_style = tab
+
+[*.{sh,bash,sbatch}]
+binary_next_line = true
+switch_case_indent = true
+space_redirects = true
+simplify = false
+
+# shfmt directory traversal and --apply-ignore use these sections.
+# The two sections cover both root-level and nested directories.
+[{.git,build,build-*,cmake-build-*,CMakeFiles,out,dist,target,_deps,external,third_party,third-party,vendor,node_modules,.venv*,venv,env,.tox,.nox,__pycache__,.cache,.pytest_cache,.mypy_cache,.ruff_cache,results,artifacts,generated}/**]
+ignore = true
+
+[**/{.git,build,build-*,cmake-build-*,CMakeFiles,out,dist,target,_deps,external,third_party,third-party,vendor,node_modules,.venv*,venv,env,.tox,.nox,__pycache__,.cache,.pytest_cache,.mypy_cache,.ruff_cache,results,artifacts,generated}/**]
+ignore = true
+
+[*.{generated,min}.*]
+ignore = true

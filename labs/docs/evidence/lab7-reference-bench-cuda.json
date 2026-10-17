@@ -1,0 +1,79 @@
+{
+  "lab": 7,
+  "implementation": "reference",
+  "mode": "bench",
+  "device": "cuda",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-16T19:38:50.637336+00:00",
+  "commands": [
+    {
+      "argv": [
+        "c++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-I",
+        "src",
+        "bench.cpp",
+        "-o",
+        "/tmp/mlsys-lab7-f5cnxumz/lab7/lab"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab7-f5cnxumz/lab7/lab"
+      ],
+      "returncode": 0,
+      "stdout": "kind,capacity,prefetch,phase,demand_misses,prefetch_loads,total_transfer_bytes,requests\nsynthetic_trace,2,0,0,2000,0,8388608000,2000\nsynthetic_trace,2,0,1,2000,0,8388608000,2000\nsynthetic_trace,2,0,2,2000,0,8388608000,2000\nsynthetic_trace,2,1,0,9,1992,8392802304,2000\nsynthetic_trace,2,1,1,638,1975,10959716352,2000\nsynthetic_trace,2,1,2,1,2000,8392802304,2000\nsynthetic_trace,4,0,0,4,0,16777216,2000\nsynthetic_trace,4,0,1,1999,0,8384413696,2000\nsynthetic_trace,4,0,2,3,0,12582912,2000\nsynthetic_trace,4,1,0,4,0,16777216,2000\nsynthetic_trace,4,1,1,638,1936,10796138496,2000\nsynthetic_trace,4,1,2,1,1,8388608,2000\nsynthetic_trace,8,0,0,4,0,16777216,2000\nsynthetic_trace,8,0,1,1998,0,8380219392,2000\nsynthetic_trace,8,0,2,3,0,12582912,2000\nsynthetic_trace,8,1,0,4,0,16777216,2000\nsynthetic_trace,8,1,1,597,1631,9344909312,2000\nsynthetic_trace,8,1,2,1,1,8388608,2000\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "nvcc",
+        "-std=c++17",
+        "-O2",
+        "-arch=sm_89",
+        "transfer_bench.cu",
+        "-o",
+        "/tmp/mlsys-lab7-f5cnxumz/lab7/transfer"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab7-f5cnxumz/lab7/transfer"
+      ],
+      "returncode": 0,
+      "stdout": "kind,streams,repeat,bytes,wall_ms\ntransfer_calibration,1,0,134217728,15.2736\ntransfer_calibration,1,1,134217728,13.8206\ntransfer_calibration,1,2,134217728,13.6798\ntransfer_calibration,1,3,134217728,13.5677\ntransfer_calibration,1,4,134217728,14.0334\ntransfer_calibration,2,0,134217728,10.7986\ntransfer_calibration,2,1,134217728,10.7295\ntransfer_calibration,2,2,134217728,11.0949\ntransfer_calibration,2,3,134217728,10.8915\ntransfer_calibration,2,4,134217728,10.7549\n",
+      "stderr": ""
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab7/README.md": "371c5e21cb0f224aa5f54b25a0067e7e96cdea1c904921a409882c74ea5c3f9d",
+    "labs/lab7/bench.cpp": "5949f8b1507e56d2f4af9145fbc9933e666d33f323304e85fda897c1d5adb76c",
+    "labs/lab7/grade.md": "1fd61ef610f2a52cffcd9d3e7625432953d134a41152ad7b9ede53ac74a78c02",
+    "labs/lab7/src/moe_student.hpp": "6cc9f5b3308fc2cef5271bc5652ab3e3936ebd219227de77d091f19386622d98",
+    "labs/lab7/test.cpp": "397c701dcb90eac83c2ad8baef112ad773959899699d72dfbad78cf60b6704e9",
+    "labs/lab7/transfer_bench.cu": "2f06a0d4580fdc18debb3047e7b1fc05c92deb443c91504b50cc44dee8e77505",
+    "solutions/lab7/src/moe_student.hpp": "3f18426e58f361a8099738daab497eef4bdd6e7a73d7efbcb9f876b5e725870f"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 3.1682912460091757
+}

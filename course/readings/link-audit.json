@@ -1,0 +1,775 @@
+{
+  "checked_client_date": "2026-10-17",
+  "utc": "2026-10-17T02:49:45.381745+00:00",
+  "scope": "HTTP reachability only; some pages were also independently read via web search. HTTP errors do not prove missing content.",
+  "links": [
+    {
+      "url": "https://arxiv.org/abs/2211.15841",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2211.15841",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.09781",
+      "referenced_by": ["course/modules/04-speculative-slo.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2305.09781",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.14314",
+      "referenced_by": [
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/resources.md",
+        "labs/lab6/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2305.14314",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2306.00978",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2306.00978",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2312.07104",
+      "referenced_by": [
+        "course/modules/05-prefix-cache.md",
+        "course/readings/resources.md",
+        "labs/lab5/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2312.07104",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2312.15234",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2312.15234",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2401.14361",
+      "referenced_by": ["course/modules/07-moe-offload.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2401.14361",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2402.02750",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2402.02750",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2405.04532",
+      "referenced_by": ["course/modules/02-low-bit-kernels.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2405.04532",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2405.05751",
+      "referenced_by": ["course/modules/03-dynamic-compilation.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2405.05751",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2407.12820",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2407.12820",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2409.19256",
+      "referenced_by": ["course/modules/08-rollout-scheduling.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2409.19256",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2501.01005",
+      "referenced_by": ["course/modules/01-kv-cache.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2501.01005",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2501.12162",
+      "referenced_by": ["course/modules/04-speculative-slo.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2501.12162",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2512.22219",
+      "referenced_by": ["course/modules/03-dynamic-compilation.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2512.22219",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2604.13327",
+      "referenced_by": ["course/modules/03-dynamic-compilation.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2604.13327",
+      "status": "reachable"
+    },
+    {
+      "url": "https://arxiv.org/abs/2605.30859",
+      "referenced_by": ["course/modules/08-rollout-scheduling.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://arxiv.org/abs/2605.30859",
+      "status": "reachable"
+    },
+    {
+      "url": "https://bbycroft.net/llm",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://bbycroft.net/llm",
+      "status": "reachable"
+    },
+    {
+      "url": "https://colab.research.google.com/drive/11IBla1q1McoZ2oCANCGHns8VtzG5nCMP",
+      "referenced_by": ["course/readings/courses-and-labs.md"],
+      "http_status": 200,
+      "final_url": "https://colab.research.google.com/drive/11IBla1q1McoZ2oCANCGHns8VtzG5nCMP",
+      "status": "reachable"
+    },
+    {
+      "url": "https://colab.research.google.com/drive/16H9RvSg4XIF35X3fLGQUVwAE9ccvDj14",
+      "referenced_by": ["course/readings/courses-and-labs.md"],
+      "http_status": 200,
+      "final_url": "https://colab.research.google.com/drive/16H9RvSg4XIF35X3fLGQUVwAE9ccvDj14",
+      "status": "reachable"
+    },
+    {
+      "url": "https://dlsyscourse.org/",
+      "referenced_by": ["course/readings/courses-and-labs.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://dlsyscourse.org/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.nvidia.com/cuda/parallel-thread-execution/index.html",
+      "referenced_by": ["course/modules/02-low-bit-kernels.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://docs.nvidia.com/cuda/parallel-thread-execution/index.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.nvidia.com/nsight-systems/UserGuide/index.html",
+      "referenced_by": [
+        "course/guides/experiments.md",
+        "course/modules/07-moe-offload.md",
+        "course/readings/resources.md",
+        "course/readings/visualizations.md",
+        "labs/lab7/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://docs.nvidia.com/nsight-systems/UserGuide/index.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/checkpoint.html",
+      "referenced_by": [
+        "course/guides/pytorch-bridge.md",
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/resources.md",
+        "labs/lab6/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/docs/stable/checkpoint.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+      "referenced_by": ["course/guides/pytorch-bridge.md"],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/cuda.html",
+      "referenced_by": [
+        "course/guides/pytorch-bridge.md",
+        "course/readings/resources.md",
+        "labs/setup.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/docs/stable/notes/cuda.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html",
+      "referenced_by": ["course/guides/pytorch-bridge.md"],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/intermediate/torch_compile_tutorial.html",
+      "referenced_by": [
+        "course/guides/pytorch-bridge.md",
+        "course/modules/03-dynamic-compilation.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/tutorials/intermediate/torch_compile_tutorial.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html",
+      "referenced_by": [
+        "course/guides/experiments.md",
+        "course/guides/pytorch-bridge.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://flashinfer.ai/",
+      "referenced_by": ["course/readings/resources.md", "course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://flashinfer.ai/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://flexllm.github.io/",
+      "referenced_by": ["course/modules/06-memory-efficient-training.md"],
+      "http_status": 200,
+      "final_url": "https://flexllm.github.io/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/EfficientMoE/MoE-Infinity",
+      "referenced_by": [
+        "course/modules/07-moe-offload.md",
+        "course/readings/resources.md",
+        "labs/lab7/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/EfficientMoE/MoE-Infinity",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/EfficientMoE/MoE-Infinity/blob/96a95527028f434f94a616c487094714ef10436b/benchmarks/expert_io_microbench/bench_overlap_prefetch.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/EfficientMoE/MoE-Infinity/blob/96a95527028f434f94a616c487094714ef10436b/benchmarks/expert_io_microbench/bench_overlap_prefetch.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/EfficientMoE/MoE-Infinity/blob/96a95527028f434f94a616c487094714ef10436b/core/prefetch/archer_prefetch_handle.cpp",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/EfficientMoE/MoE-Infinity/blob/96a95527028f434f94a616c487094714ef10436b/core/prefetch/archer_prefetch_handle.cpp",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/FlexLLM/artifact",
+      "referenced_by": [
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/resources.md",
+        "labs/lab6/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/FlexLLM/artifact",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/FlexLLM/artifact/blob/9c01a2ae5a2c004292add9fe38050776178d3045/README.md",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/FlexLLM/artifact/blob/9c01a2ae5a2c004292add9fe38050776178d3045/README.md",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/HugoZHL/PQCache",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/HugoZHL/PQCache",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/HugoZHL/PQCache/blob/0b74e125207dc3f24da3bbaaf84e8a5f1d3b1828/vq_method/retrieval_based/cache_manager.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/HugoZHL/PQCache/blob/0b74e125207dc3f24da3bbaaf84e8a5f1d3b1828/vq_method/retrieval_based/cache_manager.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/LMCache/LMCache",
+      "referenced_by": ["course/modules/05-prefix-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/LMCache/LMCache",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/MiniYuanBot/mlsys-foundations",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/MiniYuanBot/mlsys-foundations",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/PKU-DAIR/DARTS",
+      "referenced_by": [
+        "course/modules/08-rollout-scheduling.md",
+        "course/readings/resources.md",
+        "labs/lab8/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/PKU-DAIR/DARTS",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/PKU-DAIR/DARTS/blob/e07825aee39612e0659ce7e5a38f8ae02a2250b2/darts/recipe/darts/main_ppo.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/PKU-DAIR/DARTS/blob/e07825aee39612e0659ce7e5a38f8ae02a2250b2/darts/recipe/darts/main_ppo.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/PKU-DAIR/DARTS/blob/e07825aee39612e0659ce7e5a38f8ae02a2250b2/darts/recipe/darts/ray_trainer.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/PKU-DAIR/DARTS/blob/e07825aee39612e0659ce7e5a38f8ae02a2250b2/darts/recipe/darts/ray_trainer.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/artidoro/qlora",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/artidoro/qlora",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/bbycroft/llm-viz",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/bbycroft/llm-viz",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/flashinfer-ai/flashinfer",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/flashinfer-ai/flashinfer",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/flexflow/flexflow-serve",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/flexflow/flexflow-serve",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/gau-nernst/learn-cuda",
+      "referenced_by": [
+        "course/modules/02-low-bit-kernels.md",
+        "course/readings/courses-and-labs.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/gau-nernst/learn-cuda",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/google/perfetto",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/google/perfetto",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/jy-yuan/KIVI",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/jy-yuan/KIVI",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/jy-yuan/KIVI/blob/876b4d2d08e3b1d5f70d0969c299d8c7c42ddfb6/models/utils_quant.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/jy-yuan/KIVI/blob/876b4d2d08e3b1d5f70d0969c299d8c7c42ddfb6/models/utils_quant.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/jy-yuan/KIVI/blob/876b4d2d08e3b1d5f70d0969c299d8c7c42ddfb6/quant/csrc/gemv_cuda.cu",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/jy-yuan/KIVI/blob/876b4d2d08e3b1d5f70d0969c299d8c7c42ddfb6/quant/csrc/gemv_cuda.cu",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/lcpu-club/wmhpc-training-camp-x-lcpu-ai-infra-seminars",
+      "referenced_by": ["course/readings/courses-and-labs.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/lcpu-club/wmhpc-training-camp-x-lcpu-ai-infra-seminars",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mirage-project/mirage",
+      "referenced_by": ["course/modules/03-dynamic-compilation.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mirage-project/mirage",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mirage-project/mirage/blob/f9eb70c254acefc9f3667b2a973d0dcf25471fce/python/mirage/mpk/persistent_kernel.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mirage-project/mirage/blob/f9eb70c254acefc9f3667b2a973d0dcf25471fce/python/mirage/mpk/persistent_kernel.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mit-han-lab/llm-awq",
+      "referenced_by": ["course/modules/02-low-bit-kernels.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mit-han-lab/llm-awq",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mit-han-lab/llm-awq/blob/d6e797a42b9ef7778de8ee2352116e0f48a78d61/awq/kernels/csrc/quantization/gemv_cuda.cu",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mit-han-lab/llm-awq/blob/d6e797a42b9ef7778de8ee2352116e0f48a78d61/awq/kernels/csrc/quantization/gemv_cuda.cu",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mit-han-lab/omniserve",
+      "referenced_by": ["course/modules/02-low-bit-kernels.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mit-han-lab/omniserve",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/mit-han-lab/omniserve/blob/02b2925aa6fa3b92b06316a1524b7f38922cd9c8/omniserve/core/scheduler.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/mit-han-lab/omniserve/blob/02b2925aa6fa3b92b06316a1524b7f38922cd9c8/omniserve/core/scheduler.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/poloclub/transformer-explainer",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/poloclub/transformer-explainer",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/sgl-project/sglang",
+      "referenced_by": ["course/modules/04-speculative-slo.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/sgl-project/sglang",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/sgl-project/sglang/blob/456231e2517dd29e78c77d20126c893b3f1a6675/python/sglang/srt/managers/scheduler.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/sgl-project/sglang/blob/456231e2517dd29e78c77d20126c893b3f1a6675/python/sglang/srt/managers/scheduler.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/sgl-project/sglang/blob/456231e2517dd29e78c77d20126c893b3f1a6675/python/sglang/srt/mem_cache/radix_cache.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/sgl-project/sglang/blob/456231e2517dd29e78c77d20126c893b3f1a6675/python/sglang/srt/mem_cache/radix_cache.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/srush/GPU-Puzzles",
+      "referenced_by": [
+        "course/modules/02-low-bit-kernels.md",
+        "course/readings/courses-and-labs.md",
+        "course/readings/visualizations.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/srush/GPU-Puzzles",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/srush/Triton-Puzzles",
+      "referenced_by": ["course/readings/courses-and-labs.md", "course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/gpu-mode/Triton-Puzzles",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-cs336/assignment2-systems",
+      "referenced_by": [
+        "course/modules/03-dynamic-compilation.md",
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/courses-and-labs.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/stanford-cs336/assignment2-systems",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-cs336/assignment2-systems/blob/ca8bc81a59b70516f7ebb2da4808daade877c736/cs336_assignment2_systems.pdf",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/stanford-cs336/assignment2-systems/blob/ca8bc81a59b70516f7ebb2da4808daade877c736/cs336_assignment2_systems.pdf",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-cs336/assignment5-alignment",
+      "referenced_by": [
+        "course/modules/08-rollout-scheduling.md",
+        "course/readings/courses-and-labs.md",
+        "course/readings/resources.md",
+        "labs/lab8/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/stanford-cs336/assignment5-alignment",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-cs336/assignment5-alignment/blob/c2734a26308710949fe13226960a1e8cece94b7e/cs336_spring2026_assignment5_alignment.pdf",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/stanford-cs336/assignment5-alignment/blob/c2734a26308710949fe13226960a1e8cece94b7e/cs336_spring2026_assignment5_alignment.pdf",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-cs336/assignment5-alignment/blob/c2734a26308710949fe13226960a1e8cece94b7e/tests/test_grpo.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/stanford-cs336/assignment5-alignment/blob/c2734a26308710949fe13226960a1e8cece94b7e/tests/test_grpo.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/stanford-futuredata/megablocks",
+      "referenced_by": [
+        "course/modules/07-moe-offload.md",
+        "course/readings/resources.md",
+        "labs/lab7/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/databricks/megablocks",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/verl-project/verl",
+      "referenced_by": [
+        "course/modules/08-rollout-scheduling.md",
+        "course/readings/resources.md",
+        "labs/lab8/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://github.com/verl-project/verl",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/verl-project/verl/blob/18cfb74852a053a27dcf301d3318a093be81b628/docs/algo/grpo.md",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/verl-project/verl/blob/18cfb74852a053a27dcf301d3318a093be81b628/docs/algo/grpo.md",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/verl-project/verl/blob/18cfb74852a053a27dcf301d3318a093be81b628/verl/trainer/main_ppo.py",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/verl-project/verl/blob/18cfb74852a053a27dcf301d3318a093be81b628/verl/trainer/main_ppo.py",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/zikun-li/AdaServe-Artifact-Evaluation",
+      "referenced_by": ["course/modules/04-speculative-slo.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/zikun-li/AdaServe-Artifact-Evaluation",
+      "status": "reachable"
+    },
+    {
+      "url": "https://github.com/zikun-li/AdaServe-Artifact-Evaluation/blob/dbae1c30319f70c73b0f512ba2e5710003382786/README.md",
+      "referenced_by": ["course/readings/code-map.md"],
+      "http_status": 200,
+      "final_url": "https://github.com/zikun-li/AdaServe-Artifact-Evaluation/blob/dbae1c30319f70c73b0f512ba2e5710003382786/README.md",
+      "status": "reachable"
+    },
+    {
+      "url": "https://hanlab.mit.edu/courses/2024-fall-65940",
+      "referenced_by": [
+        "course/modules/01-kv-cache.md",
+        "course/modules/02-low-bit-kernels.md",
+        "course/readings/courses-and-labs.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://hanlab.mit.edu/courses/2024-fall-65940",
+      "status": "reachable"
+    },
+    {
+      "url": "https://hpc.pku.edu.cn/",
+      "referenced_by": ["course/guides/directions.md", "labs/setup.md"],
+      "http_status": 200,
+      "final_url": "https://hpc.pku.edu.cn/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://hsword.github.io/",
+      "referenced_by": ["course/guides/directions.md"],
+      "http_status": 200,
+      "final_url": "https://hsword.github.io/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://hsword.github.io/publications/",
+      "referenced_by": ["course/guides/directions.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://hsword.github.io/publications/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://huggingface.co/docs/transformers/en/kv_cache",
+      "referenced_by": ["course/modules/01-kv-cache.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://huggingface.co/docs/transformers/en/kv_cache",
+      "status": "reachable"
+    },
+    {
+      "url": "https://i.cs.hku.hk/~cwu/papers/gmsheng-eurosys25.pdf",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://i.cs.hku.hk/~cwu/papers/gmsheng-eurosys25.pdf",
+      "status": "reachable"
+    },
+    {
+      "url": "https://infra.seminars.lcpu.dev/",
+      "referenced_by": ["course/readings/courses-and-labs.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://infra.seminars.lcpu.dev/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://lmsys.org/blog/2024-01-17-sglang/",
+      "referenced_by": [
+        "course/modules/05-prefix-cache.md",
+        "course/readings/resources.md",
+        "course/readings/visualizations.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://www.lmsys.org/blog/2024-01-17-sglang/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://mlsyscourse.org/",
+      "referenced_by": [
+        "course/modules/03-dynamic-compilation.md",
+        "course/readings/courses-and-labs.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://mlsyscourse.org/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://perfetto.dev/",
+      "referenced_by": [
+        "course/guides/experiments.md",
+        "course/modules/03-dynamic-compilation.md",
+        "course/readings/visualizations.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://perfetto.dev/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://poloclub.github.io/transformer-explainer/",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://poloclub.github.io/transformer-explainer/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://proceedings.mlsys.org/paper_files/paper/2025/hash/dbf02b21d77409a2db30e56866a8ab3a-Abstract-Conference.html",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://proceedings.mlsys.org/paper_files/paper/2025/hash/dbf02b21d77409a2db30e56866a8ab3a-Abstract-Conference.html",
+      "status": "reachable"
+    },
+    {
+      "url": "https://pytorch.org/blog/activation-checkpointing-techniques/",
+      "referenced_by": [
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/resources.md",
+        "course/readings/visualizations.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://pytorch.org/blog/activation-checkpointing-techniques/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://pytorch.org/get-started/locally/",
+      "referenced_by": ["labs/setup.md"],
+      "http_status": 200,
+      "final_url": "https://pytorch.org/get-started/locally/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://pytorch.org/memory_viz",
+      "referenced_by": ["course/readings/visualizations.md"],
+      "http_status": 200,
+      "final_url": "https://docs.pytorch.org/memory_viz",
+      "status": "reachable"
+    },
+    {
+      "url": "https://stanford-cs336.github.io/",
+      "referenced_by": ["course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "http://cs336.stanford.edu/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/publication/you-only-prefill-once-combining-cached-knowledge-for-large-language-model-serving-with-cacheblend/",
+      "referenced_by": ["course/modules/05-prefix-cache.md"],
+      "http_status": 200,
+      "final_url": "https://www.microsoft.com/en-us/research/publication/you-only-prefill-once-combining-cached-knowledge-for-large-language-model-serving-with-cacheblend/",
+      "status": "reachable"
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/uploads/prod/2024/09/eurosys25-final999.pdf",
+      "referenced_by": [
+        "course/modules/05-prefix-cache.md",
+        "course/readings/resources.md",
+        "labs/lab5/README.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2024/09/eurosys25-final999.pdf",
+      "status": "reachable"
+    },
+    {
+      "url": "https://www.pdl.cmu.edu/PDL-FTP/BigLearning/AdaServe_EuroSys_26_abs.shtml",
+      "referenced_by": ["course/modules/04-speculative-slo.md", "course/readings/resources.md"],
+      "http_status": 200,
+      "final_url": "https://www.pdl.cmu.edu/PDL-FTP/BigLearning/AdaServe_EuroSys_26_abs.shtml",
+      "status": "reachable"
+    },
+    {
+      "url": "https://www.usenix.org/conference/nsdi26/presentation/oliaro",
+      "referenced_by": [
+        "course/modules/06-memory-efficient-training.md",
+        "course/readings/resources.md"
+      ],
+      "http_status": 200,
+      "final_url": "https://www.usenix.org/conference/nsdi26/presentation/oliaro",
+      "status": "reachable"
+    }
+  ]
+}

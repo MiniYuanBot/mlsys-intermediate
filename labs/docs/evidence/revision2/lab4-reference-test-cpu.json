@@ -1,0 +1,42 @@
+{
+  "lab": 4,
+  "implementation": "reference",
+  "mode": "test",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-17T02:48:10.348548+00:00",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline"
+      ],
+      "returncode": 0,
+      "stdout": "\nrunning 7 tests\ntest tests::expected_edges ... ok\ntest tests::full_acceptance ... ok\ntest tests::infeasible_is_not_success ... ok\ntest tests::nonlinear_verification_matters ... ok\ntest tests::shorter_wins_rate_tie ... ok\ntest tests::slow_draft_falls_back ... ok\ntest tests::unobserved_suffix_is_not_failure ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+      "stderr": "   Compiling slo-speculation v0.1.0 (/tmp/mlsys-lab4-_fhf12kp/lab4)\n    Finished `release` profile [optimized] target(s) in 0.28s\n     Running unittests src/policy_student.rs (target/release/deps/slo_speculation-e1ba1448bb4c45a1)\n     Running unittests src/main.rs (target/release/deps/bench-a84f6fb3619c9c74)\n   Doc-tests slo_speculation\n"
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab4/Cargo.toml": "35aa136d8ec3e0c7730cc6555eb06c5aacea1a729a2532cc0ef962b0fe93535b",
+    "labs/lab4/README.md": "3bd09ebf9f98d86c6f98c45e027ac50ec929c7955a5675f06c90536fc1182d4e",
+    "labs/lab4/grade.md": "dc8371f008965966d0bcff629bab340056d544d438e628a28bd4cafae4e6be3d",
+    "labs/lab4/src/main.rs": "9817b562380fa37cfa62d2eca08c29dafd744e24a69758c1aa46db4157b57b15",
+    "labs/lab4/src/policy_student.rs": "c33825dc989af9116c54bfb5c91b34734be484a98f76580a0a08eb41ccaab039",
+    "solutions/lab4/src/policy_student.rs": "1790c4144740eeea851f1fc038946afb6e7b176abee414043ca4aba3df4a45f3"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 0.30550156100071035
+}

@@ -1,0 +1,56 @@
+{
+  "lab": 1,
+  "implementation": "reference",
+  "mode": "bench",
+  "device": "cpu",
+  "host": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "utc": "2026-10-17T02:47:56.837774+00:00",
+  "commands": [
+    {
+      "argv": [
+        "c++",
+        "-std=c++17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-I",
+        "src",
+        "bench.cpp",
+        "-o",
+        "/tmp/mlsys-lab1-gkftbxs6/lab1/lab"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/mlsys-lab1-gkftbxs6/lab1/lab"
+      ],
+      "returncode": 0,
+      "stdout": "tokens,dim,group,keep,payload_bytes,fp16_bytes,relative_l2,attention_cpu_us\n128,64,16,128,16384,32768,0.087129,8.3629\n128,64,16,64,16384,32768,0.652244,4.2368\n128,64,16,32,16384,32768,1.69058,2.44425\n128,64,64,128,10240,32768,0.11365,8.324\n128,64,64,64,10240,32768,0.646226,5.92775\n128,64,64,32,10240,32768,1.63524,2.2111\n512,64,16,512,65536,131072,0.0899842,32.0862\n512,64,16,256,65536,131072,1.01763,15.9664\n512,64,16,128,65536,131072,1.30722,9.36735\n512,64,64,512,40960,131072,0.145254,32.3182\n512,64,64,256,40960,131072,1.00952,17.9681\n512,64,64,128,40960,131072,1.28046,8.26785\n2048,64,16,2048,262144,524288,0.106275,128.587\n2048,64,16,1024,262144,524288,1.04281,73.8887\n2048,64,16,512,262144,524288,2.07432,33.5033\n2048,64,64,2048,163840,524288,0.150235,129.314\n2048,64,64,1024,163840,524288,1.01933,64.4033\n2048,64,64,512,163840,524288,1.99647,33.5512\n",
+      "stderr": ""
+    }
+  ],
+  "status": "passed",
+  "packages": {
+    "torch": "2.14.1+cu126",
+    "transformers": "5.18.0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.2"
+  },
+  "source_sha256": {
+    "labs/lab1/README.md": "a1a3a300e0f54fcaea175e5af7c411b1aaa1a3817e40083ad4a33c6acd601511",
+    "labs/lab1/bench.cpp": "6409e973c631a65553dbfad8b2f60dd88d3118d240c3680c99bf52007764a7b8",
+    "labs/lab1/grade.md": "8860adec31487a26e0a5608ccf0ceefb8093d6a8ea7cea5c1bebaa06e5b17588",
+    "labs/lab1/test.cpp": "7f660622196eefb9c714601dccfe32e37caa527c454778a26e8e6aa4c96b7501",
+    "labs/lab1/src/kv_student.hpp": "9be521c1dc72ad2ddaf5981d0394e75f74fd45e68aa3fa550feb98b16df60240",
+    "solutions/lab1/src/kv_student.hpp": "359c97aa86c083a85d87f489219dfd93778bbfca38aa1595d97d807060224ed3"
+  },
+  "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "nvidia-smi": "NVIDIA GeForce RTX 4060 Laptop GPU, 566.24, 8188 MiB",
+  "wall_seconds": 0.9665606850030599
+}

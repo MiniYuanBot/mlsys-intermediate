@@ -1,0 +1,10 @@
+[package]
+name = "slo-speculation"
+version = "0.2.0"
+edition = "2021"
+[lib]
+name = "slo_speculation"
+path = "src/lib.rs"
+[[bin]]
+name = "bench"
+path = "src/main.rs"
