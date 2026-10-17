@@ -33,15 +33,17 @@ tags: [lecture, moe, offload, cuda, cpp]
 
 ### 1.1 一个 MoE 层的最小形式
 
-router 为 token x 产生专家权重，选择集合 $\mathcal K(x)$，输出：
+router 为 token $x$ 产生专家权重，选择集合 $\mathcal{K}(x)$，输出：
 
-$$y(x)=\sum_{e\in\mathcal K(x)}g_e(x)f_e(x).$$
+$$
+y(x)=\sum_{e\in\mathcal{K}(x)}g_e(x)f_e(x).
+$$
 
-实验 A1 从 `[tokens,experts]` logits 中选择 top-k：相同 logit 优先选择编号小的专家，再只对选中的 k 个值做 softmax，得到 `Route{token,expert,weight}`。C5 则先计算 dense gate，再调用这条路由路径，并在专家输出上加 residual。本实验实现这些前向计算，不训练 router。
+实验 A1 从 $[\mathrm{tokens},\mathrm{experts}]$ logits 中选择 top-k：相同 logit 优先选择编号小的专家，再只对选中的 $k$ 个值做 softmax，得到 `Route{token,expert,weight}`。C5 则先计算 dense gate，再调用这条路由路径，并在专家输出上加 residual。本实验实现这些前向计算，不训练 router。
 
 dispatch 和 combine 接收的是已经确定的 routes，因此 combine 不能再次 softmax，也不能把重复路由的累加改为覆盖。A1 的 top-k 不会为同一 token 重复选择同一专家；A2/A4 仍用手工构造的重复路由检查布局与累加契约。
 
-若有 E 个专家，每个 S bytes，常驻存储仍需要近似 ES，而一个 token 的专家计算只涉及 k 个专家。批次中的不同 token 可能选不同专家，使本轮需要的专家数远大于 k。
+若有 $E$ 个专家，每个占 $S$ 字节，常驻存储仍需要近似 $ES$ 字节，而一个 token 的专家计算只涉及 $k$ 个专家。批次中的不同 token 可能选不同专家，使本轮需要的专家数远大于 $k$。
 
 > [!example] 看图：沿着一个 token 找到专家
 >
@@ -57,9 +59,11 @@ dispatch 和 combine 接收的是已经确定的 routes，因此 combine 不能�
 
 ### 1.3 传输下界
 
-如果一次真实加载 S bytes、有效带宽为 BW，则：
+如果一次真实加载 $S$ 字节、有效带宽为 $\mathrm{BW}$，则：
 
-$$T_{copy}\ge S/BW.$$
+$$
+T_{\mathrm{copy}}\ge\frac{S}{\mathrm{BW}}.
+$$
 
 64MiB 专家、假设 12GiB/s 有效带宽，理想传输时间约为 $64/(12\times1024)$ 秒，即 5.2ms。这是手算，不是 RTX 4060 的实测。小传输启动开销、PCIe 拓扑、主机内存和争用都可能让实际值更大。
 
@@ -69,12 +73,12 @@ $$T_{copy}\ge S/BW.$$
 
 > [!question] 随堂自测 D7-1：路由与资源预算
 >
-> 1. logits 为 `[2,2,0]`、k=2 时，A1 应选哪两个专家、各自权重是多少？若改成 k=1，能否认为只需保存一个专家？
+> 1. logits 为 $[2,2,0]$、$k=2$ 时，A1 应选哪两个专家、各自权重是多少？若改成 $k=1$，能否认为只需保存一个专家？
 > 2. 把 §1.3 的专家大小减半为 32MiB，带宽仍为 12GiB/s，且只有 1ms 计算可以覆盖传输。理想传输下界和未被覆盖的等待各是多少？
 
 > [!tip]- 核对要点
 >
-> 1. 选 expert0/1，权重都是 0.5；k=1 选 expert0、权重为 1。一次选择不改变其他输入可能访问的专家集合，也不改变总权重存储需求。
+> 1. 选 expert0/1，权重都是 0.5；$k=1$ 选 expert0、权重为 1。一次选择不改变其他输入可能访问的专家集合，也不改变总权重存储需求。
 > 2. 约 2.60ms 和 1.60ms。这里假设独占带宽且传输及时开始；启动和排队只会增加等待，数值不是硬件测量。
 
 ## §2 Dispatch：用计数排序得到专家连续布局
@@ -86,14 +90,14 @@ $$T_{copy}\ge S/BW.$$
 用以下五条 route：
 
 ```text
-r0: token0 → expert2, weight=.75
-r1: token0 → expert0, weight=.25
-r2: token1 → expert2, weight=.50
-r3: token1 → expert2, weight=.50   # 特意保留重复路由
-r4: token2 → expert1, weight=1.0
+r0: token0 -> expert2, weight=.75
+r1: token0 -> expert0, weight=.25
+r2: token1 -> expert2, weight=.50
+r3: token1 -> expert2, weight=.50   # duplicate route kept intentionally
+r4: token2 -> expert1, weight=1.0
 ```
 
-有 4 个专家。count=`[1,1,3,0]`，排他边界 offsets=`[0,1,2,5,5]`。专家 e 占据 `ordered[offsets[e]:offsets[e+1]]`。最后一个 offset 必须等于 route 总数 R。
+有 4 个专家。$\mathrm{count}=[1,1,3,0]$，排他边界 $\mathrm{offsets}=[0,1,2,5,5]$。专家 e 占据 `ordered[offsets[e]:offsets[e+1]]`。最后一个 offset 必须等于 route 总数 R。
 
 ### 2.2 三步算法
 
@@ -112,41 +116,45 @@ expert3: empty
 
 ### 2.3 不变量与边界
 
-必须满足 offsets 长度 E+1、非递减、首项 0、末项 R；每个原 route 出现一次且仅一次；每个分段内 expert 字段正确。空专家区间长度为 0，空路由在 tokens=0 时合法。
+必须满足 offsets 长度 E+1、非递减、首项 0、末项 R；每个原 route 出现一次且仅一次；每个分段内 expert 字段正确。空专家区间长度为 0，空路由在 `tokens=0` 时合法。
 
 不能忽略非法 expert index，否则得到的加速只是少做了工作。容量不足时，也不能静默截断 routes。本实验选择不丢 token 的语义；若研究训练中的 capacity/drop policy，那属于另一个会影响模型质量的变量。
 
 > [!question] 随堂自测 D7-2：分桶与守恒
 >
-> 1. 在 §2 的五条 route 末尾追加 `r5: token2 → expert0, weight=.2`。写出新的 offsets 和 ordered route 序列；空 expert3 的区间如何表示？
+> 1. 在 §2 的五条 route 末尾追加 `r5: token2 -> expert0, weight=.2`。写出新的 offsets 和 ordered route 序列；空 expert3 的区间如何表示？
 > 2. 若把 token1 的两条 expert2 route 去重，只保留一条且权重不变，哪些不变量被破坏？仅核对输出 shape 能否发现？
 
 > [!tip]- 核对要点
 >
-> 1. offsets 为 `[0,2,3,6,6]`，顺序为 `r1,r5,r4,r0,r2,r3`；expert3 为 `[6,6)`。同专家内仍保持原输入次序。
+> 1. offsets 为 $[0,2,3,6,6]$，顺序为 `r1,r5,r4,r0,r2,r3`；expert3 为 $[6,6)$。同专家内仍保持原输入次序。
 > 2. route 数量与逐条保留契约被破坏，后续贡献会减半；shape 仍可能完全正确。需要检查 route 覆盖和数值累加，不能只检查维度。
 
 ## §3 Combine：逆映射不是简单拷贝
 
 ### 3.1 数据布局约定
 
-`expert_outputs` 按 ordered route 顺序存放，每条有 width 个元素；它的长度必须是 `R*width`。输出是 `[tokens,width]`，初始全零。
+`expert_outputs` 按 ordered route 顺序存放，每条有 width 个元素；它的长度必须是 $R\cdot\mathrm{width}$。输出是 $[\mathrm{tokens},\mathrm{width}]$，初始全零。
 
-对 ordered 第 i 条 route r，执行：
+对 ordered 第 $i$ 条 route $r$，执行：
 
-$$\mathrm{out}[r.token,j]\mathrel{+}=r.weight\cdot\mathrm{expert\_outputs}[i,j].$$
+$$
+\mathrm{out}[t_i,j]\leftarrow\mathrm{out}[t_i,j]+w_i\,\mathrm{expert\_outputs}[i,j].
+$$
 
-把 `+=` 写成 `=` 会覆盖之前专家的贡献。CUDA 实现中若多个线程块同时累加同 token，还必须考虑原子操作或先局部归约；CPU 的顺序实现没有这个竞态。
+这里 $t_i$ 和 $w_i$ 分别对应第 $i$ 条 route 的 `token` 和 `weight`。把 `+=` 写成 `=` 会覆盖之前专家的贡献。CUDA 实现中若多个线程块同时累加同 token，还必须考虑原子操作或先局部归约；CPU 的顺序实现没有这个竞态。
 
 ### 3.2 一个完整数值例子
 
-设 expert e 对任一输入返回 `[e+1,2(e+1)]`。上例中 token0 为：
+设 expert $e$ 对任一输入返回 $[e+1,2(e+1)]$。上例中 token0 为：
 
-$$.75[3,6]+.25[1,2]=[2.5,5].$$
+$$
+0.75[3,6]+0.25[1,2]=[2.5,5].
+$$
 
-token1 为 `.5[3,6]+.5[3,6]=[3,6]`；token2 为 `[2,4]`。最终展平输出是 `[2.5,5,3,6,2,4]`。这是本节五条 route 的手算例子。
+token1 为 $.5[3,6]+.5[3,6]=[3,6]$；token2 为 $[2,4]$。最终展平输出是 $[2.5,5,3,6,2,4]$。这是本节五条 route 的手算例子。
 
-配套 [test.cpp](../../labs/lab7/test.cpp) 的 `a_dispatch/a_combine` 使用另一组更小的输入：`[(0,2,.5),(0,0,.5),(1,2,1),(1,2,1)]`。其 offsets 为 `[0,1,1,4,4]`；按分桶后的顺序给定单通道输出 `[2,4,6,8]`，合并结果应为 `[3,14]`。先算清这两个例子，再运行测试，避免混用 route 顺序。
+配套 [test.cpp](../../labs/lab7/test.cpp) 的 `a_dispatch/a_combine` 使用另一组更小的输入：$[(0,2,.5),(0,0,.5),(1,2,1),(1,2,1)]$。其 offsets 为 $[0,1,1,4,4]$；按分桶后的顺序给定单通道输出 $[2,4,6,8]$，合并结果应为 $[3,14]$。先算清这两个例子，再运行测试，避免混用 route 顺序。
 
 这个简单的专家函数用于单独检验映射正确性，避免与专家网络的计算混在一起。通过这项测试，并不能证明真实 MoE MLP 或 grouped GEMM 已经正确实现。
 
@@ -163,7 +171,7 @@ dispatch 需要计数、前缀和与 gather/scatter；专家侧可能需要按�
 
 > [!tip]- 核对要点
 >
-> 1. 输出为 `[2.25,4.5]`；权重和为 0.75 是输入契约的一部分，再归一化会改写结果。
+> 1. 输出为 $[2.25,4.5]$；权重和为 0.75 是输入契约的一部分，再归一化会改写结果。
 > 2. 不能；复制与计算可能重叠。需核对测量窗口、同步边界和 profiler 时间线，确认各段是否属于同一次运行，不能单凭相加推翻墙钟。
 
 ## §4 专家缓存：区分命中、等待、发起加载与阻塞
@@ -179,7 +187,7 @@ dispatch 需要计数、前缀和与 gather/scatter；专家侧可能需要按�
 | `Loaded`  | 已为新专家预留空间并发起模拟加载 | 等待完成；此时还不能计算                  |
 | `Blocked` | 专家过大，或没有足够的可淘汰空间 | 等待资源释放；超容量请求不能靠等待解决    |
 
-特别注意名字容易误导的 `Loaded`：它表示加载已被接纳，不表示数据已就绪。模型只有一个串行 copy engine，新加载的完成时刻为 `max(time, link_free) + bytes / bandwidth`，并据此更新 `link_free`。loading entry 从接纳时就占容量，完成前不能 pin 或淘汰。
+特别注意名字容易误导的 `Loaded`：它表示加载已被接纳，不表示数据已就绪。模型只有一个串行 copy engine，新加载的完成时刻为 $\max(\mathrm{time},\mathrm{link\_free})+\mathrm{bytes}/\mathrm{bandwidth}$，并据此更新 `link_free`。loading entry 从接纳时就占容量，完成前不能 pin 或淘汰。
 
 `advance(time)` 将时钟向前推进，返回这段时间内完成的专家，按完成时刻和 ID 排序。实验用 `ready` 时间和 `pins` 引用计数表示 absent→loading→ready→in use→ready 的生命周期；这些是 CPU 上的事件模型，实际 CUDA 依赖留到 C 阶段验证。
 
@@ -211,13 +219,13 @@ dispatch 需要计数、前缀和与 gather/scatter；专家侧可能需要按�
 
 ### 5.1 历史转移表
 
-实验预测器保存带遗忘的转移权重 $C[a,b]$。每次 `observe(e)` 先把整张表乘以 0.9，再给 previous→e 加 1，最后令 previous=e。较早的历史因此逐渐衰减。
+实验预测器保存带遗忘的转移权重 $C[a,b]$。每次 `observe(e)` 先把整张表乘以 0.9，再给 previous→e 加 1，最后令 `previous=e`。较早的历史因此逐渐衰减。
 
 `predict(bytes, budget, min_probability)` 取当前 previous 对应的一行，用 $p(b\mid a)=C[a,b]/\sum_j C[a,j]$ 作为预测置信度。先筛掉低于阈值的后继，再按置信度降序、expert ID 升序选择；只有放得进剩余 byte budget 的专家才能进入结果。冷启动或没有合格候选时返回空列表，不使用“累计两次才预测”的规则。这是经验转移概率，不是统计置信区间。
 
-例如先观察 `0,1,0`，当前专家 0 唯一已知后继为 1。若 expert1 大小为 10B、阈值为 0.3，预算 10B 时返回 `[1]`，预算 9B 时返回空列表。随后持续观察 `2,0`，新的 0→2 转移会逐渐压过旧的 0→1；`b_predictor` 正是用热点变化和预算不足检查这种行为。
+例如先观察 $0,1,0$，当前专家 0 唯一已知后继为 1。若 expert1 大小为 10B、阈值为 0.3，预算 10B 时返回 $[1]$，预算 9B 时返回空列表。随后持续观察 $2,0$，新的 0→2 转移会逐渐压过旧的 0→1；`b_predictor` 正是用热点变化和预算不足检查这种行为。
 
-B7 在当前 demand 就绪并 pin 后调用 `observe`，再以 `compute * bandwidth` 为预取预算、0.3 为阈值选择候选。这个预算只估计计算窗口能覆盖多少传输；能否真正载入，还要经过缓存容量和同一复制链路的约束。
+B7 在当前 demand 就绪并 pin 后调用 `observe`，再以 $\mathrm{compute}\cdot\mathrm{bandwidth}$ 为预取预算、0.3 为阈值选择候选。这个预算只估计计算窗口能覆盖多少传输；能否真正载入，还要经过缓存容量和同一复制链路的约束。
 
 ### 5.2 严格的信息边界
 
@@ -227,15 +235,17 @@ B7 在当前 demand 就绪并 pin 后调用 `observe`，再以 `compute * bandwi
 
 ### 5.3 一张必须平衡的账
 
-若每个专家都按 S bytes 加载，模拟总流量为：
+若每个专家都按 $S$ 字节加载，模拟总流量为：
 
-$$B_{total}=S(N_{demand\ load}+N_{prefetch\ load}).$$
+$$
+B_{\mathrm{total}}=S(N_{\text{demand load}}+N_{\text{prefetch load}}).
+$$
 
 例如 demand-only 有 100 次加载；预取后 demand 仅 40 次，但 prefetch 加载了 80 次，则总加载从 100 变成 120，增加 20%。如果只报告 demand miss 降低 60%，就会掩盖总流量增加的事实。
 
 B benchmark 的专家大小固定为 2048B，容量为 4096/8192/12288B，带宽为 128B/us，每次专家计算为 20us；每种容量分别关闭和开启预取，共 6 行。120 次访问的前半段在 3 个专家间循环，后半段换成 4 个新专家。这些数值是事件模型的参数，不是硬件校准结果。
 
-接口支持按专家传入不同 bytes，账本应逐次累加实际接纳的加载大小。C 阶段则实际使用 INT8 权重：一个 up `[H,D]`、down `[D,H]` 专家的参数记录占 `2HD + 4(H+D)` bytes，其中包含 FP32 row scales；不能把 B 的 2048B 直接当作 C 的记录大小。
+接口支持按专家传入不同 bytes，账本应逐次累加实际接纳的加载大小。C 阶段则实际使用 INT8 权重：一个 up $[H,D]$、down $[D,H]$ 专家的参数记录占 $2HD+4(H+D)$ bytes，其中包含 FP32 row scales；不能把 B 的 2048B 直接当作 C 的记录大小。
 
 ### 5.4 未使用预取与收益
 
@@ -247,12 +257,12 @@ B benchmark 的专家大小固定为 2048B，容量为 4096/8192/12288B，带宽
 
 > [!question] 随堂自测 D7-5：预测与指标口径
 >
-> 1. 历史只观察到 `0,1,0`，expert1 为 10B、阈值 0.3，预算 9B/10B 时分别预测什么？如果 evaluator 知道下一条是 expert2，能否把这个信息交给在线预测器？
+> 1. 历史只观察到 $0,1,0$，expert1 为 10B、阈值 0.3，预算 9B/10B 时分别预测什么？如果 evaluator 知道下一条是 expert2，能否把这个信息交给在线预测器？
 > 2. demand-only 加载 100 次；预取方案 demand 加载 40 次、prefetch 加载 80 次，专家等大。总 bytes 如何变化？若后者 misses 小于 Belady 的 oracle_misses，是否说明突破了缓存最优下界？
 
 > [!tip]- 核对要点
 >
-> 1. 分别为空列表、`[1]`。未来 expert2 只能用于隔离的 oracle；把它交给在线策略会泄漏未来。
+> 1. 分别为空列表、$[1]$。未来 expert2 只能用于隔离的 oracle；把它交给在线策略会泄漏未来。
 > 2. 总 bytes 增加 20%。预取 misses 衡量未立即取得 ready 专家的 demand，Belady 衡量等大小 demand-only 的最少换入；两个事件计数不同，不能据此宣称突破下界。
 
 ## §6 CUDA 双 buffer：异步 API 不是重叠证据
@@ -266,8 +276,8 @@ C3 的 `expert_matvec` 让每个线程计算一个 route 的一个输出通道�
 每个槽分别有一条 copy stream 和一条 compute stream。copy 等待该槽上一次 compute 的 done；本次复制完成后记录 ready；compute 等待 ready，执行 up/down，最后记录 done。下面只画每个槽的依赖链，双槽实际使用四条 stream：
 
 ```text
-slot0: H2D0 → ready0 → use0 → done0 → H2D2 → use2 ...
-slot1:       H2D1 → ready1 → use1 → done1 → H2D3 → use3 ...
+slot0: H2D0 -> ready0 -> use0 -> done0 -> H2D2 -> use2 ...
+slot1:         H2D1 -> ready1 -> use1 -> done1 -> H2D3 -> use3 ...
 ```
 
 host buffer 只读且在全部工作结束前保持有效。若主机在异步传输完成前改写源数据，同样会破坏语义。

@@ -20,12 +20,12 @@
 行数只统计答案填空区域中非空、非注释、非纯括号的行，不含已提供的接口、测试和 bench。预计时间包括调试、测量与报告，讲义另计 5h；这些估时尚未经学生试学验证。按每周 36h 安排，可用 30h 完成本讲和 lab，余下 6h 阅读论文、参与讨论。
 
 ```text
-src/cache_student.rs   A1–A5/B1–B5：精确前缀、缓存所有权
-src/replay_student.rs  C1–C4：准入/调度/事件回放
-src/main.rs            提供：三阶段 benchmark
-src/lib.rs             提供：模块导出
- tests/exercises.rs    提供：15个测试与手算oracle
-exercise.py            提供：分阶段运行
+src/cache_student.rs   A1-A5, B1-B5: exact prefixes and cache ownership
+src/replay_student.rs  C1-C4: admission, scheduling, event replay
+src/main.rs            provided: A/B/C benchmarks
+src/lib.rs             provided: module exports
+tests/exercises.rs     provided: 15 tests and hand-calculated oracles
+exercise.py            provided: stage runner
 ```
 
 以下命令统一在 **`mlsys-intermediate/labs/`** 下运行；A 阶段测试不调用 B/C 尚未实现的函数。

@@ -31,7 +31,7 @@ tags: [measurement, reproducibility]
 
 - **TTFT**：请求到达服务端至第一个输出 token；含排队。只测 prefill CUDA kernel 的时间不可称线上 TTFT。
 - **ITL**：相邻输出 token 的发出间隔。一次推测提交多个 token 时，需要报告突发提交的情况和用户可见时间，不能将整轮耗时均匀分摊后当作 tail ITL。
-- **TPOT**：常见请求平均 `(完成时间−首 token 时间)/(输出数−1)`；输出数 <2 单列，注明定义。
+- **TPOT**：常见请求平均为 $(t_{\mathrm{finish}}-t_{\mathrm{first}})/(N_{\mathrm{out}}-1)$；其中 $t_{\mathrm{finish}}$ 为完成时间，$t_{\mathrm{first}}$ 为首 token 时间，$N_{\mathrm{out}}$ 为输出 token 数。$N_{\mathrm{out}}<2$ 的请求单列，注明定义。
 - **Goodput**：观测窗口内**满足预先定义 SLO 的请求数**除以窗口长度；请求级与 token 级不要混用。窗口内未完成的请求属于 censored，必须说明处理方式。
 - **显存**：至少区分已分配 tensor、allocator reserved 和进程占用。KV payload 的数学估计不是进程峰值；CPU offload 还需报告 host RAM、pinned bytes、PCIe 流量。
 - **质量**：重构误差 → 层输出误差 → 固定文本 NLL/任务正确率 → 下游学习曲线，是不同证据。随机 attention 误差小不能替代长上下文任务质量。

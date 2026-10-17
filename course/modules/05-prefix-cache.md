@@ -42,8 +42,8 @@ $$
 ```text
 A = [system: translate][document X][question A]
 B = [system: summarize][document X][question B]
-                           文档 token 相同
-                           高层 hidden state 一般不同
+                           same document tokens
+                           higher-layer hidden states may differ
 ```
 
 问题不在于 hash 碰撞：即使用无碰撞的文档 ID 作为键，也没有记录决定计算结果的上文。
@@ -84,14 +84,14 @@ $$
 
 ### 2.1 一个可手算的例子
 
-设每块 B=2 个 token，缓存了 `[1,2,3,4]`。实验存储两个键：
+设每块 $B=2$ 个 token，缓存了 $[1,2,3,4]$。实验存储两个键：
 
 ```text
 K0 = (namespace, [1,2])
 K1 = (namespace, [1,2,3,4])
 ```
 
-第二个键包含完整 ancestry，而不是仅含 `[3,4]`。请求 `[1,2,3,9]` 命中 2 token；`[8,9,3,4]` 命中 0；`[1]` 没有完整块，命中 0。
+第二个键包含完整 ancestry，而不是仅含 $[3,4]$。请求 $[1,2,3,9]$ 命中 2 token；$[8,9,3,4]$ 命中 0；$[1]$ 没有完整块，命中 0。
 
 对一般长度 T，登记的块数为 $\lfloor T/B\rfloor$。当前接口忽略未满尾块；尾部空间浪费小于一块，但复用粒度受 B 限制。B 变小通常改善匹配粒度，同时增加索引、引用计数与查找工作。
 
@@ -101,7 +101,7 @@ K1 = (namespace, [1,2,3,4])
 
 实验用 `BTreeMap<Key, Entry>` 保存节点，便于观察全序、确定性 tie-break 和完整键；`block_keys()` 返回请求路径上的所有整块前缀。它并不是高效的 radix tree。
 
-若 T=4096、B=16、token ID 为 4 字节，只计算每节点保存的前缀向量元素，总计：
+若 $T=4096$、$B=16$、token ID 为 4 字节，只计算每节点保存的前缀向量元素，总计：
 
 $$
 4B\sum_{j=1}^{T/B}j
@@ -124,20 +124,20 @@ flowchart TD
  D --> E[3,4]
 ```
 
-右侧 `[3,4]` 与左侧 `[3,4]` 不是同一个计算前缀。图中的位置比边标签本身更能表达 KV 身份。
+右侧 $[3,4]$ 与左侧 $[3,4]$ 不是同一个计算前缀。图中的位置比边标签本身更能表达 KV 身份。
 
 > [!info] 图解：前缀身份与块边界
 > 查看 [vLLM APC 设计中的三块前缀示意及文末 Example](https://docs.vllm.ai/en/latest/design/prefix_caching/)。先沿第三块回溯 parent hash，再看 Time 3：块大小为 4 时，共同的 10 个 token 为什么只复用 8 个？这些是数据结构和事件示意，不是延迟曲线；上游版本的空闲队列实现也不等同于本实验的叶节点淘汰。
 
 > [!question] 随堂自测 D5-2：匹配粒度与元数据
 >
-> 1. B=2，已缓存 `[1,2,3,4]`。请求 `[1,2,3,9]`、`[8,9,3,4]`、`[1]` 各命中多少 token？若第一块缺失而第二个完整前缀键仍在，查找应怎样处理？
-> 2. T 从 4096 翻倍到 8192、B=16 不变时，显式完整前缀键的 token payload 增加几倍？请计算 bytes，不计容器开销。
+> 1. $B=2$，已缓存 $[1,2,3,4]$。请求 $[1,2,3,9]$、$[8,9,3,4]$、$[1]$ 各命中多少 token？若第一块缺失而第二个完整前缀键仍在，查找应怎样处理？
+> 2. T 从 4096 翻倍到 8192、$B=16$ 不变时，显式完整前缀键的 token payload 增加几倍？请计算 bytes，不计容器开销。
 
 > [!tip]- 核对要点
 >
 > 1. 依次命中 2、0、0。遇到缺失祖先立即停止；后代残留属于拓扑损坏，应由 `validate` 检出，不能越过缺口复用。
-> 2. 新值为 4×16×512×513/2=8,404,992 bytes，约为原来的 3.992 倍；固定 B 时是二次增长，不是原始 token 数的线性增长。
+> 2. 新值为 $4\times16\times512\times513/2=8{,}404{,}992\,\mathrm{B}$，约为原来的 3.992 倍；固定 B 时是二次增长，不是原始 token 数的线性增长。
 
 ## §3 活跃请求与缓存拥有不同的生命周期
 
@@ -148,20 +148,20 @@ flowchart TD
 `Entry.refs` 表示活跃 lease 引用数，`last` 表示最近访问时钟，`hits` 表示被 acquire 的累计次数。`refs=0` 是可淘汰的必要条件；在本实验中还必须是 leaf，并且不在当前插入路径上。
 
 ```text
-insert       -> 缓存中存在，refs=0
+insert       -> cached, refs=0
 acquire A    -> refs=1
 acquire B    -> refs=2
-release A    -> refs=1，仍不可驱逐
-release B    -> refs=0，可参加淘汰候选筛选
+release A    -> refs=1, eviction blocked
+release B    -> refs=0, eligible for victim selection
 ```
 
 仅更新 `last`，让块看起来刚被访问过，不能替代 pin。LRU 用于优化性能，pin 则约束哪些块可以安全删除；应先满足正确性约束，再按性能策略排序。
 
 ### 3.2 六步小轨迹
 
-容量 2 块、B=2，先插入 `[1,2,3,4]`，随后两个请求都 acquire 这条路径。
+容量 2 块、$B=2$，先插入 $[1,2,3,4]$，随后两个请求都 acquire 这条路径。
 
-| 事件      | `[1,2]` refs | `[1,2,3,4]` refs | 允许插入 `[5,6]`？ |
+| 事件      | $[1,2]$ refs | $[1,2,3,4]$ refs | 允许插入 $[5,6]$？ |
 | --------- | -----------: | ---------------: | ------------------ |
 | insert    |            0 |                0 | 可以淘汰叶子       |
 | acquire A |            1 |                1 | 不允许             |
@@ -170,7 +170,7 @@ release B    -> refs=0，可参加淘汰候选筛选
 | 插入失败  |            1 |                1 | 缓存状态不变       |
 | release B |            0 |                0 | 可以淘汰叶子       |
 
-淘汰时不能先删除 `[1,2]` 而留下 `[1,2,3,4]`。从叶子向上回收可保留路径完整性。真实 radix tree 可能使用更紧凑的计数传播方式，需要证明相同性质。
+淘汰时不能先删除 $[1,2]$ 而留下 $[1,2,3,4]$。从叶子向上回收可保留路径完整性。真实 radix tree 可能使用更紧凑的计数传播方式，需要证明相同性质。
 
 ### 3.3 Rust 能保证什么，不能保证什么
 
@@ -181,11 +181,11 @@ release B    -> refs=0，可参加淘汰候选筛选
 > [!question] 随堂自测 D5-3：引用与缓存寿命
 >
 > 1. 两块前缀同时被 A、B 两个 lease 引用。释放 A 后，pinned blocks 和 references 分别是多少？再释放 B 后，缓存是否必须删除？
-> 2. 一个节点 refs=0，却有后代或属于正在插入的路径。它能否被 `victim` 选择？Rust 消费 lease 是否同时证明 lease 属于当前 cache？
+> 2. 一个节点 `refs=0`，却有后代或属于正在插入的路径。它能否被 `victim` 选择？Rust 消费 lease 是否同时证明 lease 属于当前 cache？
 
 > [!tip]- 核对要点
 >
-> 1. 释放 A 后两块各 refs=1，所以 pinned blocks=2、references=2；释放 B 后两者均为 0，缓存仍可保留供未来复用。
+> 1. 释放 A 后两块各 `refs=1`，所以 pinned `blocks=2`、`references=2`；释放 B 后两者均为 0，缓存仍可保留供未来复用。
 > 2. 不能，候选还须为未受保护的叶子；所有权消费只防止同一个 lease 值重复使用，cache 身份匹配仍是调用方契约。
 
 ## §4 事务插入：失败也需要规格
@@ -203,7 +203,7 @@ release B    -> refs=0，可参加淘汰候选筛选
 在每次寻找 victim 前筛选：
 
 $$
-V=\{v:\ refs(v)=0,\ v\notin\text{new path},\ v\text{ has no descendant}\}.
+V=\{v:\ \operatorname{refs}(v)=0,\ v\notin\text{new path},\ v\text{ has no descendant}\}.
 $$
 
 然后在 V 内按 LRU 或 frequency 排序。V 为空时返回失败。不能先按全体节点选“最冷的”，再假设它能够被删除。
@@ -245,12 +245,12 @@ C阶段trace每请求8token，前4token可形成热点，后4token含唯一请�
 假设某请求复用前缀节省 12ms prefill，查询与引用管理增加 0.4ms，载入缓存增加 3ms，排队额外增加 10ms，则首 token 净变化约为：
 
 $$
-\Delta TTFT\approx -12+0.4+3+10=+1.4\text{ms}.
+\Delta T_{\mathrm{TTFT}}\approx(-12+0.4+3+10)\,\mathrm{ms}=+1.4\,\mathrm{ms}.
 $$
 
 这个例子中，虽然命中了很多 token，用户仍更晚收到首 token。数值只用于解释公式，不是 lab 实测结果。
 
-真实测量必须记录到达、prefill 开始、首 token 和结束时间。仅用 `matched_tokens * constant` 推出 TTFT 是成本模型，需要用引擎数据校准，也不能把它写成服务实测。
+真实测量必须记录到达、prefill 开始、首 token 和结束时间。仅用 $\mathrm{matched\_tokens}\cdot\mathrm{constant}$ 推出 TTFT 是成本模型，需要用引擎数据校准，也不能把它写成服务实测。
 
 ### 5.3 公平性从哪里来
 
@@ -261,24 +261,24 @@ B阶段回放是串行状态检查；C阶段是带3个抽象worker的离散事�
 > [!question] 随堂自测 D5-5：命中率、事件与用户等待
 >
 > 1. 两个请求分别复用 2/2 和 0/8 token，总体 token hit ratio 是多少？若按 §5.2 的教学成本账结算，TTFT 是改善还是恶化？
-> 2. 设 B=2、缓存容量为 2 块、2 个 worker、Always 准入；两个相同的 2-token 请求在 t=0 并发启动，起初无缓存，每 token prefill=1ms、decode=1ms；第三个相同请求 t=4 到达。按 C 阶段语义分别写出 hit 与 finish。
+> 2. 设 $B=2$、缓存容量为 2 块、2 个 worker、Always 准入；两个相同的 2-token 请求在 t=0 并发启动，起初无缓存，每 token `prefill=1ms`、`decode=1ms`；第三个相同请求 t=4 到达。按 C 阶段语义分别写出 hit 与 finish。
 
 > [!tip]- 核对要点
 >
 > 1. 总体为 2/(2+8)=0.2；§5.2 的 TTFT 增加 1.4ms，命中并不保证用户等待减少。
-> 2. hit=[0,0,2]，finish=[3,3,5]ms。前两个请求完成前，新 KV 尚未发布，不能让第二个请求复用正在计算的结果；这对应 `c_replay_hand_timeline`。
+> 2. $\mathrm{hit}=[0,0,2]$，$\mathrm{finish}=[3,3,5]\,\mathrm{ms}$。前两个请求完成前，新 KV 尚未发布，不能让第二个请求复用正在计算的结果；这对应 `c_replay_hand_timeline`。
 
 ## §6 稳定热点、扫描与热点切换
 
 LRU 依赖近期局部性；frequency 依赖长期频次。稳定热点下，频次有机会保护常用前缀；热点迁移后，旧频次又可能阻碍新内容进入。这些机制假设需要在相同 trace 上验证，不能视为对所有工作负载的保证。
 
-B benchmark为4容量×2淘汰策略，共8行；C benchmark为3容量×2准入策略×2调度策略×3租户视图，共36行。TwoHit用有界历史挡住一次性扫描，LPM按命中选择并为等待超过阈值的请求恢复先来顺序。
+B benchmark 覆盖 4 种容量与 2 种淘汰策略，共 $4\times2=8$ 行；C benchmark 覆盖 3 种容量、2 种准入策略、2 种调度策略与 3 个租户视图，共 $3\times2\times2\times3=36$ 行。TwoHit用有界历史挡住一次性扫描，LPM按命中选择并为等待超过阈值的请求恢复先来顺序。
 
 分析总体token hit ratio、各租户mean wait/p95 E2E和容量失败。默认trace是确定性的，重复跑同一个trace不增加统计独立性；增加burst或scan长度才形成敏感性比较。
 
 > [!question] 随堂自测 D5-6：准入与公平性
 >
-> 1. TwoHit 的历史容量足够，B=2，依次访问 `[1,2,3,4]` 与 `[1,2,9,9]`。两次允许缓存的连续前缀分别多长？若容量为 0 呢？
+> 1. TwoHit 的历史容量足够，$B=2$，依次访问 $[1,2,3,4]$ 与 $[1,2,9,9]$。两次允许缓存的连续前缀分别多长？若容量为 0 呢？
 > 2. 频次策略只在大缓存中获益，你首先检查哪些机制？年龄保护为什么仍不能保证过载下每个请求在固定时间内完成？
 
 > [!tip]- 核对要点

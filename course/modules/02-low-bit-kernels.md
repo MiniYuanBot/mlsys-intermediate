@@ -29,13 +29,13 @@ tags: [lecture, cuda, ptx, quantization, kernel]
 
 ### 1.1 GEMM 到 GEMV：权重重用机会发生变化
 
-单个新 token 的线性层为 `y=Wx`，W 是 `[M,N]`，x 是 N 维。大约需要 `2MN` 次浮点操作；若权重为 FP32，仅权重读取就有 `4MN` 字节，因此忽略 x/y 的算术强度约为：
+单个新 token 的线性层为 $y=Wx$，$W$ 是 $[M,N]$ 矩阵，$x$ 是 $N$ 维向量。大约需要 `2MN` 次浮点操作；若权重为 FP32，仅权重读取就有 `4MN` 字节，因此忽略 x/y 的算术强度约为：
 
 $$
-I_{FP32}\approx\frac{2MN}{4MN}=0.5\ \mathrm{FLOP/byte}.
+I_{\mathrm{FP32}}\approx\frac{2MN}{4MN}=0.5\ \mathrm{FLOP/byte}.
 $$
 
-batch B 增大时，同一权重可服务多个向量；如果实现复用良好，权重相关算术强度随 B 增大。这解释了为什么 batch=1 的最佳方案不一定适合 prefill 或大 batch serving。
+batch $B$ 增大时，同一权重可服务多个向量；如果实现复用良好，权重相关算术强度随 $B$ 增大。这解释了为什么 batch=1 的最佳方案不一定适合 prefill 或大 batch serving。
 
 对 int4 权重、每 g 个数一个 FP32 scale，权重相关有效字节约为：
 
@@ -43,18 +43,20 @@ $$
 b_w=0.5+4/g.
 $$
 
-`g=128` 时为 0.53125B，理想权重流量下降约 7.53 倍。但每个权重新增了解包和尺度乘法，算术强度升高也不意味着一定更快。
+$g=128$ 时为 0.53125B，理想权重流量下降约 7.53 倍。但每个权重新增了解包和尺度乘法，算术强度升高也不意味着一定更快。
 
-### 1.2 4096×4096 的实际字节账
+### 1.2 $4096\times4096$ 的实际字节账
 
 假设 N 为偶数且 group 整除：
 
-```text
-FP32 W：4096 × 4096 × 4 = 64 MiB
-int4 codes：4096 × 4096 / 2 = 8 MiB
-FP32 scales：4096 × (4096/128) × 4 = 0.5 MiB
-x + y：4096 × 4 × 2 = 32 KiB
-```
+$$
+\begin{aligned}
+M_{W,\mathrm{FP32}} &= 4096\times4096\times4\,\mathrm{B} = 64\,\mathrm{MiB},\\
+M_{\mathrm{codes}} &= \frac{4096\times4096}{2}\,\mathrm{B} = 8\,\mathrm{MiB},\\
+M_{\mathrm{scales}} &= 4096\times\frac{4096}{128}\times4\,\mathrm{B} = 0.5\,\mathrm{MiB},\\
+M_x+M_y &= 4096\times4\times2\,\mathrm{B} = 32\,\mathrm{KiB}.
+\end{aligned}
+$$
 
 若先把 int4 解包成 FP32 W，再调用 cuBLAS，需要产生 64MiB 中间矩阵。其逻辑写入与后续读取必须计入成本；实际 DRAM 流量受缓存影响，不能直接把逻辑字节当 profiler 实测字节。
 
@@ -79,44 +81,52 @@ flowchart LR
 
 > [!question] 随堂自测 D2-1：流量能否换算成加速
 >
-> 1. 忽略 x/y，`g=128` 时本讲 W4A32 GEMV 的权重相关算术强度是多少？为什么不能把相对 FP32 的字节比直接写成实测加速比？
+> 1. 忽略 x/y，$g=128$ 时本讲 W4A32 GEMV 的权重相关算术强度是多少？为什么不能把相对 FP32 的字节比直接写成实测加速比？
 > 2. 已知 codes 为 8MiB、scales 为 0.5MiB，先解包再 GEMV 会增加多大的 FP32 中间矩阵？比较 fused 与 resident 时为什么要让二者使用同一量化权重？
 
 > [!tip]- 核对要点
 >
-> 1. `2/(0.5+4/128)≈3.765 FLOP/byte`，只计算点积 FLOP 与权重流量。它没有包括解包指令、x/y、launch、归约及缓存行为，不能推出 7.53 倍实测加速。
+> 1. $2/(0.5+4/128)\approx 3.765 \,\mathrm{\mathrm{FLOP}/\mathrm{byte}}$，只计算点积 FLOP 与权重流量。它没有包括解包指令、x/y、launch、归约及缓存行为，不能推出 7.53 倍实测加速。
 > 2. 中间矩阵为 64MiB，逻辑上还需写入后再读取；硬件流量需另测。相同权重隔离执行路径差异，原始权重则用于单独衡量量化损失。
 
 ## §2 一个低比特格式必须说清楚的四件事
 
 ### 2.1 数值：对称 q，偏移存储
 
-组内最大绝对值为 a，scale=`a/7`；lab 量化 q 到 `[-7,7]`，常量零组 scale 取 1。编码使用 `u=q+8`，因此码是 1–15，码 0 不由当前量化器生成。
+组内最大绝对值为 $a$，$s=a/7$；lab 量化 $q$ 到 $[-7,7]$，常量零组 scale 取 1。编码使用 $u=q+8$，因此码是 1–15，码 0 不由当前量化器生成。
 
-两个 u 存在一个 byte：第一个占低四位，第二个占高四位。
+两个 $u$ 存在一个 byte：第一个占低四位，第二个占高四位。
 
-```text
-q       = [-7,  0,  7]
-u=q+8   = [ 1,  8, 15]
-bytes   = [0x81, 0x0f]
-decode  = [1-8, 8-8, 15-8] = [-7,0,7]
-```
+$$
+\begin{aligned}
+q&=[-7,0,7],\\
+u=q+8&=[1,8,15],\\
+\mathrm{bytes}&=[\mathtt{0x81},\mathtt{0x0f}],\\
+q_{\mathrm{decoded}}&=[1-8,8-8,15-8]=[-7,0,7].
+\end{aligned}
+$$
 
-请不要对 nibble 做 4bit 符号扩展。0xF 在当前格式中是 u=15、q=7；若按有符号 int4 解释，会误读为 -1。D1 的无符号仿射量化也不能直接复用。
+请不要对 nibble 做 4bit 符号扩展。0xF 在当前格式中是 $u=15$、$q=7$；若按有符号 int4 解释，会误读为 -1。D1 的无符号仿射量化也不能直接复用。
 
 ### 2.2 布局：每行独立 padding
 
-lab2 按行存储，每行使用 `ceil(N/2)` 个 byte：
+lab2 按行存储，每行使用 $\lceil N/2\rceil$ 个 byte：
 
-```text
-packed address = row * ceil(N/2) + col/2
-shift          = 4 * (col % 2)
-scale address  = row * ceil(N/group) + col/group
-```
+令行、列索引为 $r,c$，组大小为 $g$：
+
+$$
+\begin{aligned}
+\operatorname{addr}_{\mathrm{codes}}(r,c)
+&=r\left\lceil\frac{N}{2}\right\rceil+\left\lfloor\frac{c}{2}\right\rfloor,\\
+\operatorname{shift}(c)&=4(c\bmod2),\\
+\operatorname{addr}_{\mathrm{scales}}(r,c)
+&=r\left\lceil\frac{N}{g}\right\rceil+\left\lfloor\frac{c}{g}\right\rfloor.
+\end{aligned}
+$$
 
 与 D1 整个矩阵平坦打包不同，N 为奇数时，每行最后高 nibble 空着，下一行从下一个完整 byte 开始。两个格式都合理，但调用方与 kernel 必须选择同一种。
 
-精确容量为 `M*ceil(N/2)+4*M*ceil(N/g)`。N=31 时每行 16B codes；N=32 也为 16B。只计算 `MN/2` 会低估奇数行宽下的 padding。
+精确容量为 $M\lceil N/2\rceil+4M\lceil N/g\rceil$。$N=31$ 时每行 16B codes；$N=32$ 也为 16B。只计算 $MN/2$ 会低估奇数行宽下的 padding。
 
 ### 2.3 指令：PTX 不是最终机器码
 
@@ -134,13 +144,13 @@ CUDA 编译通常经历 CUDA C++→PTX→SASS。手写一条 PTX 并不能保证
 
 > [!question] 随堂自测 D2-2：格式必须逐字节一致
 >
-> 1. `M=3,N=5,g=4` 时 codes 与 scales 各占多少字节？坐标 `(1,0)` 的 codes 字节索引和 scale 元素索引是多少？
+> 1. $M=3,N=5,g=4$ 时 codes 与 scales 各占多少字节？坐标 $(1,0)$ 的 codes 字节索引和 scale 元素索引是多少？
 > 2. 对 `[0x81,0x0f]` 解出前三个整数权重，再说明为何 `0x0f` 的高 nibble 不能当成第四个有效权重。把 `bfe` 换成 shift/mask 后 SASS 相同，能够得到什么结论？
 
 > [!tip]- 核对要点
 >
-> 1. codes 为 `3×ceil(5/2)=9B`，scales 为 `4×3×ceil(5/4)=24B`，共 33B；codes 字节索引=3，scale 元素索引=2，对应 FP32 scale 数组的字节偏移 8B。不能沿用 D1 跨行连续打包的 byte 地址。
-> 2. 结果为 `[-7,0,7]`，最后高 nibble 是 padding，不代表有效的 -8。SASS 相同说明该编译配置下两种源码生成了相同指令路径；无法据此保证所有形状、编译器版本和架构都相同。
+> 1. codes 为 $3\times\lceil5/2\rceil=9\,\mathrm{B}$，scales 为 $4\times3\times\lceil5/4\rceil=24\,\mathrm{B}$，共 33B；codes 字节索引=3，scale 元素索引=2，对应 FP32 scale 数组的字节偏移 8B。不能沿用 D1 跨行连续打包的 byte 地址。
+> 2. 结果为 $[-7,0,7]$，最后高 nibble 是 padding，不代表有效的 -8。SASS 相同说明该编译配置下两种源码生成了相同指令路径；无法据此保证所有形状、编译器版本和架构都相同。
 
 ## §3 一个 warp 负责一行：逐步构建正确 kernel
 
@@ -152,49 +162,51 @@ $$
 y_r=\sum_{c=0}^{N-1}\left(u_{r,c}-8\right)s_{r,\lfloor c/g\rfloor}x_c.
 $$
 
-分配一个 warp 的 32 个 lane，lane l 处理 `c=l,l+32,l+64,…`。每个 lane 的局部和覆盖互不相交的列，所有 lane 的并集覆盖整行。
+分配一个 warp 的 32 个 lane，lane $l$ 处理 $c=l,l+32,l+64,\ldots$。每个 lane 的局部和覆盖互不相交的列，所有 lane 的并集覆盖整行。
 
 ```text
 lane 0: columns 0,32,64,...
 lane 1: columns 1,33,65,...
 ...
 lane31: columns31,63,95,...
-        ↓ each holds partial sum
-shuffle offset16 → 8 → 4 → 2 → 1
-        ↓ lane0 has the row sum
+        | each lane holds a partial sum
+        v
+shuffle offsets: 16 -> 8 -> 4 -> 2 -> 1
+        | lane 0 holds the row sum
+        v
 ```
 
-每个线程先把 partial 初始化为 0。`N<32` 时，没有列可处理的 lane 仍参加归约，它的贡献为 0。
+每个线程先把 partial 初始化为 0。$N<32$ 时，没有列可处理的 lane 仍参加归约，它的贡献为 0。
 
 ### 3.2 warp 到 block 的映射
 
 默认 block 有 128 线程，即 4 个 warp；每 block 处理 4 行：
 
-```text
-lane = threadIdx.x & 31
-row  = (blockIdx.x * blockDim.x + threadIdx.x) / 32
+```cpp
+lane = threadIdx.x & 31;
+row = (blockIdx.x * blockDim.x + threadIdx.x) / 32;
 ```
 
-当 row≥M 时，整个 warp 都无效，可以一起返回。合法 warp 的所有 lane 都执行 shuffle，所以可以使用全 warp mask。
+当 $\mathrm{row}\ge M$ 时，整个 warp 都无效，可以一起返回。合法 warp 的所有 lane 都执行 shuffle，所以可以使用全 warp mask。
 
-不能让 col≥N 的 lane 直接 return，再让其他 lane 使用全 mask shuffle：mask 指定参与的线程并未全部执行该指令，集体操作的前提不再成立。正确做法是仅跳过加载/FMA，让这些 lane 继续参与归约。
+不能让 $\mathrm{col}\ge N$ 的 lane 直接 return，再让其他 lane 使用全 mask shuffle：mask 指定参与的线程并未全部执行该指令，集体操作的前提不再成立。正确做法是仅跳过加载/FMA，让这些 lane 继续参与归约。
 
 > [!example] 看图：沿 shuffle 边追踪一项部分和
 > 打开 [NVIDIA 的 warp 原语图解](https://developer.nvidia.com/blog/using-cuda-warp-level-primitives/)，看开头的树形归约图和 Listing 1，再读 “Synchronized Data Exchange” 对 mask 的解释。在图上追踪 lane 31 的部分和怎样到达 lane 0，并把五轮 offset 标回自己的 kernel。该图解释通信关系，不给出本机延迟；本 lab 对有效行采用全 warp 参与、空 lane 贡献 0 的方案。
 
 > [!question] 随堂自测 D2-3：覆盖与参与是两件事
 >
-> 1. `N=65` 时 lane 0 和 lane 31 分别处理哪些列？`N=1` 时，哪些 lane 有数据，哪些 lane 仍需执行 shuffle？
-> 2. `M=5,blockDim=128` 时第二个 block 哪些 warp 有效？为什么整条无效行可以返回，而一条有效行内没有数据的 lane 不能照样返回？
+> 1. $N=65$ 时 lane 0 和 lane 31 分别处理哪些列？$N=1$ 时，哪些 lane 有数据，哪些 lane 仍需执行 shuffle？
+> 2. $M=5,\mathrm{blockDim}=128$ 时第二个 block 哪些 warp 有效？为什么整条无效行可以返回，而一条有效行内没有数据的 lane 不能照样返回？
 
 > [!tip]- 核对要点
 >
-> 1. lane 0 处理 `{0,32,64}`，lane 31 处理 `{31,63}`；`N=1` 时只有 lane 0 加载/FMA，但 32 个 lane 都执行归约。
+> 1. lane 0 处理 $\{0,32,64\}$，lane 31 处理 $\{31,63\}$；$N=1$ 时只有 lane 0 加载/FMA，但 32 个 lane 都执行归约。
 > 2. 第二个 block 的第一个 warp 处理 row 4，其余处理 row 5–7，全部越界。整 warp 返回不留下参与者；有效 warp 内部分返回会破坏当前全 mask 归约的参与约定。
 
 ### 3.3 尾部测试为什么比方阵更有用
 
-现有测试包含 `(M,N)=(1,1),(3,31),(37,65),(128,256),(513,1025)`。这些输入覆盖以下边界情况：
+现有测试包含 $(M,N)=(1,1),(3,31),(37,65),(128,256),(513,1025)$。这些输入覆盖以下边界情况：
 
 - 极小工作量和大量空 lane；
 - N 不是 warp 宽度倍数；
@@ -202,7 +214,7 @@ row  = (blockIdx.x * blockDim.x + threadIdx.x) / 32
 - M 不是每 block 行数的倍数；
 - 多轮循环和尾组 scale。
 
-如果只有 4096×4096 通过，寻址、mask 和尾组处理仍可能都有错。先让奇数形状通过测试，再讨论加速。
+如果只有 $4096\times4096$ 通过，寻址、mask 和尾组处理仍可能都有错。先让奇数形状通过测试，再讨论加速。
 
 ### 3.4 两种误差需要两个参考
 
@@ -214,7 +226,7 @@ row  = (blockIdx.x * blockDim.x + threadIdx.x) / 32
 
 > [!question] 随堂自测 D2-4：用哪个 oracle 定位问题
 >
-> 1. GPU 与量化 CPU oracle 一致，但与原始权重点积相差很大，应优先检查 CUDA 寻址还是量化误差？反过来，只有 `N=65` 的 kernel error 很大，应先检查哪三处？
+> 1. GPU 与量化 CPU oracle 一致，但与原始权重点积相差很大，应优先检查 CUDA 寻址还是量化误差？反过来，只有 $N=65$ 的 kernel error 很大，应先检查哪三处？
 
 > [!tip]- 核对要点
 >
@@ -235,7 +247,7 @@ GPU launch 是异步的，CPU 调用返回时间不等于执行时间。现有 b
 可以把 fused 时间粗分为：
 
 $$
-T_{fused}\approx T_{launch}+\max(T_{memory},T_{decode+FMA+reduce}).
+T_{\mathrm{fused}}\approx T_{\mathrm{launch}}+\max(T_{\mathrm{memory}},T_{\text{decode + FMA + reduce}}).
 $$
 
 这个式子可用于提出假设，但不能代替 profiler 验证。以下观察各有多种可能解释：
@@ -251,7 +263,7 @@ $$
 
 ### 4.3 一个可实现的布局改动
 
-原 kernel 中相邻两 lane 分别读取同一 byte 的两个 nibble。可尝试每 lane 一次取一个 byte，连续处理两个列：`c=2*lane,2*lane+1`，下一轮加 64。
+原 kernel 中相邻两 lane 分别读取同一 byte 的两个 nibble。可尝试每 lane 一次取一个 byte，连续处理两个列：$c=2\cdot \mathrm{lane},2\cdot \mathrm{lane}+1$，下一轮加 64。
 
 优点是可能减少重复地址/加载指令；代价是每 lane 更多活跃中间值、尾部处理更复杂。内存系统可能已合并原读取，所以不能预设一定更快。实验要求用同样布局、同样量化数据，隔离线程映射变化。
 
@@ -263,7 +275,7 @@ $$
 S=\frac{1}{(1-p)+p/s}.
 $$
 
-例如 p=0.4、s=2，总加速只有 1.25。如果还增加了格式转换、调度和同步成本，总收益会更小。先确认这个 kernel 是否构成真实 workload 的瓶颈，再决定是否围绕它的优化开展论文工作。
+例如 $p=0.4$、$s=2$，总加速只有 1.25。如果还增加了格式转换、调度和同步成本，总收益会更小。先确认这个 kernel 是否构成真实 workload 的瓶颈，再决定是否围绕它的优化开展论文工作。
 
 > [!question] 随堂自测 D2-5：怎样推翻自己的性能解释
 >
@@ -272,7 +284,7 @@ $$
 
 > [!tip]- 核对要点
 >
-> 1. 新总时间为 `6+2+1=9ms`，约 1.11 倍，而不是局部的 2 倍，也不是忽略转换后的 1.25 倍。
+> 1. 新总时间为 $6+2+1=9\,\mathrm{ms}$，约 1.11 倍，而不是局部的 2 倍，也不是忽略转换后的 1.25 倍。
 > 2. 可能是 launch 主导，可扩大工作量观察差距；也可能加载已被合并或新增解包指令抵消收益，应检查生成代码、加载/指令指标。单次耗时相近无法区分这些机制。
 
 ## §5 前沿方法为何要共同设计格式与执行
@@ -296,12 +308,12 @@ $$
 
 > [!question] 随堂自测 D2-6：校准改变了什么
 >
-> 1. `W=[2,3],x=[4,5],s=[2,0.5]`，分别计算 `W'=W diag(s)`、`x'=x/ s` 和变换前后点积。为什么量化以后还要搜索 s？
-> 2. C3 的候选包含 alpha=0，是否保证 held-out 误差也不劣于 alpha=0？运行 C4 时为什么不能根据新输入再次估计通道尺度？
+> 1. $W=[2,3],x=[4,5],s=[2,0.5]$，分别计算 $W'=W\operatorname{diag}(s)$、$x'=x/ s$ 和变换前后点积。为什么量化以后还要搜索 s？
+> 2. C3 的候选包含 $\alpha=0$，是否保证 held-out 误差也不劣于 $\alpha=0$？运行 C4 时为什么不能根据新输入再次估计通道尺度？
 
 > [!tip]- 核对要点
 >
-> 1. `W'=[4,1.5]、x'=[2,10]`，两个点积都是 23。等价性只针对未量化浮点变换；量化舍入和分组范围随尺度变化，输出误差需要实际比较。
+> 1. $W'=[4,1.5]$、$x'=[2,10]$，两个点积都是 23。等价性只针对未量化浮点变换；量化舍入和分组范围随尺度变化，输出误差需要实际比较。
 > 2. 只保证已评估候选中的校准目标不劣，不保证分布外表现。C4 使用冻结 artifact；临时改尺度会改变权重/输入的配对语义，也把评测变成新的校准过程。
 
 ## §6 一个适合当前设备的研究切口
@@ -340,7 +352,7 @@ C 中已提供校准→artifact→held-out→CUDA 执行的完整参考答案。
 
 ## 自测清单
 
-- [ ] 独立计算含行 padding 和 scale 的字节数，留下 3×5 示例的地址表。
+- [ ] 独立计算含行 padding 和 scale 的字节数，留下 $3\times5$ 示例的地址表。
 - [ ] 从 0x81/0x0f 解出三个权重，说明它与 D1 仿射格式的区别。
 - [ ] 画出 warp 列覆盖、五轮归约与无效行行为，解释所有有效参与者的 mask 约定。
 - [ ] 为不规则 shape 选择边界测试，区分 kernel error 与 quantization error。

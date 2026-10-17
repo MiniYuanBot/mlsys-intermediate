@@ -20,12 +20,12 @@
 行数只计参考答案 TODO 区域中的有效代码，排除空行、注释、纯括号行和 scaffold/tests/benchmark，不要求你的实现恰好一样长。估时包含调试和实验，讲义 5h 另计；尚未经过学生试学，请记录实际用时。每周36h可安排本讲和实验29h，其余7h用于阅读或组会。
 
 ```text
-src/policy_student.rs  A1–A5、B1–B5：概率、校准、决策
-src/engine_student.rs  C1–C4：状态和离散事件服务
-src/lib.rs             提供：模块导出
-src/main.rs            提供：A/B/C 三组 benchmark
- tests/exercises.rs    提供：14 个独立测试，不会被答案覆盖
-exercise.py            提供：阶段入口
+src/policy_student.rs  A1-A5, B1-B5: probability, calibration, decisions
+src/engine_student.rs  C1-C4: state and discrete-event service
+src/lib.rs            provided: module exports
+src/main.rs           provided: A/B/C benchmarks
+tests/exercises.rs    provided: 14 independent tests; shared by both implementations
+exercise.py           provided: stage runner
 ```
 
 以下命令都在 **`mlsys-intermediate/labs/`** 运行。按 A、B、C 的顺序完成；A 阶段测试不会调用 B/C 的 stub。

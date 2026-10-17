@@ -60,9 +60,6 @@ def files() -> list[Path]:
                     continue
                 if path.parent == ROOT / ".obsidian" and fnmatch(name, "workspace*.json"):
                     continue
-                # Preserve immutable run records; their embedded source hashes describe the original run.
-                if "evidence" in path.relative_to(ROOT).parts and path.suffix != ".md":
-                    continue
                 selected.append(path)
     return sorted(selected)
 

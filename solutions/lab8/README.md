@@ -39,4 +39,4 @@ python3 tools/run.py --lab 8 --impl reference --part C --mode test
 python3 tools/run.py --lab 8 --impl reference --part all --mode bench
 ```
 
-已在CPU执行全部12项契约测试和A3/B12/C108行benchmark；统一命令/环境记录见[验证记录](../../labs/docs/validation.md)。B 的时间单位来自事件模型，C 的曲线来自实际更新的 policy。答案不包含真实 KV/RNG 保存、多 GPU rollout、语言模型 reward 或 DARTS 冗余选样；这些内容需要后续模型实验验证。
+测试包含 12 项契约检查，完整 benchmark 输出 A3/B12/C108 行；运行时保留命令、环境和结果。B 的时间单位来自事件模型，C 的曲线来自实际更新的 policy。答案不包含真实 KV/RNG 保存、多 GPU rollout、语言模型 reward 或 DARTS 冗余选样；这些内容需要后续模型实验验证。

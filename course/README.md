@@ -2,7 +2,7 @@
 
 从 [课程总索引](index.md) 开始。本课程接续 `mlsys-foundations`，包含八个研究专题。每个专题围绕一个具体的系统问题展开：先推导机制，再实现和测量，最后判断候选研究问题是否值得继续。
 
-项目内容分为三个目录：`course/` 放课程、阅读资源、研究路线与可视化；`labs/` 放实验、测试、公共工具和本地实验产物；`solutions/` 放参考实现。把项目目录作为 Obsidian vault 打开，入口是 `course/index.md`；标准相对 Markdown 链接也可在 GitHub 阅读。项目总入口、共享编辑器设置和格式配置位于[仓库根目录](../README.md)。
+项目内容分为三个目录：`course/` 放课程、阅读资源、研究路线与笔记模板；`labs/` 放实验、测试、公共工具和本地实验产物；`solutions/` 放参考实现。把项目目录作为 Obsidian vault 打开，入口是 `course/index.md`；标准相对 Markdown 链接也可在 GitHub 阅读。项目总入口、共享编辑器设置和格式配置位于[仓库根目录](../README.md)。
 
 ## 如何使用
 
@@ -17,7 +17,7 @@
 
 ## 开始实验
 
-命令与 foundations 一致，统一在 `labs/` 目录执行：
+与 foundations 一样，实验命令统一在仓库的 `labs/` 目录执行：
 
 ```bash
 cd labs
@@ -29,10 +29,10 @@ python3 tools/run.py --lab 1 --impl reference --mode test
 
 使用 [环境说明](../labs/setup.md) 复用现有环境；运行产物保存在 `labs/results/`，个人报告写入 `labs/reports/`。参考实现通过临时副本运行，不覆盖学生源码。参考答案覆盖已提供的核心接口；新增实验与开放挑战的覆盖范围以各 lab 清单为准。
 
-## 资源与质量记录
+## 延伸阅读
 
 - [大学课程与开放 lab](readings/courses-and-labs.md)、[论文和源码索引](readings/resources.md)、[固定源码阅读入口](readings/code-map.md)。
-- [离线交互可视化](visuals/index.html)：KV 预算、推测成本、编译摊销和激活预算；演示值不当作实测。
-- [验证范围](../labs/docs/validation.md)、[独立评审记录](../labs/docs/editorial-review.md)、[统一格式规范](../labs/docs/formatting.md)。
+- [可视化阅读索引](readings/visualizations.md)：各讲的图解、开源交互与性能分析工具，附观察任务。
+- [论文阅读方法](guides/reading.md)、[实验规范](guides/experiments.md)、[研究提案模板](templates/proposal.md)。
 
-资料核验和本次设计修订日期为 2026-10-17（Asia/Shanghai）。这八个方向供你开始探索，候选假设还需查新并与导师讨论。完成教学实验不等于完成论文。
+> 编辑笔记和代码时，可查阅[统一格式规范](../labs/docs/formatting.md)。

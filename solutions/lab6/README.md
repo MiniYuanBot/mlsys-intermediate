@@ -17,6 +17,6 @@ python tools/run.py --lab 6 --impl reference --mode test --device cuda
 python tools/run.py --lab 6 --impl reference --mode bench --device cuda
 ```
 
-参考测试有 14 个方法，覆盖每个必修 TODO；CPU 与 CUDA 的实际结果及 hash 见[验证](../../labs/docs/validation.md)。合并误差、输入与参数梯度、微批更新按浮点容差比较；base 恢复和字节数则要求精确一致。
+参考测试有 14 个方法，覆盖每个必修 TODO；CPU 与 CUDA 分别运行，结果与源码 hash 保存在 runner 生成的记录中。合并误差、输入与参数梯度、微批更新按浮点容差比较；base 恢复和字节数则要求精确一致。
 
 推荐错误注入：在 base linear 使用 no_grad；加载时逐项检查逐项写入；checkpoint 关闭 RNG；对微批 mean 做简单平均；把参数 view offload。先看目标测试是否失败，再恢复。扩展到异步 offload 时，仅开启 non_blocking 还不够，必须额外验证 host buffer 的生命周期和 stream event。

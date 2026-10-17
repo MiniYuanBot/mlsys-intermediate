@@ -1,74 +1,61 @@
-# 第三次修订实际验证记录
+# 参考实现验证说明
 
-日期：2026-10-17。本轮重构了八个实验的基础A、核心B、前沿C和全部参考答案。有效记录见[revision3索引](evidence/revision3/README.md)，机器可读清单见[summary.json](evidence/revision3/summary.json)。每份记录包含命令、环境、stdout/stderr、返回码和源码SHA256。
+本页保留 2026-10-17 的试运行范围摘要。旧版逐次日志已清理；下表用于说明已检查的行为和边界，不提供当前源码的原始运行记录。复查时请执行文末命令，以新生成的日志为准。
 
-## 实际执行范围
+## 已验证范围
 
-| Lab | 实际正确性验证                              | 实际benchmark                   | 能说明什么                                        |
-| --- | ------------------------------------------- | ------------------------------- | ------------------------------------------------- |
-| 1   | C++两轴/极值量化、111增量边界、PQ独立oracle | 18行（三seed/两长度/三预算）    | 实际CPU缓存与检索数值，非GPU论文系统              |
-| 2   | CPU A/C；CUDA所有kernel及校准接线           | 主机校准3行、CUDA40行           | 实际C++/CUDA W4A32，不是完整AWQ/Marlin系统        |
-| 3   | CPU A/B/C1–C4真实Inductor；CUDA全阶段含融合 | 19条真实JSON记录、120行融合数据 | 真编译/执行；缓存制度有说明，不当作冷编译         |
-| 4   | Rust 14测试，含无探索退化反例               | A20/B120/C60行                  | 到达队列与SLO离散事件模型，时间非实测服务延迟     |
-| 5   | Rust 15测试，含不同祖先后块反例             | A12/B8/C36行                    | 实际缓存状态/lease/并发trace，服务ms为模型        |
-| 6   | CPU和CUDA各14测试，含dtype事务和梯度        | CPU/CUDA各24行                  | 实际微型网络optimizer step；CUDA实际offload与峰值 |
-| 7   | CPU数值/事件；CUDA12组形状的单双槽专家      | A9/B6/CPU C6/CUDA C12行         | 实际INT8专家执行+传输；B模拟与C测量分列           |
-| 8   | Rust 12契约测试、确定性时序反例             | A3/B12/C108行                   | 实际小型策略梯度学习；token/worker耗时是事件模型  |
+| Lab | 正确性检查                                                  | benchmark 输出                  | 测量边界                                                      |
+| --- | ----------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------- |
+| 1   | C++ 两轴量化、极值、111 个增量边界、PQ 独立 oracle          | 18 行                           | CPU 缓存与检索，未测 GPU 论文系统                             |
+| 2   | CPU A/C；CUDA 各 kernel 及校准接线                          | 主机校准 3 行、CUDA 40 行       | 局部 W4A32 线性层，未复现完整 AWQ/Marlin                      |
+| 3   | CPU A/B/C1–C4 的真实 Inductor 执行；CUDA 全阶段含融合       | 19 条 JSON 记录、120 行融合数据 | 包含真实编译与执行，需另行说明进程和磁盘缓存状态              |
+| 4   | Rust 14 项测试，含无探索退化反例                            | A20/B120/C60 行                 | 到达队列和 SLO 离散事件模型，时间不是实测服务延迟             |
+| 5   | Rust 15 项测试，含不同祖先后块反例                          | A12/B8/C36 行                   | 实际缓存状态、lease 和并发 trace；服务时间来自模型            |
+| 6   | CPU 与 CUDA 各 14 项测试，含 dtype 事务和梯度               | CPU/CUDA 各 24 行               | 微型网络 optimizer step；CUDA 路径包含实际 offload 和峰值测量 |
+| 7   | CPU 14 项检查；CUDA 12 组单双槽专家配置                     | A9/B6/CPU C6/CUDA C12 行        | INT8 专家执行与传输；B 的模拟和 C 的测量分别报告              |
+| 8   | Rust 12 项契约测试，含有限差分、裁剪分支和 3 个 seed 的学习 | A3/B12/C108 行                  | 实际小型策略梯度训练；token/worker 耗时来自事件模型           |
 
-八个lab的参考test和bench均已通过。补充执行Lab2 CPU A/C、Lab3 CPU、Lab6 CPU；八个初始学生骨架的A阶段均按预期在TODO处失败，未静默导入答案。参考运行仅证明题目可执行，不是学生个人完成证明。
+上述参考 test 与 benchmark 均曾运行通过。八个初始学生骨架的 A 阶段也曾检查，均在未完成的 TODO 处失败。参考实现可运行不代表学生已完成任务；评分仍按各 lab 的 `grade.md`，个人反例、报告和开放挑战单独验收。
 
-评分依据见各lab的`grade.md`：逐算法性质/状态检查、数值oracle与报告方法分开，没有要求固定加速倍数。个人报告和开放研究挑战未被自动测试代替。
+## 环境与限制
 
-## 环境与测量边界
+试运行环境为 WSL2/Linux、RTX 4060 Laptop 8GB、CUDA Toolkit 12.6、PyTorch 2.14.1+cu126、Python 3.12.3，使用 C++17 与 Rust 标准库。GPU benchmark 串行执行，未排除其他桌面负载。未实机验证 macOS、原生 Windows/MSVC、多 GPU 或学校 HPC。
 
-WSL2/Linux，RTX4060 Laptop 8GB；CUDA Toolkit12.6，PyTorch2.14.1+cu126，Python3.12.3；C++17与Rust标准库。不同记录保留实际版本。GPU基准串行运行，避免本轮多个GPU实验互相占用；不能保证系统没有其他桌面负载。
+Lab2 的 B 和 C 的 GPU 集成、Lab3 C5、Lab6 的 GPU 搬运与峰值、Lab7 C3/C4/C6 需要 NVIDIA GPU。CPU 测试不能替代这些部分的验收。Lab7 的单双槽计时未附 profiler 时间线，不能仅据此认定传输与计算发生了重叠；Lab8 的学习曲线只适用于给定的小型环境。
 
-未实机验证Mac、原生Windows/MSVC、多GPU或学校HPC。Lab2完整B/C、Lab3 C5、Lab6实际搬运/峰值、Lab7 C3/C4/C6需要NVIDIA GPU；其余CPU数值或事件系统不伪装为GPU性能。
+## 重新运行
 
-## 输出和工作量检查
-
-- [workload](workload.md)：123个成对TODO，2038行有效参考实现；[原始统计](evidence/revision3/workload.json)。
-- [格式检查](evidence/revision3/format-check.json)：使用foundations配置，C/C++/CUDA、Python、Rust、Shell、Markdown/JSON/HTML统一检查。
-- [交付检查](evidence/revision3/quality-check.json)：目录结构、局部链接、Python语法、TODO配对、所有正式bench表导出。
-- [交叉审核](editorial-review.md)：算法/文稿缺陷、具体修复和复测范围。
-
-Lab3第一次benchmark退出0，但stdout交错破坏了JSONL；该记录仅作诊断，正式结果使用`lab3-reference-bench-cuda-clean.json`。Lab7早期表头缺列及单次计时结果由`lab7-reference-bench-cuda-final2.json`替代。清单不会把这些旧输出当作最终可导出证据。
-
-## 复查
-
-以下命令cwd为`labs/`，使用已安装PyTorch的解释器：
+以下命令从 `labs/` 执行，使用已配置所需工具链和 PyTorch 的解释器。`run.py` 将命令、环境、源码 SHA256、stdout/stderr 和退出状态保存到本地 `results/`，并打印 `RECORD` 路径。
 
 ```bash
-python tools/workload_audit.py
-python tools/check_links.py
-python tools/format_check.py
-python tools/run.py --lab 1 --part A --impl reference --mode test
-python tools/run.py --lab 2 --impl reference --mode test --device cuda
-python tools/run.py --lab 6 --impl reference --mode bench --device cuda
+# CPU 可完成的实验。
+for lab in 1 4 5 8; do
+    python3 tools/run.py --lab "$lab" --impl reference --mode test
+    python3 tools/run.py --lab "$lab" --impl reference --mode bench
+done
+
+# 需要 CUDA 验证的完整路径；依次运行，避免互相争用 GPU。
+for lab in 2 3 6 7; do
+    python3 tools/run.py --lab "$lab" --impl reference --mode test --device cuda
+    python3 tools/run.py --lab "$lab" --impl reference --mode bench --device cuda
+done
+
+# 补充 CPU 路径。
+python3 tools/run.py --lab 2 --impl reference --part A --mode test
+python3 tools/run.py --lab 2 --impl reference --part C --mode test
+for lab in 3 6 7; do
+    python3 tools/run.py --lab "$lab" --impl reference --mode test
+done
 ```
 
-[第一版原始证据](evidence/README.md)和[第二版证据](evidence/revision2/README.md)保留历史数值；本版源码和评分以当前任务书及revision3记录为准。
+没有 GPU 时，可先按[实验索引](../index.md)运行 CPU 范围，并在报告中标注尚未执行的部分。数据表导出与绘图用法见[公共工具](../tools/README.md)。
 
-## D7/D8 讲义与实验对照复核（2026-10-17）
-
-本次对照学生接口、参考实现、契约测试和 benchmark，修正了两篇讲义保留的旧版实验说明。D7 更新缓存的四种返回值、加载完成时刻、pin 引用计数、预测预算及实际 CUDA 执行范围；D8 更新优势标准化公式、组身份检查、裁剪梯度及版本阈值对学习的影响。实验实现未改动。
-
-| 复核项          | 本次执行结果                                                                  | 原始记录                                            |
-| --------------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
-| Lab 7 正确性    | 14 项 CPU 检查、12 组 CUDA 配置通过；CUDA 最大绝对误差为 `2.23517e-08`        | [test](evidence/lecture-sync-lab7-test-cuda.json)   |
-| Lab 7 benchmark | A9/B6/CPU C6/CUDA C12 行；CUDA 最大绝对误差为 `2.08616e-07`，低于 `2e-4` 容差 | [bench](evidence/lecture-sync-lab7-bench-cuda.json) |
-| Lab 8 正确性    | 12 项 Rust 契约测试通过，包括有限差分、裁剪分支和 3 个 seed 的实际学习        | [test](evidence/lecture-sync-lab8-test-cpu.json)    |
-| Lab 8 benchmark | A3/B12/C108 行；27 次训练均完成，保留严格版本阈值下的较差结果                 | [bench](evidence/lecture-sync-lab8-bench-cpu.json)  |
-
-Lab 7 在 RTX 4060 Laptop 8GB 上运行：B 的 4096B 容量下，预取将 demand 等待未命中从 120 降为 9，总接纳字节却从 245760B 增至 249856B。讲义据此区分 demand 等待、总加载量与 Belady 换入下界。此次没有采集 profiler 时间线，不能仅凭单双槽墙钟差异声称观察到了重叠。
-
-Lab 8 的 100 波实验中，max_lag=4 时最终 expected reward 为 0.9823–0.9846，更新 400 次；max_lag=0 时为 0.6203–0.6209，更新 100 次并丢弃 2400 条超龄样本。这是当前 bandit 与事件模型的结果，比较固定的是波数，不是更新次数或墙钟预算。
-
-复现本次运行，在 `labs/` 下执行：
+维护课程时，可另行运行以下检查：
 
 ```bash
-python3 tools/run.py --lab 7 --impl reference --part all --mode test --device cuda
-python3 tools/run.py --lab 7 --impl reference --part all --mode bench --device cuda
-python3 tools/run.py --lab 8 --impl reference --part all --mode test
-python3 tools/run.py --lab 8 --impl reference --part all --mode bench
+python3 tools/workload_audit.py --output results/workload.json
+python3 tools/check_links.py
+python3 tools/format_check.py
 ```
+
+这些检查分别覆盖 TODO 配对与规模、内部 Markdown 文件链接和格式，不能替代算法测试与实验分析。

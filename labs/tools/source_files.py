@@ -22,7 +22,6 @@ IGNORED = (
     "vendor",
     "results",
     "reports",
-    "evidence",
     "artifacts",
     "generated",
     ".*cache*",

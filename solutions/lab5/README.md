@@ -1,6 +1,6 @@
-# Lab 5 参考答案与运行证据
+# Lab 5 参考答案与解题导读
 
-[任务书](../../labs/lab5/README.md) · [评分](../../labs/lab5/grade.md) · [试运行原始记录](validation.json)
+[任务书](../../labs/lab5/README.md) · [评分](../../labs/lab5/grade.md)
 
 答案在 [cache_student.rs](src/cache_student.rs) 与 [replay_student.rs](src/replay_student.rs)。A/B/C 全部 14 项 TODO 均已实现；独立测试、benchmark 和 CLI 保留在 labs 侧。
 
@@ -24,8 +24,15 @@ TwoHit 记录完整块祖先的近期访问，历史表也有容量限制。它�
 
 指标按总token加权，而不是平均每请求命中率。capacity failure只统计事务插入因空间/pin失败；TwoHit决定少缓存不属于这个失败计数。C的worker是抽象独立服务台，不等价于单GPU多batch。
 
-## 已执行的检查
+## 运行与对照
 
-2026-10-17在CPU运行 `exercise.py --mode test --part A/B/C/all`，分别5/5/5/15个测试通过；all benchmark产生A12、B8、C36行。学生A stub返回101且明确未实现。原始命令输出与源码SHA在validation.json，最终统一格式化后的哈希以项目runner记录为准。
+在 `labs/` 目录运行参考实现：
+
+```bash
+python3 tools/run.py --lab 5 --impl reference --mode test
+python3 tools/run.py --lab 5 --impl reference --mode bench
+```
+
+可加 `--part A/B/C` 选择阶段。A/B/C/all 分别包含 5/5/5/15 个测试，完整 benchmark 输出 A12、B8、C36 行；对照时同时检查测试结果与输出字段，不能只看命令是否退出。
 
 运行合成负载时已观察到反例：capacity=4 时，two-hit+LPM 的整体 hit 约为 0.236，低于 two-hit+FIFO 的约 0.239，因此不能预设组合策略一定更好。图中的 p95 与 wait 来自显式成本模型，未测量真实 GPU、网络或内核吞吐。

@@ -39,6 +39,6 @@ python3 tools/run.py --lab 7 --impl reference --part C --mode test --device cuda
 python3 tools/run.py --lab 7 --impl reference --part all --mode bench --device cuda
 ```
 
-CPU14个命名检查与A/B/C benchmark已试运行，CUDA编译通过；统一GPU试运行及最终命令记录见[验证记录](../../labs/docs/validation.md)。B 的模拟时间不能用于证明 C 的加速，CUDA benchmark 也不要求双槽一定更快。
+CPU 路径包含 14 个命名检查，CUDA 路径另检查 12 组配置。两条路径分别运行，保存 runner 输出的记录。B 的模拟时间不能用于证明 C 的加速，CUDA benchmark 也不要求双槽一定更快。
 
 对照答案时，建议只查看当前卡住的 TODO。先写出不变量、画出最小反例，再看实现。除了掌握 map/stream 的调用顺序，还要能解释为什么 blocked 必须满足事务语义，以及 copy 为什么需要等待 done。

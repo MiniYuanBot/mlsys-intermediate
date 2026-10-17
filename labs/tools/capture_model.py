@@ -11,10 +11,6 @@ import json
 import time
 from pathlib import Path
 
-import torch
-import transformers
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
 
 def cache_pairs(cache):
     if hasattr(cache, "layers"):
@@ -28,7 +24,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--model", type=Path, required=True)
     p.add_argument(
-        "--prompts", type=Path, default=Path(__file__).resolve().parents[1] / "data/prompts.txt"
+        "--prompts", type=Path, required=True, help="UTF-8 text file, one prompt per line"
     )
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--device", choices=["cpu", "cuda"], default="cuda")
@@ -40,8 +36,20 @@ def main():
         p.error("token limits must be positive")
     if not a.model.is_dir():
         p.error("--model must be an existing local directory")
+    try:
+        prompt_bytes = a.prompts.read_bytes()
+        prompts = prompt_bytes.decode("utf-8").splitlines()
+    except (OSError, UnicodeError) as error:
+        p.error(f"cannot read --prompts as UTF-8: {error}")
+    if not any(line.strip() for line in prompts):
+        p.error("--prompts must contain at least one nonblank line")
     if a.output.exists():
         p.error("--output already exists; use a new directory to preserve records")
+
+    import torch
+    import transformers
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
     a.output.mkdir(parents=True)
     dtype = (
         torch.float32
@@ -74,7 +82,7 @@ def main():
         "transformers": transformers.__version__,
         "dtype": str(dtype),
         "device": a.device,
-        "prompt_sha256": hashlib.sha256(a.prompts.read_bytes()).hexdigest(),
+        "prompt_sha256": hashlib.sha256(prompt_bytes).hexdigest(),
         "max_input": a.max_input,
         "max_new": a.max_new,
         "chat_template": False,
@@ -91,7 +99,7 @@ def main():
     eos = model.generation_config.eos_token_id
     eos = set(eos if isinstance(eos, list) else ([] if eos is None else [eos]))
     with torch.inference_mode(), (a.output / "requests.jsonl").open("w") as out:
-        for request_id, text in enumerate(a.prompts.read_text().splitlines()):
+        for request_id, text in enumerate(prompts):
             if not text.strip():
                 continue
             inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=a.max_input)[

@@ -33,22 +33,22 @@ tags: [lecture, lora, checkpointing, autograd, training]
 把某个训练时刻的显存拆成：
 
 $$
-M=M_W+M_G+M_O+M_A+M_{workspace}+M_{runtime}.
+M=M_W+M_G+M_O+M_A+M_{\mathrm{workspace}}+M_{\mathrm{runtime}}.
 $$
 
-W 是参数，G 是梯度，O 是优化器状态，A 是仍需使用的激活。workspace 包括算子临时区；runtime 还可能含通信和图执行缓冲。这些对象的生命周期各不相同，因此显存峰值不一定出现在前向的最后一层。
+$W$ 是参数，$G$ 是梯度，$O$ 是优化器状态，$A$ 是仍需使用的激活。workspace 包括算子临时区；runtime 还可能含通信和图执行缓冲。这些对象的生命周期各不相同，因此显存峰值不一定出现在前向的最后一层。
 
 例如 FP32 参数每元素 4 bytes，FP32 梯度每元素也是 4 bytes，Adam 的两个 FP32 动量通常再占 8 bytes。还需根据实际配置检查是否存在 FP32 master weights、状态是否使用低比特表示，以及实现是否额外保留张量，不能将所有混合精度训练都按“16 bytes/parameter”计算。
 
 ### 1.2 冻结参数省掉哪些项
 
-若 W 不可训练，通常不需要为它保存梯度和优化器状态，但它仍须参与前向，还可能参与输入梯度计算。对中间激活的需求取决于计算图，而不是仅由 `requires_grad` 的参数比例决定。
+若 $W$ 不可训练，通常不需要为它保存梯度和优化器状态，但它仍须参与前向，还可能参与输入梯度计算。对中间激活的需求取决于计算图，而不是仅由 `requires_grad` 的参数比例决定。
 
 lab 的 Model 默认有 8 个 residual block，实际默认 benchmark 使用 4 个块，每块是 LayerNorm→LoRA up projection→GELU→LoRA down projection→dropout。它**没有 attention、词表 logits、KV 或交叉熵**。长序列让中间张量随 token 数增长，但不能据此估计真实 Transformer 的全部峰值。
 
 ### 1.3 一个单位检查
 
-形状 `[B,T,H]=[2,128,256]` 的 FP32 张量占：
+形状 $[B,T,H]=[2,128,256]$ 的 FP32 张量占：
 
 $$
 2\cdot128\cdot256\cdot4=262{,}144\ \text{bytes}=0.25\ \text{MiB}.
@@ -58,7 +58,7 @@ $$
 
 > [!question] 随堂自测 D6-1：先分清账目与单位
 >
-> 1. 忽略 bias，din=dout=1024、r=8、全部 FP32 时，基座 W 与可训练 A/B 各占多少 MiB？是否能据此推出训练峰值？
+> 1. 忽略 bias，$d_{\mathrm{in}}=d_{\mathrm{out}}=1024$、$r=8$、全部 FP32 时，基座 W 与可训练 A/B 各占多少 MiB？是否能据此推出训练峰值？
 > 2. 冻结 W 后，W 本体、W 梯度、W 的优化器状态、输入梯度所需计算分别怎样变化？
 
 > [!tip]- 核对要点
@@ -70,32 +70,32 @@ $$
 
 ### 2.1 形状先于代码
 
-令输入 X 为 `[N,d_in]`，基座 W 为 `[d_out,d_in]`，低秩 A 为 `[r,d_in]`，B 为 `[d_out,r]`。输出：
+令输入 $X$ 为 $[N,d_{\mathrm{in}}]$，基座 $W$ 为 $[d_{\mathrm{out}},d_{\mathrm{in}}]$，低秩 $A$ 为 $[r,d_{\mathrm{in}}]$，$B$ 为 $[d_{\mathrm{out}},r]$。输出：
 
 $$
-Y=XW^T+sXA^TB^T,\qquad s=\alpha/r.
+Y=XW^{\top}+sXA^{\top}B^{\top},\qquad s=\alpha/r.
 $$
 
 `torch.nn.functional.linear(X,W)` 按这一权重布局计算，不应再手动转置一次。输入也可以带多个前导 batch 维；只对最后一维做线性变换。
 
 ```text
-X [N, din] ────────── Wᵀ ──────────────────┐
-     └──────── Aᵀ → [N,r] → Bᵀ → ×s ─────┼→ Y [N,dout]
-                                           ┘
+X [N, d_in] --+-- base linear (W) -------------------------------+--> Y [N, d_out]
+              |                                                  |
+              +-- down (A) --> [N, r] --> up (B) --> scale (s) --+
 ```
 
-新增参数量为 $r(d_{in}+d_{out})$。当 `din=dout=1024,r=8`，LoRA 参数为 16,384，基座为 1,048,576，比例 1/64。这个比例只描述参数，不是训练峰值比例。
+新增参数量为 $r(d_{\mathrm{in}}+d_{\mathrm{out}})$。当 $d_{\mathrm{in}}=d_{\mathrm{out}}=1024,\;r=8$，LoRA 参数为 16,384，基座为 1,048,576，比例 1/64。这个比例只描述参数，不是训练峰值比例。
 
-### 2.2 为什么 B=0 时 A 的首次梯度为零
+### 2.2 为什么 $B=0$ 时 $A$ 的首次梯度为零
 
-令 G=$\partial L/\partial Y$，忽略 batch 维展开问题，有：
+令 $G=\partial L/\partial Y$，忽略 batch 维展开问题，有：
 
 $$
-\frac{\partial L}{\partial B}=sG^T(XA^T),\qquad
-\frac{\partial L}{\partial A}=sB^TG^TX.
+\frac{\partial L}{\partial B}=sG^{\top}(XA^{\top}),\qquad
+\frac{\partial L}{\partial A}=sB^{\top}G^{\top}X.
 $$
 
-初始 B=0 时，LoRA 分支输出为 0，所以模型初始输出等于基座；A 的梯度也为 0，而 B 的梯度一般非零。更新 B 后，下一步 A 才可能得到非零梯度。不能为了让 A 首次获得非零梯度而改变规定的初始化。
+初始 $B=0$ 时，LoRA 分支输出为 0，所以模型初始输出等于基座；A 的梯度也为 0，而 B 的梯度一般非零。更新 $B$ 后，下一步 A 才可能得到非零梯度。不能为了让 A 首次获得非零梯度而改变规定的初始化。
 
 实验的 `test_a1_frozen_base_input_and_adapter_gradients` 正是在检验这组关系：base 输出一致、W 没有 grad、B 有梯度、A 首次梯度为零。
 
@@ -107,9 +107,9 @@ $$
 \frac{\partial L}{\partial X}=GW+sGBA.
 $$
 
-如果 X 来自上游可训练层，错误地在 `no_grad` 中计算 `XWᵀ` 会丢掉第一项。此时 loss 仍可能下降，B 也可能仍有梯度，因此仅检查这两点无法发现错误。
+如果 X 来自上游可训练层，错误地在 `no_grad` 中计算 $XW^{\top}$ 会丢掉第一项。此时 loss 仍可能下降，B 也可能仍有梯度，因此仅检查这两点无法发现错误。
 
-一个最小反例：取 r=1、B=0、X.requires_grad=True，令 loss 为输出求和。此时正确输入梯度等于 W 每列的和，而不是全零。`test_a1_frozen_base_input_and_adapter_gradients` 的后半段将 B 设为非零，用独立矩阵公式检查两条分支的输入梯度；仅检查初始输出与 A/B 参数梯度，不能代替这一检查。
+一个最小反例：取 $r=1$、$B=0$，并设置 `X.requires_grad=True`，令 loss 为输出求和。此时正确输入梯度等于 W 每列的和，而不是全零。`test_a1_frozen_base_input_and_adapter_gradients` 的后半段将 B 设为非零，用独立矩阵公式检查两条分支的输入梯度；仅检查初始输出与 A/B 参数梯度，不能代替这一检查。
 
 ### 2.4 与完整微调的比较条件
 
@@ -119,19 +119,19 @@ $$
 
 > [!question] 随堂自测 D6-2：一个梯度错误能否被 loss 发现
 >
-> 1. 设 W=[[1,2],[3,4]]、B=0、X=[[5,6]]，loss 为两个输出之和。正确的输入梯度是多少？若给基座分支加 `no_grad()` 呢？
-> 2. B=0 时 A 的首次梯度为零是否说明 LoRA 实现坏了？如何让测试同时覆盖基座与低秩分支的输入梯度？
+> 1. 设 $W=\begin{bmatrix}1&2\\3&4\end{bmatrix}$、$B=0$、$X=[5,6]$，loss 为两个输出之和。正确的输入梯度是多少？若给基座分支加 `no_grad()` 呢？
+> 2. $B=0$ 时 $A$ 的首次梯度为零是否说明 LoRA 实现坏了？如何让测试同时覆盖基座与低秩分支的输入梯度？
 
 > [!tip]- 核对要点
 >
-> 1. 正确梯度为 [[4,6]]；错误关闭基座 autograd 后，只剩 B=0 的低秩分支，输入梯度为零。loss 数值此时仍可能相同。
-> 2. 不是，这是初始化带来的结果，B 的梯度通常非零。再令 B 非零、给定上游 G，用 `GW+sGBA` 独立计算输入梯度；不能用另一遍相同 forward 当 oracle。
+> 1. 正确梯度为 [[4,6]]；错误关闭基座 autograd 后，只剩 $B=0$ 的低秩分支，输入梯度为零。loss 数值此时仍可能相同。
+> 2. 不是，这是初始化带来的结果，B 的梯度通常非零。再令 B 非零、给定上游 G，用 $GW+sGBA$ 独立计算输入梯度；不能用另一遍相同 forward 当 oracle。
 
 ## §3 Autograd 保存了什么，checkpoint 改了什么
 
 ### 3.1 保存与重算的依赖图
 
-对 `u=f(x),v=g(u),y=h(v)`，普通 autograd 根据 backward 所需保存输入或中间结果。checkpoint 可以只保留某个区域的边界输入，在 backward 需要时重新运行该区域，恢复相关张量。
+对 $u=f(x),\;v=g(u),\;y=h(v)$，普通 autograd 根据 backward 所需保存输入或中间结果。checkpoint 可以只保留某个区域的边界输入，在 backward 需要时重新运行该区域，恢复相关张量。
 
 ```mermaid
 flowchart LR
@@ -177,7 +177,7 @@ lab 的 `run_blocks(blocks,x,keep)` 采用每 block 一个决策：True 走普�
 
 若前向用了 mask m，重计算时用了 m'，backward 看到的可能不再是原前向路径。即使 mask 的分布相同，也不等于单次梯度相同。
 
-设 $y=xm/(1-p)$。一次前向 m=0 导致 y=0，而重计算 m'=1；若继续使用这次重算生成的导数，所得梯度不对应原来的随机路径。研究中有时可以接受不同随机估计器，但不能称其与原算法逐步等价。
+设 $y=xm/(1-p)$。一次前向 $m=0$ 导致 $y=0$，而重计算 m'=1；若继续使用这次重算生成的导数，所得梯度不对应原来的随机路径。研究中有时可以接受不同随机估计器，但不能称其与原算法逐步等价。
 
 ### 4.2 公平的梯度对照流程
 
@@ -195,7 +195,7 @@ lab C3 在 dropout 开启时比较输入和参数梯度，C4 对不均匀微批�
 
 > [!question] 随堂自测 D6-4：随机等价不是分布相同
 >
-> 1. 取 p=0.5、y=xm/(1−p)、loss=y，原前向 m=0，重算却用 m′=1。两条路径对 x 的导数各是多少？只固定最开始的一次 seed 足够公平比较多个策略吗？
+> 1. 取 $p=0.5$、$y=xm/(1-p)$、$L=y$，原前向 $m=0$，重算却用 $m'=1$。两条路径对 x 的导数各是多少？只固定最开始的一次 seed 足够公平比较多个策略吗？
 > 2. 两种实现得到同样的 loss，梯度分别为 [1,0] 与 [0,1]。梯度范数能发现错误吗？应如何比较？
 
 > [!tip]- 核对要点
@@ -217,7 +217,7 @@ $$
 
 ### 5.2 用独立枚举校验一个小例子
 
-取 sizes=`[2,5,3,7]`，costs=`[1,9,4,6]`，B=8。可保存 block 1 和 2，总大小 8、收益 13；保存 block 0 和 1，总大小 7、收益 10。枚举 16 个子集可以得到独立 oracle。
+取 $\mathrm{sizes}=[2,5,3,7]$，$\mathrm{costs}=[1,9,4,6]$，$B=8$。可保存 block 1 和 2，总大小 8、收益 13；保存 block 0 和 1，总大小 7、收益 10。枚举 16 个子集可以得到独立 oracle。
 
 动态规划状态可定义为前 i 项、已使用 u 单位时的最大收益。第 i 项有不选与选两种转移；记录 mask 或前驱用于重建。注意 0/1 的“每项至多一次”：原地更新容量时需要正确方向，或者像参考那样从旧状态构造新状态。
 
@@ -233,11 +233,11 @@ B2 用手工小表验证0/1规划，B4扩展为多选DP。B5实际测每块retai
 
 后续可以逐块 profile，记录输入长度、保存张量规模与重算时间，用其中一部分配置拟合 s/c，再用未参与拟合的长度测试。比较预测峰值与实际峰值。误差较大时，应先修正成本模型，否则即使规划器求出最优解，也可能在优化错误的目标。
 
-[交互演示](../visuals/index.html)中的激活预算面板可用于手算验证。改变预算观察离散跳变，解释为何多 1 个单位有时无收益、有时能省掉一个昂贵 block。
+沿用 §5.2 的 sizes 与 costs，枚举 16 个子集，分别求预算 $B=8,9,10$ 时的最优保留集合与剩余重计算成本。在笔记中画出预算—成本阶梯图，解释为何多 1 个单位有时无收益、有时能省掉一个昂贵 block。
 
 > [!question] 随堂自测 D6-5：规划最优与实际可行
 >
-> 1. 对 sizes=[2,5,3,7]、costs=[1,9,4,6]、B=8，给出最优 keep 和收益。若动态规划一次更新重复选了某层，它解决的还是本题吗？
+> 1. 对 $\mathrm{sizes}=[2,5,3,7]$、$\mathrm{costs}=[1,9,4,6]$、$B=8$，给出最优 keep 和收益。若动态规划一次更新重复选了某层，它解决的还是本题吗？
 > 2. 两个计划都满足预测 retained KiB 预算，其中一个实际 OOM。应先怀疑 DP 还是成本模型？列出至少两项被模型省略的内存。
 
 > [!tip]- 核对要点
@@ -285,7 +285,7 @@ C3把retain/checkpoint/offload接入同一网络，C4将微批MSE sum除以总�
 > [!tip]- 核对要点
 >
 > 1. 分别为 4096、1、2、2；它们是累计计数，不能描述全部 host 活对象峰值。本实现同步复制，也不能据此宣称有传输重叠。
-> 2. 整体目标为 (2×1+3×4)/5=2.8；简单平均为 2.5，错误增加了小微批的权重。应按总 target.numel 归一化 sum loss。
+> 2. 整体目标为 $(2\times1+3\times4)/5=2.8$；简单平均为 2.5，错误增加了小微批的权重。应按总 target.numel 归一化 sum loss。
 > 3. 不足以证明，可能只是 allocator 保留池。warmup 初始化优化器等状态；快照记录会增加诊断开销，应单独运行并注明条件。
 
 ## §7 前沿方法分别改变哪一项
@@ -346,7 +346,7 @@ FlexLLM 研究共服务，不能仅用单独训练时节省的显存来评价。
 ## 资料汇总
 
 - 图解必看：[PyTorch checkpoint 保存/重算与选择性保存图](https://pytorch.org/blog/activation-checkpointing-techniques/)，对应 §3；[GPU memory 时间线与分类图](https://pytorch.org/blog/understanding-gpu-memory-1/)，对应 §6。先完成指定图的标注，全文可选读。
-- 可选交互：[官方 memory snapshot 查看器](https://docs.pytorch.org/memory_viz)，用于自己的 CUDA 记录；[本地激活预算面板](../visuals/index.html)，用于教学背包手算。两类图的数据来源不同。
+- 可选交互：[官方 memory snapshot 查看器](https://docs.pytorch.org/memory_viz)，用于自己的 CUDA 记录。§5 的预算阶梯图来自手算模型，两者的数据来源不同。
 - 接口与实验：[PyTorch checkpoint 文档](https://docs.pytorch.org/docs/stable/checkpoint.html)、[saved tensors hooks 教程](https://docs.pytorch.org/tutorials/intermediate/autograd_saved_tensors_hooks_tutorial.html)、[Lab 6](../../labs/lab6/README.md)、[改编来源](../../labs/lab6/resources.md)、[PyTorch 桥接](../guides/pytorch-bridge.md)、[实验规范](../guides/experiments.md)。
 - 前沿选读：[QLoRA](https://arxiv.org/abs/2305.14314)、[FlexLLM 项目](https://flexllm.github.io/)、[artifact](https://github.com/FlexLLM/artifact)、[CS336 Systems](https://github.com/stanford-cs336/assignment2-systems)、[固定源码入口](../readings/code-map.md)。按目标选读，不要求同时运行所有上游工程。
 

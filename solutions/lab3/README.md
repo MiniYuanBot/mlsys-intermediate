@@ -17,4 +17,4 @@ C2 实际调用 Inductor，保留每个候选函数，并单独报告整个校�
 
 C5 使用一 block/row 和 shared 二叉归约；尾部线程贡献零，但仍参与 barrier，分母使用真实 width，并保持 gamma 广播正确。当前 C5 只用于局部融合对照，没有注册到 C2 图中，因此不能声称完整编译器选择了自定义 kernel。
 
-开发阶段已实际通过A/B 10个测试、旧兼容2个测试，以及CPU真实Inductor C1–C4。最终CUDA记录见[统一验证](../../labs/docs/validation.md)。CPU runner 会打印 C5 NOT RUN，不能据此认定 GPU 验收通过。首次调用可能复用缓存，因此报告中不能将该数值称为完全冷启动的编译耗时。本实验完成的教学流程也不等于 Mirage/MPK 完整系统复现。
+A/B 包含 10 项测试和 2 项线性成本接口检查；C1–C4 实际调用 Inductor。CPU runner 会打印 C5 NOT RUN，不能据此认定 GPU 验收通过。首次调用可能复用缓存，因此报告中不能将该数值称为完全冷启动的编译耗时。本实验完成的教学流程也不等于 Mirage/MPK 完整系统复现。

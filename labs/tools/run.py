@@ -96,104 +96,20 @@ def main():
                 if out.returncode:
                     raise RuntimeError(f"command failed with exit {out.returncode}")
 
-            if (work / "exercise.py").exists():
-                run(
-                    [
-                        sys.executable,
-                        "exercise.py",
-                        "--mode",
-                        args.mode,
-                        "--device",
-                        args.device,
-                        "--part",
-                        args.part,
-                    ]
-                )
-            elif args.part != "all":
-                raise RuntimeError("this lab has no staged exercise.py driver yet")
-            elif args.lab in (1, 7):
-                exe = work / "lab"
-                run(
-                    [
-                        os.environ.get("CXX", "c++"),
-                        "-std=c++17",
-                        "-O2",
-                        "-Wall",
-                        "-Wextra",
-                        "-I",
-                        "src",
-                        f"{args.mode}.cpp",
-                        "-o",
-                        exe,
-                    ]
-                )
-                run([exe])
-                if args.lab == 7 and args.device == "cuda":
-                    gpu_exe = work / "transfer"
-                    run(
-                        [
-                            "nvcc",
-                            "-std=c++17",
-                            "-O2",
-                            "-arch=sm_89",
-                            "transfer_bench.cu",
-                            "-o",
-                            gpu_exe,
-                        ]
-                    )
-                    run([gpu_exe])
-            elif args.lab in (4, 5, 8):
-                if args.mode == "test":
-                    run(["cargo", "test", "--release", "--offline"])
-                else:
-                    run(["cargo", "run", "--release", "--offline", "--quiet"])
-            elif args.lab == 6:
-                run([sys.executable, f"{args.mode}.py", "--device", args.device])
-            elif args.lab == 3:
-                run(
-                    [sys.executable, "policy_test.py" if args.mode == "test" else "policy_bench.py"]
-                )
-                if args.device == "cuda":
-                    exe = work / "lab"
-                    run(
-                        [
-                            "nvcc",
-                            "-std=c++17",
-                            "-O2",
-                            "-lineinfo",
-                            "-arch=sm_89",
-                            "-I",
-                            "src",
-                            f"{args.mode}.cu",
-                            "-o",
-                            exe,
-                        ]
-                    )
-                    run([exe])
-                else:
-                    print("SCOPE: lab3 CUDA fusion was NOT executed; CPU bucket policy only.")
-            elif args.lab == 2:
-                if args.device != "cuda":
-                    raise RuntimeError(
-                        "lab2 requires --device cuda and an NVIDIA GPU; CPU is not a substitute"
-                    )
-                exe = work / "lab"
-                run(
-                    [
-                        "nvcc",
-                        "-std=c++17",
-                        "-O2",
-                        "-lineinfo",
-                        "-arch=sm_89",
-                        "-I",
-                        "src",
-                        f"{args.mode}.cu",
-                        "-lcublas",
-                        "-o",
-                        exe,
-                    ]
-                )
-                run([exe])
+            if not (work / "exercise.py").is_file():
+                raise RuntimeError(f"lab{args.lab} is missing its exercise.py driver")
+            run(
+                [
+                    sys.executable,
+                    "exercise.py",
+                    "--mode",
+                    args.mode,
+                    "--device",
+                    args.device,
+                    "--part",
+                    args.part,
+                ]
+            )
             record["status"] = "passed"
     except (RuntimeError, OSError) as e:
         record["error"] = str(e)

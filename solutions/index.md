@@ -4,7 +4,7 @@
 
 目录布局与 `labs/labN/` 对应，仅覆盖 TODO 文件。测试、benchmark 和提供的 driver 留在 labs。参考实现用于解释机制，不是各论文原系统或性能最优实现。
 
-以下命令从 **`labs/` 目录** 执行。A/B/C全部必修TODO均有答案和测试；学生个人反例、报告和开放研究挑战仍需独立完成。代码量见[审计](../labs/docs/workload.md)，真实试跑见[验证](../labs/docs/validation.md)。
+以下命令从 **`labs/` 目录** 执行。A/B/C全部必修TODO均有答案和测试；学生个人反例、报告和开放研究挑战仍需独立完成。对照答案前，先记录自己的最小失败输入与预期输出。
 
 ```bash
 python tools/run.py --lab 4 --impl reference --mode test

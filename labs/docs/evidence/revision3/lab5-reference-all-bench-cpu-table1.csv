@@ -1,9 +1,0 @@
-kind,stage,policy,capacity,hits,total,failed,stored
-synthetic_replay,B,lru,2,198,400,0,2
-synthetic_replay,B,frequency,2,198,400,0,2
-synthetic_replay,B,lru,4,198,400,0,4
-synthetic_replay,B,frequency,4,198,400,0,4
-synthetic_replay,B,lru,8,388,400,0,6
-synthetic_replay,B,frequency,8,388,400,0,6
-synthetic_replay,B,lru,16,388,400,0,6
-synthetic_replay,B,frequency,16,388,400,0,6

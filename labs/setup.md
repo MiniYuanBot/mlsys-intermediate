@@ -42,14 +42,15 @@ C++、Rust、纯 Python 部分可作为 CPU 学习路线，Apple Silicon 的 MPS
 
 ## 真实模型采集
 
-工具只读取显式指定的**已有本地目录**，默认 `trust_remote_code=False`，不自动下载。以下路径替换为你的实际模型目录；本次用户设备存在 Qwen3-0.6B/1.7B，推荐先用 0.6B。
+工具只读取显式指定的**已有本地模型目录**，默认 `trust_remote_code=False`，不自动下载。可先使用 lab1 的 [prompts.txt](lab1/prompts.txt) 跑通采集流程，其中包含四条中英文示例。也可以通过 `--prompts` 指定自己的 UTF-8 文本，每行一个 prompt，空行会被忽略。以下模型路径替换为实际目录；输出目录必须尚不存在。
 
 ```bash
 python tools/capture_model.py --model /path/to/Qwen3-0.6B \
+  --prompts lab1/prompts.txt \
   --output results/model-probe-01 --max-input 128 --max-new 32 --capture-kv
 ```
 
-它对每一步同步，产生 diagnostic latency，不包含排队/网络，不是在线服务 TTFT。K/V dump 发生在计时外，可能影响后续缓存/内存状态；正式 latency 对照应关闭 dump，并独立预热。prompt 是教学合成文本，不代表质量基准。
+它对每一步同步，产生 diagnostic latency，不包含排队/网络，不是在线服务 TTFT。K/V dump 发生在计时外，可能影响后续缓存/内存状态；正式 latency 对照应关闭 dump，并独立预热。记录所用提示词的来源和长度分布；自拟文本可用于机制检查，不应直接作为质量基准。
 
 ## 升级与复现
 

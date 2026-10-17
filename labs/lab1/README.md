@@ -161,6 +161,18 @@ python tools/extract.py results/lab1/reference.json --table 0 --out results/lab1
 
 挑战另计 8–16h：从[本地模型采集工具](../tools/capture_model.py)读取真实 K/V；比较层/head 间码本泛化；将 selective gather 迁移到 pinned host + CUDA stream 并测真实传输；为 decode 新 token 加增量索引与重建策略。先保留至少一个失败案例，并建立公平的 baseline，再判断是否值得继续研究。
 
+可先用本实验的 [prompts.txt](prompts.txt) 跑通采集流程。它包含四条中英文示例，适合检查输入、生成与 K/V 导出；正式研究需另选能代表目标负载的文本，并记录来源和长度分布。
+
+在 `labs/` 目录执行，替换模型路径，并使用尚不存在的输出目录：
+
+```bash
+python tools/capture_model.py --model /path/to/Qwen3-0.6B \
+  --prompts lab1/prompts.txt --output results/lab1/model-probe-01 \
+  --max-input 128 --max-new 32 --capture-kv
+```
+
+环境依赖与计时边界见[模型采集说明](../setup.md#真实模型采集)。
+
 ## 资料汇总
 
 | 资料                                                                                       | 本实验中怎样使用                                                                   |

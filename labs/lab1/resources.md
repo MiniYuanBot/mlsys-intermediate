@@ -9,6 +9,6 @@
 | [Stanford CS336 Assignment 2](https://github.com/stanford-cs336/assignment2-systems)                                                                             | attention 基准、数值对照、性能分析作业结构                                                    | B5 流式 softmax 与密集 oracle 分离，分清准备时间和稳态时间         | 不复制 GPU FlashAttention 作业；本任务使用 C++ CPU 分块 attention                                        |
 | [FAISS product quantizer 实现](https://github.com/facebookresearch/faiss/blob/main/faiss/impl/ProductQuantizer.cpp)                                              | 子量化器训练、code 生成和 inner-product lookup                                                | C1 Lloyd 子空间训练、C2 冻结编码、C3 lookup 累加                   | 不依赖 FAISS 求解；省去 SIMD、预计算表优化、索引服务与大规模训练                                         |
 
-建议先读论文图和上述函数，再填写[代码地图](../../course/readings/code-map.md)的机制差异表。可视化采用[课程交互页](../../course/visuals/index.html)理解预算，再用实验 CSV 绘制可导出的曲线；交互页是示意，不能作为性能证据。
+建议先读论文图和上述函数，再填写[代码地图](../../course/readings/code-map.md)的机制差异表。先完成[讲义 §1](../../course/modules/01-kv-cache.md)的 KV 字节预算手算，再用实验 CSV 绘制曲线；公式估算与实测结果分别标注。相关图解见[可视化阅读索引](../../course/readings/visualizations.md)。
 
 资源入口可能随上游变化；论文版本、上游固定快照记录见[代码阅读地图](../../course/readings/code-map.md)。本仓库运行证据记录的是本地源码 hash。

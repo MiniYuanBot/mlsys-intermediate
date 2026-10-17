@@ -1,7 +1,0 @@
-kind,part,seed,width,tokens,ms,checksum
-measured_cpu,C,1,32,32,0.16457,0.512589
-measured_cpu,C,1,64,32,0.516716,-16.477
-measured_cpu,C,2,32,32,0.14655,-5.63226
-measured_cpu,C,2,64,32,0.488948,-8.73975
-measured_cpu,C,3,32,32,0.139593,2.55392
-measured_cpu,C,3,64,32,0.632693,0.657911

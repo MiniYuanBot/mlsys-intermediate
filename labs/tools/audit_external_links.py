@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Audit HTTP reachability of Markdown links; this is not a scientific review."""
 
+import argparse
 import concurrent.futures
 import datetime
 import json
@@ -11,15 +12,18 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
-urls = {}
-for path in ROOT.rglob("*.md"):
-    if any(
-        x.startswith(".venv") or x in ("build", "target", ".git", "node_modules")
-        for x in path.parts
-    ):
-        continue
-    for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text()):
-        urls.setdefault(url, []).append(str(path.relative_to(ROOT)))
+
+
+def collect_urls():
+    from source_files import project_files
+
+    urls = {}
+    for path in project_files(ROOT):
+        if path.suffix != ".md":
+            continue
+        for url in re.findall(r"\]\((https?://[^\s)]+)\)", path.read_text()):
+            urls.setdefault(url, []).append(str(path.relative_to(ROOT)))
+    return urls
 
 
 def check(item):
@@ -42,25 +46,34 @@ def check(item):
     return result
 
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
-    results = list(pool.map(check, sorted(urls.items())))
-output = ROOT / "course/readings/link-audit.json"
-output.write_text(
-    json.dumps(
-        {
-            "checked_client_date": datetime.datetime.now(ZoneInfo("Asia/Shanghai"))
-            .date()
-            .isoformat(),
-            "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "scope": "HTTP reachability only; some pages were also independently read via web search. HTTP errors do not prove missing content.",
-            "links": results,
-        },
-        ensure_ascii=False,
-        indent=2,
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "labs/results/external-links.json")
+    args = parser.parse_args()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+        results = list(pool.map(check, sorted(collect_urls().items())))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(
+        json.dumps(
+            {
+                "checked_client_date": datetime.datetime.now(ZoneInfo("Asia/Shanghai"))
+                .date()
+                .isoformat(),
+                "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "scope": "HTTP reachability only; HTTP errors do not prove missing content.",
+                "links": results,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
     )
-    + "\n"
-)
-print("URLs", len(results), "reachable", sum(r["status"] == "reachable" for r in results))
-for r in results:
-    if r["status"] != "reachable":
-        print(r["status"], r.get("http_status"), r["url"])
+    print("URLs", len(results), "reachable", sum(r["status"] == "reachable" for r in results))
+    for result in results:
+        if result["status"] != "reachable":
+            print(result["status"], result.get("http_status"), result["url"])
+    print(f"RECORD: {args.output}")
+
+
+if __name__ == "__main__":
+    main()

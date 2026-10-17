@@ -40,10 +40,6 @@
 **/yarn.lock
 **/Cargo.lock
 
-# Preserve raw experiment records; Markdown explanations remain formatted.
-labs/docs/evidence/**
-!labs/docs/evidence/**/
-!labs/docs/evidence/**/*.md
 # Obsidian per-user state is not shared.
 .obsidian/workspace*.json
 .obsidian/cache/
