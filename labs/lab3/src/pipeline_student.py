@@ -19,7 +19,7 @@ class Sample:
 # sorting before the split leaks future popularity. Test: chronological_split.
 def split_trace(lengths, train_count):
     # BEGIN TODO A1
-    raise NotImplementedError("TODO A1: implement the contract above")
+    raise NotImplementedError("A1")
     # END TODO A1
 
 
@@ -28,7 +28,7 @@ def split_trace(lengths, train_count):
 # Store MAD so a noisy calibration remains visible. Test: robust_profiles.
 def summarize(samples):
     # BEGIN TODO A2
-    raise NotImplementedError("TODO A2: implement the contract above")
+    raise NotImplementedError("A2")
     # END TODO A2
 
 
@@ -37,32 +37,38 @@ def summarize(samples):
 # invocations at its measured cost. No linear per-item assumption. Test: interval_cost.
 def segment_costs(histogram, profiles):
     # BEGIN TODO A3
-    raise NotImplementedError("TODO A3: implement the contract above")
+    raise NotImplementedError("A3")
     # END TODO A3
 
 
-# A4: histogram total-variation distance on union support; counterexample must
-# detect a new shape even when old mean length is unchanged. Test: distribution_shift.
+# A4: total-variation distance TV(p,q) = 1/2 * sum_n |p(n) - q(n)| between the
+# normalized training histogram p and the empirical distribution q of `recent`, summed
+# over the UNION of supports (a shape seen only in `recent` counts fully). Range [0,1].
+# Both empty -> 0.0; exactly one empty -> 1.0. Nonpositive shapes/counts raise
+# ValueError. Test: distribution_shift (fractional cases vs an exact Fraction oracle).
 def trace_shift(training, recent):
     # BEGIN TODO A4
-    raise NotImplementedError("TODO A4: implement the contract above")
+    raise NotImplementedError("A4")
     # END TODO A4
 
 
 # B1: exact DP over prefix length and number of buckets, constrained by capacity.
-# Backtrack chosen upper bounds; deterministic tie: smaller bucket count, then
-# earliest split. Test: dp_exhaustive enumerates ALL partitions independently.
+# Bounds are training shapes; the last bound is the largest shape. Return sorted bounds.
+# Deterministic ties: fewer buckets first; then, scanning split points left to right,
+# keep the first strict minimum (the last bucket starts as early as possible).
+# Test: dp_exhaustive enumerates ALL partitions independently.
 def plan(histogram, profiles, capacity):
     # BEGIN TODO B1
-    raise NotImplementedError("TODO B1: implement the contract above")
+    raise NotImplementedError("B1")
     # END TODO B1
 
 
-# B2: upper-bound route; enforce padding ratio budget. Unknown large shapes
-# return None for eager fallback. Zero is never a legal length. Test: guarded_route.
+# B2: route to the SMALLEST bound >= length; return None (eager fallback) when no bound
+# fits or bound/length > max_padding (ratio exactly max_padding is allowed). Lengths
+# must be positive, bounds sorted/unique/positive, max_padding >= 1. Test: guarded_route.
 def route(length, bounds, max_padding=2.0):
     # BEGIN TODO B2
-    raise NotImplementedError("TODO B2: implement the contract above")
+    raise NotImplementedError("B2")
     # END TODO B2
 
 
@@ -81,14 +87,14 @@ class ArtifactCache:
     # A pinned existing key cannot be replaced. Test: pinned_transactional_lru.
     def put(self, key, value):
         # BEGIN TODO B3
-        raise NotImplementedError("TODO B3: implement the contract above")
+        raise NotImplementedError("B3")
         # END TODO B3
 
     # B4: acquire/release a lease. Touch LRU on acquire; invalid release errors.
     # Test: lease_lifetime; C executor uses try/finally so exceptions release.
     def lease(self, key, release=False):
         # BEGIN TODO B4
-        raise NotImplementedError("TODO B4: implement the contract above")
+        raise NotImplementedError("B4")
         # END TODO B4
 
 
@@ -97,7 +103,7 @@ class ArtifactCache:
 # Never use observed test counts here. Test: admission_break_even.
 def admit(profile, future_calls, margin=2.0):
     # BEGIN TODO B5
-    raise NotImplementedError("TODO B5: implement the contract above")
+    raise NotImplementedError("B5")
     # END TODO B5
 
 
@@ -106,5 +112,5 @@ def admit(profile, future_calls, margin=2.0):
 # averaging per-shape ratios. Test: weighted_padding_accounting.
 def padding_account(histogram, bounds, max_padding=2.0):
     # BEGIN TODO A5
-    raise NotImplementedError("TODO A5: implement the contract above")
+    raise NotImplementedError("A5")
     # END TODO A5

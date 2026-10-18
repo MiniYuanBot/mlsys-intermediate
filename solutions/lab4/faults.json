@@ -1,0 +1,433 @@
+[
+  {
+    "id": "a1-survival-not-updated",
+    "todo": "A1",
+    "file": "src/policy_student.rs",
+    "find": "        survival *= p;\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "survival never shrinks, so P(N=n) ignores earlier acceptances; the 2^k enumeration oracle disagrees"
+  },
+  {
+    "id": "a1-last-bucket-dropped",
+    "todo": "A1",
+    "file": "src/policy_student.rs",
+    "find": "    mass.push(survival);\n",
+    "replace": "    mass.push(0.0);\n",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "forgets the all-accepted bonus bucket; the enumeration oracle catches it"
+  },
+  {
+    "id": "a2-variance-uses-mean",
+    "todo": "A2",
+    "file": "src/policy_student.rs",
+    "find": "second += p * n * n;",
+    "replace": "second += p * n;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "second moment computed as E[N]; the hand-computed variance 0.484375 rejects it"
+  },
+  {
+    "id": "a3-rank-off-by-one",
+    "todo": "A3",
+    "file": "src/policy_student.rs",
+    "find": "let rank = ((q * sorted.len() as f64).ceil() as usize).max(1);",
+    "replace": "let rank = ((q * sorted.len() as f64).floor() as usize + 1).min(sorted.len());",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "floor+1 instead of ceil moves p50 of 4 samples from 2 to 3; nearest-rank checks catch it"
+  },
+  {
+    "id": "a4-interp-wrong-weight",
+    "todo": "A4",
+    "file": "src/policy_student.rs",
+    "find": ".map(|(a, b)| a + ratio * (b - a))",
+    "replace": ".map(|(a, b)| b + ratio * (a - b))",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "interpolation weight reversed: context 150 maps to the 3/4 point; hand values at 150 reject it"
+  },
+  {
+    "id": "a5-mean-not-median",
+    "todo": "A5",
+    "file": "src/policy_student.rs",
+    "find": "verify.push(percentile(&values, 0.5).ok_or(\"missing k in calibration\")?);",
+    "replace": "verify.push(if values.is_empty() { return Err(\"missing k in calibration\".into()) } else { values.iter().sum::<f64>() / values.len() as f64 });",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "mean instead of nearest-rank median: (1,2,3) still gives 2, but (4,6) must give 4, not 5"
+  },
+  {
+    "id": "a5-missing-k-as-zero",
+    "todo": "A5",
+    "file": "src/policy_student.rs",
+    "find": "verify.push(percentile(&values, 0.5).ok_or(\"missing k in calibration\")?);",
+    "replace": "verify.push(percentile(&values, 0.5).unwrap_or(0.0));",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "a missing k is silently costed at 0 ms (infinite rate); the missing-k error check catches it"
+  },
+  {
+    "id": "b1-suffix-as-failure",
+    "todo": "B1",
+    "file": "src/policy_student.rs",
+    "find": "        if accepted < proposed {\n            self.failure[accepted] += 1.0;\n        }",
+    "replace": "        for j in accepted..proposed {\n            self.failure[j] += 1.0;\n        }",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "labels the censored suffix as failures; exact count checks catch it"
+  },
+  {
+    "id": "b1-no-global-decay",
+    "todo": "B1",
+    "file": "src/policy_student.rs",
+    "find": "            self.success[j] *= self.decay;\n            self.failure[j] *= self.decay;",
+    "replace": "            if j < proposed {\n                self.success[j] *= self.decay;\n                self.failure[j] *= self.decay;\n            }",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "decays only observed positions; the k=0 decay check expects failure[1] = 0.25"
+  },
+  {
+    "id": "b2-wilson-center-z",
+    "todo": "B2",
+    "file": "src/policy_student.rs",
+    "find": "let center = p + z * z / (2.0 * n);\n            let margin",
+    "replace": "let center = p + z / (2.0 * n);\n            let margin",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "center uses z instead of z^2; the bisection oracle of the Wilson quadratic catches it at z=1.96"
+  },
+  {
+    "id": "b2-wilson-no-denominator",
+    "todo": "B2",
+    "file": "src/policy_student.rs",
+    "find": "let denominator = 1.0 + z * z / n;",
+    "replace": "let denominator = 1.0;",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "drops the 1+z^2/n normalization: ordering survives, numbers do not; only the numeric Wilson oracle catches it"
+  },
+  {
+    "id": "b2-prior-not-applied",
+    "todo": "B2",
+    "file": "src/policy_student.rs",
+    "find": "out.push((s + 1.0) / (n + 2.0));",
+    "replace": "out.push(if n == 0.0 { 0.5 } else { s / n });",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "raw MLE instead of the Beta(1,1) mean: 1/1 gives 1.0 instead of 2/3"
+  },
+  {
+    "id": "b3-ties-prefer-longer",
+    "todo": "B3",
+    "file": "src/policy_student.rs",
+    "find": "if rate > best_rate + 1e-12 {",
+    "replace": "if rate >= best_rate - 1e-12 {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "ties pick the longer k; the exhaustive oracle (shorter k on ties) catches it"
+  },
+  {
+    "id": "b3-remaining-not-capped",
+    "todo": "B3",
+    "file": "src/policy_student.rs",
+    "find": "let max_k = p.len().min(profile.verify.len() - 1).min(remaining - 1);",
+    "replace": "let max_k = p.len().min(profile.verify.len() - 1).min(remaining);",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "allows k = remaining, proposing past the request's end; the exhaustive oracle with small remaining catches it"
+  },
+  {
+    "id": "b4-new-mean",
+    "todo": "B4",
+    "file": "src/policy_student.rs",
+    "find": "        self.cumulative = (self.cumulative + self.mean - value - delta).max(0.0);\n        self.count += 1;\n        self.mean += (value - self.mean) / self.count as f64;",
+    "replace": "        self.count += 1;\n        self.mean += (value - self.mean) / self.count as f64;\n        self.cumulative = (self.cumulative + self.mean - value - delta).max(0.0);",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "updates the mean before the statistic; the trigger step moves and the exact-event oracle catches it"
+  },
+  {
+    "id": "b4-no-window-reset",
+    "todo": "B4",
+    "file": "src/policy_student.rs",
+    "find": "            self.cumulative = 0.0;\n            self.mean = value;",
+    "replace": "            self.mean = value;",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "keeps the cumulative statistic after a trigger, so it fires again and again; exact event lists catch it"
+  },
+  {
+    "id": "b5-ignore-budget",
+    "todo": "B5",
+    "file": "src/policy_student.rs",
+    "find": "used + cost > budget + 1e-12",
+    "replace": "used + cost > budget + 1e9",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "upgrades ignore the shared budget; the feasibility check over 300 random instances catches it"
+  },
+  {
+    "id": "b5-first-not-best",
+    "todo": "B5",
+    "file": "src/policy_student.rs",
+    "find": "if best.as_ref().is_none_or(|old| score > old.3 + 1e-12) {",
+    "replace": "if best.is_none() {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "takes the first qualifying upgrade instead of the best ratio; the hand trace and maximality checks catch it"
+  },
+  {
+    "id": "b6-floor-ticks",
+    "todo": "B6",
+    "file": "src/policy_student.rs",
+    "find": "let ticks = (profiles[i].round_cost(k) / quantum - 1e-9).ceil().max(0.0);",
+    "replace": "let ticks = (profiles[i].round_cost(k) / quantum).floor().max(0.0);",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "floor under-counts costs, so infeasible vectors look feasible; the exhaustive optimum check catches it"
+  },
+  {
+    "id": "b6-tie-last",
+    "todo": "B6",
+    "file": "src/policy_student.rs",
+    "find": "            .enumerate()\n            .find(|(_, &(ticks, value))| {",
+    "replace": "            .enumerate()\n            .rev()\n            .find(|(_, &(ticks, value))| {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "reconstruction picks the largest k among equal-value options; the lexicographic tie rule check catches it"
+  },
+  {
+    "id": "c1-commit-accepted-only",
+    "todo": "C1",
+    "file": "src/engine_student.rs",
+    "find": "let committed = (accepted + 1).min(remaining);",
+    "replace": "let committed = accepted.max(1).min(remaining);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "drops the correction/bonus token; hand commit sizes and the shadow replay catch it"
+  },
+  {
+    "id": "c1-first-overwritten",
+    "todo": "C1",
+    "file": "src/engine_student.rs",
+    "find": "        if self.first.is_none() {\n            self.first = Some(end);\n        }",
+    "replace": "        self.first = Some(end);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "TTFT moves to the latest commit; the first == 2 check catches it"
+  },
+  {
+    "id": "c2-arrival-strict",
+    "todo": "C2",
+    "file": "src/engine_student.rs",
+    "find": "if state.request.arrival > now {",
+    "replace": "if state.request.arrival >= now {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "an arrival exactly at now waits; the arrival-at-now check and hand timeline catch it"
+  },
+  {
+    "id": "c3-fixed-not-infeasible",
+    "todo": "C3",
+    "file": "src/engine_student.rs",
+    "find": "let is_infeasible = choice.is_none() || cost > budget + 1e-9;",
+    "replace": "let is_infeasible = choice.is_none();",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "only policies returning None are counted, so Fixed(k) never reports infeasible rounds"
+  },
+  {
+    "id": "c3-observe-kmax",
+    "todo": "C3",
+    "file": "src/engine_student.rs",
+    "find": "        policy.observe(accepted, k);\n",
+    "replace": "        policy.observe(accepted, costs.verify.len() - 1);\n",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "feeds the estimator a proposal length the round never made; the Mean shadow replay catches it"
+  },
+  {
+    "id": "c3-no-policy-reset",
+    "todo": "C3",
+    "file": "src/engine_student.rs",
+    "find": "            policy.reset();\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "the drift detector fires but the estimator keeps stale counts; the shadow replay with Page-Hinkley resets catches it"
+  },
+  {
+    "id": "c3-requeue-before-arrivals",
+    "todo": "C3",
+    "file": "src/engine_student.rs",
+    "find": "        enqueue(&states, &mut cursor, now, &mut ready);\n        if states[index].finish.is_some() {\n            finished += 1;\n        } else {\n            ready.push_back(index);\n        }",
+    "replace": "        if states[index].finish.is_some() {\n            finished += 1;\n        } else {\n            ready.push_back(index);\n        }\n        enqueue(&states, &mut cursor, now, &mut ready);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "the running request is requeued ahead of arrivals that came during its round; hand timeline r0=[1,3], r1=[2] catches it"
+  },
+  {
+    "id": "c4-tpot-divides-tokens",
+    "todo": "C4",
+    "file": "src/engine_student.rs",
+    "find": "tpot.push((finish - first) / (state.emitted - 1) as f64);",
+    "replace": "tpot.push((finish - first) / state.emitted as f64);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "mean TPOT divided by tokens instead of gaps; hand p95 TPOT = 2 catches it"
+  },
+  {
+    "id": "c4-goodput-ms",
+    "todo": "C4",
+    "file": "src/engine_student.rs",
+    "find": "goodput: met as f64 * 1000.0 / makespan,",
+    "replace": "goodput: met as f64 / makespan,",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "forgets the ms to s conversion; the goodput = 400 req/s check catches it"
+  },
+  {
+    "id": "r1-flags-off-by-one",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "int(draft_argmax[prompt_len + i] == generated[i + 1])",
+    "replace": "int(draft_argmax[prompt_len + i - 1] == generated[i + 1])",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "off-by-one alignment of the teacher-forced draft guess; hand and random alignment checks catch it on CPU"
+  },
+  {
+    "id": "r1-flags-off-by-one-cuda",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "int(draft_argmax[prompt_len + i] == generated[i + 1])",
+    "replace": "int(draft_argmax[prompt_len + i] == generated[i])",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "compares the guess with the token it was conditioned on; on CUDA the real-loop replay check also rejects it"
+  },
+  {
+    "id": "r1-survival-as-hazard",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "out.append(None if previous == 0 else s / previous)",
+    "replace": "out.append(s)",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "uses vLLM's per-position rate P(A>=j) as the conditional a_j; the [1, .6, .2] to [1, .6, .333] example catches it"
+  },
+  {
+    "id": "r1-hazard-over-all-starts",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "hazard.append(reach / prior if prior else None)",
+    "replace": "hazard.append(reach / len(starts) if len(starts) else None)",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "hazard computed with the survival denominator; brute-force a_j and the flat IID hazard check catch it"
+  },
+  {
+    "id": "r1-accept-test-swapped",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "if u_accept * float(q[x]) < float(p[x]):",
+    "replace": "if u_accept * float(p[x]) < float(q[x]):",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "acceptance ratio inverted (q/p); Monte Carlo output no longer follows p and the rate is not sum min(p,q)"
+  },
+  {
+    "id": "r1-residual-is-p",
+    "todo": "R1",
+    "file": "real/accept_student.py",
+    "find": "residual = torch.clamp(p.double() - q.double(), min=0.0)",
+    "replace": "residual = p.double().clone()",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "resamples from p instead of max(p-q,0); the output distribution is biased toward q's mass"
+  },
+  {
+    "id": "r2-warmup-timed",
+    "todo": "R2",
+    "file": "real/profile_student.py",
+    "find": "    for _ in range(warmup):\n        fn()\n    samples = []",
+    "replace": "    samples = []\n    for _ in range(warmup):\n        token = timer.start()\n        fn()\n        samples.append(timer.stop(token))",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "latency samples include warmup calls (first-call allocation, clocks ramping up); the fake-timer check expects exactly the timed samples"
+  },
+  {
+    "id": "r2-median-upper",
+    "todo": "R2",
+    "file": "real/profile_student.py",
+    "find": "return ordered[max(1, math.ceil(q * len(ordered))) - 1]",
+    "replace": "return ordered[min(len(ordered) - 1, int(q * len(ordered)))]",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "upper median instead of nearest rank (3 vs 2 for 4 samples); it must match Rust A3 so calibrate agrees"
+  },
+  {
+    "id": "r3-replay-ignores-censoring",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "    runs[emitted].min(k)\n",
+    "replace": "    runs[emitted]\n",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "replay returns the full future run length, revealing more than the round paid for; censoring checks catch it"
+  },
+  {
+    "id": "r3-schedule-off-by-one",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "        e += accepted + 1;\n",
+    "replace": "        e += accepted.max(1);\n",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "next round starts one token early (forgets the correction/bonus token); the oracle schedule and measured rounds catch it"
+  },
+  {
+    "id": "r3-runs-no-restart",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "next = if flags[i] == 1 { next + 1 } else { 0 };",
+    "replace": "next = if flags[i] == 1 { next + 1 } else { next };",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "runs do not restart at a rejection; brute-force run lengths catch it"
+  },
+  {
+    "id": "r3-propose-past-end",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "let proposed = k.min(n - e - 1);",
+    "replace": "let proposed = k.min(n - e);",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "proposes for a decode step that does not exist; schedules disagree with the oracle and the measured last rounds"
+  },
+  {
+    "id": "r4-upper-unexplored-zero",
+    "todo": "R4",
+    "file": "src/replay_student.rs",
+    "find": "                    return 1.0;\n",
+    "replace": "                    return 0.0;\n",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "unexplored depths become pessimistic, so the policy never probes (the no_probe failure); bisection and behaviour checks catch it"
+  },
+  {
+    "id": "r4-upper-uses-minus",
+    "todo": "R4",
+    "file": "src/replay_student.rs",
+    "find": "((center + margin) / (1.0 + z * z / n)).clamp(0.0, 1.0)",
+    "replace": "((center - margin) / (1.0 + z * z / n)).clamp(0.0, 1.0)",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "returns the Wilson lower end instead of the upper end; the bisection oracle for the upper root catches it"
+  }
+]

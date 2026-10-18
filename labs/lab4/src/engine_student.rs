@@ -1,14 +1,22 @@
+//! C: request state, arrivals, a single-server discrete-event engine and SLO metrics.
+//! Policies and acceptance environments are pluggable so stage R can replay real traces.
+
 use crate::{choose_k, interpolate, percentile, Drift, Estimator, ProfilePoint};
 use std::collections::VecDeque;
 
 #[derive(Clone, Debug)]
 pub struct Request {
     pub id: usize,
+    /// Arrival time, ms.
     pub arrival: f64,
+    /// Tokens to commit (stage R: decode steps after the prefill token).
     pub output: usize,
     pub context: usize,
+    /// Absolute deadline, ms.
     pub deadline: f64,
-    pub alpha: f64,
+    /// Synthetic environment only: conditional acceptance a_j at depth j (0-based).
+    /// Controllers never read it.
+    pub accept: Vec<f64>,
 }
 #[derive(Clone, Debug)]
 pub struct State {
@@ -30,12 +38,13 @@ impl State {
             committed_at: Vec::new(),
         }
     }
-    /// C1: Commit min(accepted+1,remaining) tokens atomically at round completion.
+    /// C1: Commit min(accepted+1,remaining) tokens atomically at round completion `end`.
     /// Record first/finish once, one timestamp per committed token, no overflow.
+    /// Returns the number of committed tokens. Panics if already finished or time goes back.
     /// Tests: c_commit_cap_and_timestamps.
-    pub fn commit(&mut self, accepted: usize, end: f64) {
+    pub fn commit(&mut self, accepted: usize, end: f64) -> usize {
         // BEGIN TODO C1
-        todo!("C1: implement the contract above");
+        todo!("TODO C1")
         // END TODO C1
     }
 }
@@ -45,26 +54,19 @@ impl State {
 /// Tests: c_arrivals_once.
 pub fn enqueue(states: &[State], cursor: &mut usize, now: f64, ready: &mut VecDeque<usize>) {
     // BEGIN TODO C2
-    todo!("C2: implement the contract above");
+    todo!("TODO C2")
     // END TODO C2
 }
 
-#[derive(Clone, Copy, Debug)]
-pub enum Controller {
-    Fixed(usize),
-    Mean,
-    ConservativeNoProbe,
+/// Provided: where accepted prefixes come from. Implementations must return a value
+/// in 0..=k and must not depend on which policy is running (paired comparison).
+pub trait Acceptance {
+    fn accepted(&self, request: &Request, emitted: usize, k: usize) -> usize;
 }
-#[derive(Debug)]
-pub struct Simulation {
-    pub states: Vec<State>,
-    pub busy: f64,
-    pub infeasible: usize,
-    pub resets: usize,
-}
-/// Provided deterministic draw keyed by seed, request, committed position, and
-/// proposed depth. Policies cannot consume each other's RNG stream.
-fn draw(seed: u64, id: usize, emitted: usize, depth: usize) -> f64 {
+
+/// Provided: deterministic draw keyed by seed, request, committed position, and
+/// proposed depth. Policies cannot consume each other's random stream.
+pub fn draw(seed: u64, id: usize, emitted: usize, depth: usize) -> f64 {
     let mut x = seed
         ^ (id as u64).wrapping_mul(0x9e3779b97f4a7c15)
         ^ (emitted as u64).wrapping_mul(0xbf58476d1ce4e5b9)
@@ -73,40 +75,178 @@ fn draw(seed: u64, id: usize, emitted: usize, depth: usize) -> f64 {
     x = (x ^ (x >> 27)).wrapping_mul(0x94d049bb133111eb);
     ((x ^ (x >> 31)) >> 11) as f64 / ((1u64 << 53) as f64)
 }
-/// C3: Single-server round-robin discrete-event service. New arrivals during a
-/// round enter BEFORE the running request is requeued. Idle time jumps to the
-/// next arrival. Budget is min(round_bound,deadline-now), with explicit k=0
-/// fallback on infeasibility; do not drop late work or read future acceptance.
-/// Tests: c_hand_timeline, c_conservation_empty_and_overload.
+
+/// Provided synthetic environment with NON-IID depth-conditional acceptance:
+/// depth j is accepted iff every depth < j was and draw(...) < request.accept[j].
+pub struct Synthetic {
+    pub seed: u64,
+}
+impl Acceptance for Synthetic {
+    fn accepted(&self, r: &Request, emitted: usize, k: usize) -> usize {
+        (0..k)
+            .take_while(|&depth| draw(self.seed, r.id, emitted, depth) < r.accept[depth])
+            .count()
+    }
+}
+
+/// Provided: a controller sees only costs, the budget, the remaining output and its
+/// own past observations. `choose` returns None when nothing fits the budget.
+pub trait Policy {
+    fn name(&self) -> String;
+    fn choose(&mut self, costs: &ProfilePoint, budget: f64, remaining: usize) -> Option<usize>;
+    fn observe(&mut self, accepted: usize, proposed: usize);
+    fn reset(&mut self) {}
+}
+
+/// Provided: always proposes min(k, remaining-1, kmax), even when it does not fit.
+pub struct Fixed(pub usize);
+impl Policy for Fixed {
+    fn name(&self) -> String {
+        format!("k{}", self.0)
+    }
+    fn choose(&mut self, costs: &ProfilePoint, _: f64, remaining: usize) -> Option<usize> {
+        Some(
+            self.0
+                .min(costs.verify.len() - 1)
+                .min(remaining.saturating_sub(1)),
+        )
+    }
+    fn observe(&mut self, _: usize, _: usize) {}
+}
+
+/// Provided: per-position estimator (B1) + B3 choice. z = 0 gives posterior means
+/// ("mean"); z > 0 gives the Wilson lower bound without any probing ("no_probe").
+pub struct PerPosition {
+    pub estimator: Estimator,
+    pub z: f64,
+}
+impl PerPosition {
+    pub fn new(kmax: usize, decay: f64, z: f64) -> Self {
+        Self {
+            estimator: Estimator::new(kmax, decay),
+            z,
+        }
+    }
+}
+impl Policy for PerPosition {
+    fn name(&self) -> String {
+        if self.z == 0.0 {
+            "mean".into()
+        } else {
+            format!("no_probe_z{}", self.z)
+        }
+    }
+    fn choose(&mut self, costs: &ProfilePoint, budget: f64, remaining: usize) -> Option<usize> {
+        choose_k(
+            &self.estimator.probabilities(self.z),
+            costs,
+            budget,
+            remaining,
+        )
+    }
+    fn observe(&mut self, accepted: usize, proposed: usize) {
+        self.estimator.observe(accepted, proposed);
+    }
+    fn reset(&mut self) {
+        self.estimator = Estimator::new(self.estimator.success.len(), self.estimator.decay);
+    }
+}
+
+/// Provided: IID baseline. Same censored counts, but one pooled alpha for all depths.
+pub struct Pooled {
+    pub estimator: Estimator,
+}
+impl Policy for Pooled {
+    fn name(&self) -> String {
+        "pooled_iid".into()
+    }
+    fn choose(&mut self, costs: &ProfilePoint, budget: f64, remaining: usize) -> Option<usize> {
+        choose_k(&self.estimator.pooled(), costs, budget, remaining)
+    }
+    fn observe(&mut self, accepted: usize, proposed: usize) {
+        self.estimator.observe(accepted, proposed);
+    }
+    fn reset(&mut self) {
+        self.estimator = Estimator::new(self.estimator.success.len(), self.estimator.decay);
+    }
+}
+
+/// One executed verification round (the engine's audit log).
+#[derive(Clone, Debug, PartialEq)]
+pub struct RoundRecord {
+    pub request: usize,
+    pub start: f64,
+    pub end: f64,
+    pub k: usize,
+    pub accepted: usize,
+    pub committed: usize,
+    pub budget: f64,
+    pub infeasible: bool,
+    pub reset: bool,
+}
+
+#[derive(Debug)]
+pub struct Simulation {
+    pub states: Vec<State>,
+    pub busy: f64,
+    pub infeasible: usize,
+    pub resets: usize,
+    pub rounds: Vec<RoundRecord>,
+}
+
+/// Provided drift-detector parameters used by C3.
+pub const DRIFT_DELTA: f64 = 0.05;
+pub const DRIFT_THRESHOLD: f64 = 3.0;
+
+/// C3: Single-server round-robin discrete-event service.
+/// * Sort requests by (arrival, id); states[i] is the i-th request in that order.
+/// * Loop until all finish: if ready is empty jump `now` to the next arrival; enqueue
+///   arrivals <= now; pop the front request.
+/// * costs = interpolate(profile, context + emitted); remaining = output - emitted;
+///   budget = min(round_bound, deadline - now).
+/// * k = policy.choose(...); None -> execute k = 0 and mark the round infeasible.
+///   EVERY policy (Fixed included) marks a round infeasible when round_cost(k) exceeds
+///   budget + 1e-9. `infeasible` counts such rounds.
+/// * accepted = env.accepted(request, emitted, k); now += round_cost(k); busy too.
+/// * policy.observe(accepted, k). If k > 0, feed accepted/k to the Drift detector
+///   (DRIFT_DELTA, DRIFT_THRESHOLD); on a trigger call policy.reset() and mark the round.
+/// * commit at `now`; enqueue arrivals that happened during the round BEFORE requeueing
+///   the running request; push one RoundRecord per round.
+/// Never drop late work, never read request.accept. Tests: c_hand_timeline,
+/// c_infeasible_counts_all_policies, c_mean_policy_shadow_replay, c_drift_reset_replay,
+/// c_conservation_empty_and_overload.
 pub fn simulate(
     mut requests: Vec<Request>,
     profile: &[ProfilePoint],
-    controller: Controller,
+    policy: &mut dyn Policy,
+    env: &dyn Acceptance,
     round_bound: f64,
-    seed: u64,
 ) -> Simulation {
     // BEGIN TODO C3
-    todo!("C3: implement the contract above");
+    todo!("TODO C3")
     // END TODO C3
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Metrics {
     pub requests: usize,
     pub tokens: usize,
     pub p95_ttft: f64,
     pub p95_e2e: f64,
+    /// p95 over requests of mean TPOT = (finish - first) / (tokens - 1); 1-token requests skipped.
+    pub p95_tpot: f64,
     pub goodput: f64,
     pub makespan: f64,
     pub met: usize,
     pub utilization: f64,
 }
-/// C4: Nearest-rank p95; TTFT=first-arrival, E2E=finish-arrival. A request
-/// contributes to goodput only if finish<=absolute deadline. Divide by span
-/// from first arrival to last completion, in seconds (input ms). Empty is zero.
-/// Tests: c_metrics_independent and c_conservation_empty_and_overload.
+/// C4: Nearest-rank p95 (A3); TTFT=first-arrival, E2E=finish-arrival,
+/// mean TPOT=(finish-first)/(output-1) for output>1. A request is met if
+/// finish<=absolute deadline. goodput = met / (last finish - first arrival) in
+/// requests per second (input ms). Check token conservation per request.
+/// Empty simulation -> all zero. Tests: c_metrics_independent and conservation tests.
 pub fn summarize(sim: &Simulation) -> Metrics {
     // BEGIN TODO C4
-    todo!("C4: implement the contract above");
+    todo!("TODO C4")
     // END TODO C4
 }

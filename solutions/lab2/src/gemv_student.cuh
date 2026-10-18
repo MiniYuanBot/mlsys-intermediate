@@ -1,8 +1,15 @@
 #pragma once
 #include <cstdint>
 #include <cuda_runtime.h>
-// B1: extract four unsigned bits; shift=0 or 4. bfe.u32 is PTX, not CPU asm.
-// Test: kernels_against_double_oracle exercises all signed codes via inputs.
+// Stage B: W4A32 SIMT kernels over the lab layout (codes [rows, ceil(cols/2)], even
+// column in the low nibble, u = q + 8; FP32 scales [rows, ceil(cols/group)]).
+// X is FP32 [batch, cols], Y is FP32 [batch, rows]. Kernel inputs in the tests come
+// from the test's own packer, outputs are compared with an FP64 decode.
+
+// B1: return the 4-bit field of `byte` starting at bit `shift` (0 or 4) as an
+// UNSIGNED value 0..15, using inline PTX bfe.u32 (the offset 8 is removed by the
+// caller; a sign-extending extract would be wrong for this offset-binary format).
+// Test: B1 probe over all 256 bytes and both shifts.
 __device__ inline unsigned nibble(unsigned byte, unsigned shift) {
     // BEGIN TODO B1
     unsigned out;
@@ -10,9 +17,10 @@ __device__ inline unsigned nibble(unsigned byte, unsigned shift) {
     return out;
     // END TODO B1
 }
-// B2: one warp per output row, lane-stride K then warp sum. q+8 encoding.
-// Row tails may return (whole warp); K tails must NOT return individual lanes.
-// Test: warp_kernel covers rows 1/7/33, K 1/31/65/257 and groups 3/32/128.
+// B2: one warp per output row; lane l handles columns l, l+32, ...; partial sums
+// reduced with __shfl_down_sync over the full warp; lane 0 writes y[row]. A warp whose
+// row >= m returns as a whole; lanes without columns must still join the shuffles.
+// Test: B2 rows 1/7/33 x cols 1/31/65/257 x groups 3/32/128.
 __global__ void fused_gemv(const uint8_t *packed, const float *scales, const float *x, float *y,
                            int m, int n, int group) {
     // BEGIN TODO B2
@@ -33,9 +41,9 @@ __global__ void fused_gemv(const uint8_t *packed, const float *scales, const flo
     if (lane == 0) y[row] = sum;
     // END TODO B2
 }
-// B3: each lane owns one packed BYTE and processes up to two neighboring K.
-// The pair may cross a quantization group boundary. Separate both scales.
-// Test: pair_group_boundary includes group=3 and odd K.
+// B3: lane l handles bytes l, l+32, ... of its row, i.e. columns 2b and 2b+1. The
+// two columns may belong to different groups (each uses its own scale) and the odd
+// tail has no second column. Test: B3 with group 3 and odd widths.
 __global__ void pair_gemv(const uint8_t *p, const float *s, const float *x, float *y, int rows,
                           int cols, int group) {
     // BEGIN TODO B3
@@ -60,10 +68,9 @@ __global__ void pair_gemv(const uint8_t *p, const float *s, const float *x, floa
     if (lane == 0) y[row] = sum;
     // END TODO B3
 }
-// B4: reuse one unpacked weight across a tile of FOUR tokens in registers.
-// Grid.y selects token tile; X [batch,cols], output [batch,rows]. Every lane
-// participates in all four reductions, including a partial final token tile.
-// Test: tiled_batch uses batches 1/3/4/7 and non-divisible dimensions.
+// B4: grid.y selects a tile of FOUR tokens; each decoded weight is reused for all
+// tokens of the tile from registers. Tokens >= batch are neither read nor written,
+// but every lane still runs all four reductions. Test: B4 batches 1/3/4/7/8.
 __global__ void tiled_batch(const uint8_t *p, const float *s, const float *x, float *y, int rows,
                             int cols, int group, int batch) {
     // BEGIN TODO B4
@@ -105,9 +112,10 @@ inline void launch_batch(const uint8_t *p, const float *s, const float *x, float
     tiled_batch<<<dim3((m + 3) / 4, (batch + 3) / 4), 128>>>(p, s, x, y, m, n, g, batch);
 }
 
-// B5: parallelize the reduction dimension into ceil(cols/chunk) partitions.
-// One warp per (row,partition), partial layout [partition,rows]. No atomics.
-// Test: split_k_tail verifies chunk=17, including cols<chunk.
+// B5: split K into parts = ceil(cols/chunk); blockIdx.y = part, one warp per
+// (row, part) sums columns [part*chunk, min(cols, (part+1)*chunk)) and lane 0 writes
+// partial[part * rows + row]. No atomics. Test: B5/B6 chunk 17 incl. cols < chunk,
+// and a direct read-back of the partial buffer.
 __global__ void split_partial(const uint8_t *p, const float *s, const float *x, float *partial,
                               int rows, int cols, int group, int chunk) {
     // BEGIN TODO B5
@@ -130,9 +138,8 @@ __global__ void split_partial(const uint8_t *p, const float *s, const float *x, 
     if (lane == 0) partial[part * rows + row] = value;
     // END TODO B5
 }
-// B6: each thread sums partials of one row, grid-stride over rows. Fixed
-// partition order makes this deterministic, though its FP32 rounding differs
-// from B2. Test: split_k_tail compares against the independent double oracle.
+// B6: y[row] = sum over ALL parts of partial[part * rows + row], in part order (so
+// the result is deterministic); one thread per row, grid-stride. Test: B5/B6.
 __global__ void merge_partial(const float *partial, float *y, int rows, int parts) {
     // BEGIN TODO B6
     const int thread = blockIdx.x * blockDim.x + threadIdx.x;

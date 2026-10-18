@@ -1,21 +1,19 @@
-"""Paired real-input comparison for three published, deterministic trace scenarios."""
+"""C bench: paired real-input comparison of the measured plan (horizon 1 and 10) against
+eager, static, dynamic and fixed-bucket torch.compile on three deterministic scenarios
+(stable / shift / tail). Dynamo is reset per strategy; the Inductor disk cache is kept,
+so first calls are warm-cache numbers, not cold compilation."""
 
 from collections import Counter
 import json
 import statistics
 import torch
-from src.execution_student import measure, operation, workflow
+from src.execution_student import HOLDOUT_SEED, measure, operation, request_tensors, workflow
 from src.pipeline_student import padding_account, split_trace, trace_shift
 
 
 def inputs(lengths, width, device):
-    requests = []
-    for index, length in enumerate(lengths):
-        generator = torch.Generator(device=device).manual_seed(101 + index)
-        x = torch.randn(length, width, generator=generator, device=device)
-        residual = torch.randn(length, width, generator=generator, device=device)
-        requests.append((x, residual))
-    return requests
+    # Same seeds as C4's held-out requests, so every strategy sees identical tensors.
+    return [request_tensors(n, width, device, HOLDOUT_SEED + i) for i, n in enumerate(lengths)]
 
 
 def baseline(requests, mode, device):
@@ -81,7 +79,7 @@ def run(device):
                         "cache_regime": "Dynamo reset per strategy; normal disk cache, not cold",
                         "heldout_calls": len(heldout),
                         **accounting,
-                        **result,
+                        **{k: v for k, v in result.items() if k != "outputs"},
                     }
                 )
             )
@@ -98,3 +96,11 @@ def run(device):
                     }
                 )
             )
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--device", default="cpu")
+    run(parser.parse_args().device)

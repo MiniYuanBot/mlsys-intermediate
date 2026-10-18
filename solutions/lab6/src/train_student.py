@@ -1,4 +1,8 @@
-"""Small executable PEFT/activation-memory system; no claim of full QLoRA reproduction."""
+"""LoRA lifecycle, activation planning and saved-tensor offload on a small LoRA MLP.
+
+Stages A/B/C of lab 6. Stage R (custom autograd.Function) lives in fused_student.py.
+This is a teaching system: no quantized base, no attention, no PEFT file format.
+"""
 
 import contextlib
 import math
@@ -7,6 +11,13 @@ import time
 import torch
 from torch import nn
 from torch.utils.checkpoint import checkpoint
+
+MODES = ("retain", "checkpoint", "offload")
+
+
+def storage_key(tensor):
+    # Provided: views share storage; storage bytes may exceed view tensor bytes.
+    return (str(tensor.device), tensor.untyped_storage().data_ptr())
 
 
 class LoRALinear(nn.Module):
@@ -25,8 +36,9 @@ class LoRALinear(nn.Module):
         self.register_buffer("_base_backup", None, persistent=False)
 
     def forward(self, x):
-        # Preserve input gradients through the frozen base. A merged layer skips
-        # the adapter branch; bias, if present, is applied exactly once.
+        # Input  x[..., in]; output [..., out] = x W^T + bias + scale * (x A^T) B^T.
+        # Invariants: gradients still flow to x through the frozen base (no no_grad);
+        # bias is added exactly once; a merged layer skips the low-rank branch.
         # BEGIN TODO A1
         base = torch.nn.functional.linear(x, self.weight, self.bias)
         if self.merged:
@@ -37,22 +49,21 @@ class LoRALinear(nn.Module):
 
     @torch.no_grad()
     def merge(self):
-        # Idempotent inference merge. Save an exact base copy so unmerge does not
-        # accumulate floating-point subtraction error. Reject merge in train mode.
+        # Eval-only (ValueError in train mode); idempotent. Keep an exact copy of the
+        # base so unmerge restores it bitwise instead of subtracting the delta back.
         # BEGIN TODO A2
         if self.training:
             raise ValueError("merge requires eval mode")
         if self.merged:
             return
         self._base_backup = self.weight.detach().clone()
-        delta = self.b @ self.a
-        self.weight.add_(delta, alpha=self.scale)
+        self.weight.add_(self.b @ self.a, alpha=self.scale)
         self.merged = True
         # END TODO A2
 
     @torch.no_grad()
     def unmerge(self):
-        # Restore the bitwise base and release its backup; repeated calls are safe.
+        # Restore the bitwise base and release the backup; calling it twice is a no-op.
         # BEGIN TODO A3
         if not self.merged:
             return
@@ -65,10 +76,10 @@ class LoRALinear(nn.Module):
 
 
 def inject_lora(model, targets, rank=4, alpha=8):
-    """Replace exact named nn.Linear targets, freeze original model, return names.
+    """Replace exact named nn.Linear targets, freeze the original model, return names.
 
-    Validate all targets before mutation. Preserve weight/bias/device/dtype and
-    training flags. Snapshot named_modules before replacement; only adapters train.
+    Validate every target before any mutation (ValueError, model untouched). Keep
+    weight/bias values, device, dtype and the train/eval flag; only A/B train.
     """
     # BEGIN TODO A4
     modules = dict(model.named_modules())
@@ -99,7 +110,10 @@ def inject_lora(model, targets, rank=4, alpha=8):
 
 
 def adapter_state(model):
-    """Portable cloned CPU tensors and scale metadata, no frozen base weights."""
+    """{module name: {"a", "b", "scale"}} with cloned CPU tensors; no base weights.
+
+    Merged layers are rejected; later changes to the model must not alter the result.
+    """
     # BEGIN TODO A5
     state = {}
     for name, module in model.named_modules():
@@ -117,11 +131,10 @@ def adapter_state(model):
 
 @torch.no_grad()
 def load_adapters(model, state):
-    """Validate exact module names/shapes/finite tensors/scale before any copy.
+    """Validate names/fields/shapes/finite values/scale, stage conversions, then copy.
 
-    Stage conversion to each destination device/dtype and reject conversion
-    overflow before copying; an invalid last entry must leave all
-    earlier modules unchanged. Reject merged destinations.
+    Conversion to the destination dtype may overflow (finite float64 -> inf float32);
+    reject that before copying. Any failure leaves every module unchanged.
     """
     # BEGIN TODO A6
     modules = {
@@ -157,22 +170,32 @@ def load_adapters(model, state):
 
 
 def parameter_bytes(model):
-    """Disjoint trainable/frozen tensor bytes (not optimizer state or activation)."""
+    """{"trainable": bytes, "frozen": bytes} over unique parameter *storages*.
+
+    Distinct Parameter objects may alias one storage (tied weights built from .data,
+    views); count each storage once, in full (untyped_storage().nbytes()). A storage
+    is trainable if any parameter that aliases it requires grad. Not optimizer state,
+    gradients, activations or allocator reserve.
+    """
     # BEGIN TODO A7
-    result = {"trainable": 0, "frozen": 0}
-    seen = set()
+    storages = {}
     for parameter in model.parameters():
-        if id(parameter) in seen:
-            continue
-        seen.add(id(parameter))
-        key = "trainable" if parameter.requires_grad else "frozen"
-        result[key] += parameter.numel() * parameter.element_size()
+        key = storage_key(parameter)
+        nbytes, trainable = storages.get(key, (parameter.untyped_storage().nbytes(), False))
+        storages[key] = (nbytes, trainable or parameter.requires_grad)
+    result = {"trainable": 0, "frozen": 0}
+    for nbytes, trainable in storages.values():
+        result["trainable" if trainable else "frozen"] += nbytes
     return result
     # END TODO A7
 
 
 def run_blocks(blocks, x, keep):
-    """Non-reentrant checkpoint; preserve dropout RNG, validate full policy first."""
+    """keep[i] True: plain call; False: non-reentrant checkpoint with RNG preserved.
+
+    Validate the whole policy first (length and bool type) so a short list cannot
+    silently drop the tail of the network.
+    """
     # BEGIN TODO B1
     if len(blocks) != len(keep) or any(type(value) is not bool for value in keep):
         raise ValueError("keep policy")
@@ -186,7 +209,11 @@ def run_blocks(blocks, x, keep):
 
 
 def plan_keep(sizes, recompute_costs, budget):
-    """0/1 knapsack, positive integer size units; ties keep the earlier path."""
+    """0/1 knapsack: maximize the summed cost of blocks kept within budget units.
+
+    sizes are positive ints, costs finite and >= 0, budget an int >= 0. Each block is
+    taken at most once. Returns a bool list (True = keep activations).
+    """
     # BEGIN TODO B2
     if len(sizes) != len(recompute_costs) or type(budget) is not int or budget < 0:
         raise ValueError("knapsack inputs")
@@ -210,11 +237,6 @@ def plan_keep(sizes, recompute_costs, budget):
     # END TODO B2
 
 
-def storage_key(tensor):
-    # Provided: views share storage; storage bytes may exceed view tensor bytes.
-    return (str(tensor.device), tensor.untyped_storage().data_ptr())
-
-
 class SavedInventory:
     def __init__(self, parameters=()):
         self.excluded = {storage_key(p) for p in parameters}
@@ -222,9 +244,10 @@ class SavedInventory:
         self.saves = 0
 
     def pack(self, tensor):
-        # Count unique nonparameter storage retained across this forward. This is
-        # a forward inventory, not time-varying live/peak memory. Return a detach
-        # to avoid retaining the input's autograd graph through the packed object.
+        # Count each non-parameter storage once (full storage bytes, keyed by
+        # storage_key); parameter storages and their views are excluded. Count every
+        # call in self.saves. Return a detached alias: the packed object must not
+        # carry the autograd graph of the input (a reference cycle otherwise).
         # BEGIN TODO B3
         self.saves += 1
         key = storage_key(tensor)
@@ -241,13 +264,16 @@ class SavedInventory:
     def bytes(self):
         return sum(self.storages.values())
 
+    def context(self):
+        return torch.autograd.graph.saved_tensors_hooks(self.pack, self.unpack)
+
 
 def plan_modes(options, budget):
-    """Multiple-choice DP. options[i][mode]=(integer retained units, measured ms).
+    """Multiple-choice knapsack. options[i][mode] = (int retained units, measured ms).
 
-    Choose one of retain/checkpoint/offload per block to minimize summed cost.
-    Return (modes, used, cost); infeasible budgets raise. Model excludes lifetime
-    overlap/workspaces; verify its proposal with a full measured training step.
+    Choose exactly one mode per block, total units <= budget, minimal summed ms.
+    Return (modes, used, cost); ValueError when infeasible or malformed. The additive
+    model ignores lifetimes and workspaces: verify any plan with a measured step.
     """
     # BEGIN TODO B4
     if type(budget) is not int or budget < 0:
@@ -258,7 +284,7 @@ def plan_modes(options, budget):
             raise ValueError("empty block options")
         next_states = {}
         for mode, (size, cost) in sorted(choices.items()):
-            if mode not in {"retain", "checkpoint", "offload"}:
+            if mode not in MODES:
                 raise ValueError("mode")
             if type(size) is not int or size < 0 or not math.isfinite(cost) or cost < 0:
                 raise ValueError("option size/cost")
@@ -268,7 +294,7 @@ def plan_modes(options, budget):
                     new_used not in next_states or new_cost < next_states[new_used][0]
                 ):
                     next_states[new_used] = (new_cost, path + [mode])
-        # Pareto pruning: a cheaper smaller state dominates a larger expensive one.
+        # Pareto pruning: a smaller state that is no more expensive dominates.
         states = {}
         best_cost = math.inf
         for used, value in sorted(next_states.items()):
@@ -283,10 +309,11 @@ def plan_modes(options, budget):
 
 
 def calibrate_blocks(blocks, sample, repeats=3):
-    """Measure each block retain/checkpoint fw+bw, median ms and saved storage.
+    """Per block: median fw+bw ms and saved storage bytes for retain and checkpoint.
 
-    Inputs are detached between blocks. This calibration is not an end-to-end
-    memory predictor. Synchronize GPU around timing; clear grads each repetition.
+    Block i is measured on the detached output of blocks[:i]. One warmup per mode is
+    discarded. Synchronize CUDA around timing. Gradients are None on return.
+    Returns [{"retain": {"ms", "saved_bytes"}, "checkpoint": {...}}, ...].
     """
     # BEGIN TODO B5
     if repeats < 1:
@@ -304,7 +331,7 @@ def calibrate_blocks(blocks, sample, repeats=3):
                 if value.is_cuda:
                     torch.cuda.synchronize(value.device)
                 start = time.perf_counter()
-                with torch.autograd.graph.saved_tensors_hooks(inventory.pack, inventory.unpack):
+                with inventory.context():
                     result = run_blocks([block], value, [mode == "retain"])
                 result.sum().backward()
                 if value.is_cuda:
@@ -322,35 +349,46 @@ def calibrate_blocks(blocks, sample, repeats=3):
 
 
 class CpuOffload:
-    """Correct synchronous saved-tensor offload. No asynchronous overlap claim."""
+    """Synchronous saved-tensor offload to host memory. No transfer/compute overlap.
 
-    def __init__(self, parameters=(), min_bytes=0):
+    offload_devices: device types whose tensors are copied to host. The default is
+    ("cuda",); tests on a CPU-only machine pass ("cpu",) so the copy path (fresh host
+    storage, counters, dtype round trip) is exercised there too.
+    """
+
+    def __init__(self, parameters=(), min_bytes=0, offload_devices=("cuda",)):
         self.excluded = {storage_key(p) for p in parameters}
         self.min_bytes = min_bytes
+        self.offload_devices = tuple(offload_devices)
         self.packed_bytes = 0
         self.d2h_copies = 0
         self.h2d_copies = 0
         self.restores = 0
 
     def pack(self, tensor):
-        # Never offload model parameter storage or a view of it. CPU tensors and
-        # small tensors use detached identity. Payload records original device;
-        # actual CUDA tensors copy to independent host ownership synchronously.
+        # Payload = (copied, original device, value). Parameter storages (and views),
+        # tensors on devices outside offload_devices and tensors smaller than
+        # min_bytes: copied=False, value = tensor.detach(). Otherwise value is a fresh
+        # host copy that shares nothing with the input (later in-place writes to the
+        # input must not reach it) and no reference to the device tensor is kept.
+        # Count packed_bytes (numel * element_size) and d2h_copies for copies only.
         # BEGIN TODO C1
         nbytes = tensor.numel() * tensor.element_size()
         excluded = storage_key(tensor) in self.excluded
-        if not tensor.is_cuda or excluded or nbytes < self.min_bytes:
+        if tensor.device.type not in self.offload_devices or excluded or nbytes < self.min_bytes:
             return (False, tensor.device, tensor.detach())
-        host = tensor.detach().to(device="cpu", copy=True)
+        host = torch.empty(tensor.shape, dtype=tensor.dtype, device="cpu")
+        host.copy_(tensor.detach())
         self.packed_bytes += nbytes
         self.d2h_copies += 1
         return (True, tensor.device, host)
         # END TODO C1
 
     def unpack(self, payload):
-        # Hooks may unpack more than once; payload must remain valid and immutable.
-        # Return the original value/device/dtype, not a detached reconstruction of
-        # another view. Host copy transfer is counted on every actual restoration.
+        # May be called more than once per payload; the payload stays valid. A copied
+        # payload returns a *new* tensor on the original device with the original
+        # dtype (h2d_copies += 1 each time); identity payloads return the value.
+        # restores counts every call.
         # BEGIN TODO C2
         copied, device, value = payload
         self.restores += 1
@@ -365,11 +403,15 @@ class CpuOffload:
 
 
 def run_policy(blocks, x, modes, offload=None):
-    """Execute an already validated per-block mode list; backward uses saved hooks."""
+    """Run blocks with per-block retain/checkpoint/offload.
+
+    Validate before running anything: len(modes) == len(blocks), every mode in MODES,
+    and an offload owner when any mode is "offload" (ValueError; no block may run and
+    no RNG may be consumed). Offload blocks run inside offload.context(); the hooks
+    stay attached to the graph after the context exits.
+    """
     # BEGIN TODO C3
-    if len(modes) != len(blocks) or any(
-        m not in {"retain", "checkpoint", "offload"} for m in modes
-    ):
+    if len(modes) != len(blocks) or any(m not in MODES for m in modes):
         raise ValueError("policy")
     if "offload" in modes and offload is None:
         raise ValueError("offload owner required")
@@ -385,11 +427,13 @@ def run_policy(blocks, x, modes, offload=None):
 
 
 def train_accumulated(blocks, optimizer, microbatches, modes, offload=None, max_grad_norm=None):
-    """One SGD/Adam step over unequal-size MSE microbatches.
+    """One optimizer step over unequal-size MSE microbatches; returns the loss float.
 
-    Weight each mean loss by target.numel()/total; zero gradients once and step
-    once. Inputs/targets must have equal shapes. Compare to concatenation with
-    dropout disabled: independently partitioned dropout consumes RNG differently.
+    Objective: sum over all microbatches of (output - target)^2 divided by the total
+    number of target elements (= full-batch MSE mean). Zero gradients once, backward
+    each microbatch, optionally clip the *accumulated* gradient of all trainable
+    parameters of blocks (clip_grad_norm_, L2) once, then step once. The returned
+    value is the pre-step objective. Inputs/targets must have equal shapes.
     """
     # BEGIN TODO C4
     batches = list(microbatches)
@@ -397,6 +441,8 @@ def train_accumulated(blocks, optimizer, microbatches, modes, offload=None, max_
         raise ValueError("nonempty matching microbatches")
     if max_grad_norm is not None and (not math.isfinite(max_grad_norm) or max_grad_norm <= 0):
         raise ValueError("gradient norm")
+    if len(modes) != len(blocks) or ("offload" in modes and offload is None):
+        raise ValueError("policy")
     total = sum(y.numel() for _, y in batches)
     optimizer.zero_grad(set_to_none=True)
     loss_total = 0.0
@@ -413,13 +459,16 @@ def train_accumulated(blocks, optimizer, microbatches, modes, offload=None, max_
     # END TODO C4
 
 
-def measure_policy(blocks, batches, modes, repeats=3):
-    """Full optimizer-step timing + allocator peaks; cold optimizer init warmed up.
+def measure_policy(blocks, batches, modes, repeats=3, offload_devices=("cuda",), warm_ms=300.0):
+    """Timed full optimizer steps (AdamW, lr=0) for one policy.
 
-    Optimizer has lr=0 to keep parameters fixed for policy comparison. Each repeat
-    still runs real backward/AdamW step. CUDA allocator stats are absolute device
-    allocations for this process, CPU peak is None. Return transfer counters per
-    measured step and sampled losses; don't infer GPU savings from logical bytes.
+    One warmup step creates the optimizer state and is not measured. On CUDA the same
+    step then runs for >= warm_ms more (laptop GPUs idle at a low memory clock), and
+    each measured step is timed with torch.cuda.Event (perf_counter elsewhere).
+    Counters and CUDA peak stats are reset right before the measured steps. lr=0
+    keeps parameters fixed across policies while backward and AdamW still run.
+    Returns step_ms (median), step_ms_p25/p75, stable (p75 <= 1.5 p25), losses (one
+    per measured step), per-step transfer counters, CUDA allocator peaks (None off CUDA).
     """
     # BEGIN TODO C5
     if repeats < 1:
@@ -427,32 +476,47 @@ def measure_policy(blocks, batches, modes, repeats=3):
     parameters = [p for block in blocks for p in block.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(parameters, lr=0.0)
     device = batches[0][0].device
-    offload = CpuOffload(p for block in blocks for p in block.parameters())
+    cuda = device.type == "cuda"
+    offload = CpuOffload(
+        (p for block in blocks for p in block.parameters()), offload_devices=offload_devices
+    )
     train_accumulated(blocks, optimizer, batches, modes, offload)
-    optimizer.zero_grad(set_to_none=True)
-    if device.type == "cuda":
-        torch.cuda.synchronize(device)
+    if cuda:
+        began = time.perf_counter()
+        while (time.perf_counter() - began) * 1000 < warm_ms:
+            train_accumulated(blocks, optimizer, batches, modes, offload)
+            torch.cuda.synchronize(device)
         torch.cuda.reset_peak_memory_stats(device)
     offload.packed_bytes = offload.d2h_copies = offload.h2d_copies = offload.restores = 0
-    losses = []
-    start = time.perf_counter()
+    losses, times = [], []
     for _ in range(repeats):
-        losses.append(train_accumulated(blocks, optimizer, batches, modes, offload))
-    if device.type == "cuda":
-        torch.cuda.synchronize(device)
-    elapsed = (time.perf_counter() - start) * 1000 / repeats
+        if cuda:
+            start, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+            start.record()
+            losses.append(train_accumulated(blocks, optimizer, batches, modes, offload))
+            end.record()
+            end.synchronize()
+            times.append(start.elapsed_time(end))
+        else:
+            began = time.perf_counter()
+            losses.append(train_accumulated(blocks, optimizer, batches, modes, offload))
+            times.append((time.perf_counter() - began) * 1000)
+    q25, q50, q75 = (
+        torch.tensor(times, dtype=torch.float64)
+        .quantile(torch.tensor([0.25, 0.5, 0.75], dtype=torch.float64))
+        .tolist()
+    )
     result = {
-        "step_ms": elapsed,
+        "step_ms": q50,
+        "step_ms_p25": q25,
+        "step_ms_p75": q75,
+        "stable": q75 <= 1.5 * q25,
         "losses": losses,
         "d2h_bytes_per_step": offload.packed_bytes / repeats,
         "d2h_copies_per_step": offload.d2h_copies / repeats,
         "h2d_copies_per_step": offload.h2d_copies / repeats,
-        "peak_allocated_bytes": torch.cuda.max_memory_allocated(device)
-        if device.type == "cuda"
-        else None,
-        "peak_reserved_bytes": torch.cuda.max_memory_reserved(device)
-        if device.type == "cuda"
-        else None,
+        "peak_allocated_bytes": torch.cuda.max_memory_allocated(device) if cuda else None,
+        "peak_reserved_bytes": torch.cuda.max_memory_reserved(device) if cuda else None,
     }
     optimizer.zero_grad(set_to_none=True)
     return result

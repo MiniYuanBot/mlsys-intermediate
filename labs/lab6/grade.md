@@ -1,27 +1,24 @@
-# Lab 6 评分标准
+# Lab 6 评分与试跑依据
 
-[任务](README.md) · [参考解释](../../solutions/lab6/README.md) · [实际试跑](../docs/validation.md)
+[任务](README.md) · [参考导读](../../solutions/lab6/README.md) · [实际运行记录](../docs/validation.md)
 
-满分 100。评分对应已提供的 14 个测试方法及 24 行测量矩阵。默认计算 FP32；梯度对照 rtol=1e-4、atol=1e-6，形状/状态/字节使用精确检查。机器性能不设固定门槛。
+满分 100。A/B/C/R 都是必修，可选挑战不补偿缺失的阶段。梯度容差来自 oracle 的计算精度：float32 的梯度对照用 $10^{-5}$ 量级，float64 的 R 阶段对照用 $10^{-10}$ 到 $10^{-12}$；形状、状态、字节数一律精确比较。不按参考机的速度设性能门槛。
 
-| 项目            | 分值 | 验收证据                                                  |
-| --------------- | ---: | --------------------------------------------------------- |
-| A1 forward/梯度 |    6 | 冻结 W、非零 B 的输入梯度、bias                           |
-| A2/A3 merge     |    6 | train 拒绝、幂等、三轮精确恢复                            |
-| A4 注入         |    6 | 嵌套目标、冻结、bias/device 保留、坏目标无修改            |
-| A5/A6 state     |    9 | cloned CPU、名称/shape/finite/scale 验证、失败不部分更新  |
-| A7 账本         |    3 | trainable/frozen 实际 bytes 与范围解释                    |
-| B1 checkpoint   |    6 | dropout 条件下逐参数梯度一致                              |
-| B2/B4 规划      |   10 | 独立穷举最优解、预算、不可行与非法输入                    |
-| B3/B5 测量      |    9 | storage view 去重/排除参数；真实 fw+bw 校准及单位         |
-| C1/C2 offload   |    8 | payload 所有权、重复 unpack、CUDA 真拷贝、计数            |
-| C3 执行         |    7 | 四策略输入和参数梯度；缺 owner 拒绝                       |
-| C4 训练         |    8 | 2+3 微批与完整 batch 的 optimizer 更新一致；clip 在累积后 |
-| C5 完整测量     |    7 | warmup、真实 optimizer、CUDA 同步、24 行与 loss 一致      |
-| 报告            |   15 | 两张图、至少两个独立反例、预测/实际差距、准备成本和边界   |
+| 项                      | 分值 | 自动或人工证据                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------- | ---: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1–A3 前向与 merge      |   10 | `A1 dX = G W + s G B A`、`A1 dB/dA`、`A1 3-D output = dense LoRA formula`、`A2 round k: double merge adds the delta once`、`A3 round k: unmerge restores W bitwise`、`A3 backup released`                                                                                                                                                            |
+| A4–A7 注入、状态与账本  |   10 | `A4 rejects targets ...`、`A4 only adapters train (untouched Linear frozen too)`、`A4 dtype/device preserved`、`A6 ...: earlier modules unchanged`（形状、NaN、溢出三种）、`A7 distinct Parameters sharing one storage ...`、`A7 a view Parameter counts its whole storage`                                                                          |
+| B1/B3 checkpoint 与清单 |    8 | `B1 keep=...: forward calls per block`、`B1 all-checkpoint saves only the 3 block inputs`、`B1 ... every trainable grad matches retain`、`B3 packed object is detached`、`B3 views share storage ...`                                                                                                                                                |
+| B2/B4 规划              |    8 | `B2 optimal for all 18 budgets`、贪心反例、`B4 consistent and optimal for budgets 1..15`、不可行与非法输入                                                                                                                                                                                                                                           |
+| B5 校准                 |    4 | `B5 block i mode: saved_bytes = independent hook count`、`B5 grads cleared on return`                                                                                                                                                                                                                                                                |
+| C1–C3 offload 与策略    |   10 | `C1 payload is host memory that shares nothing with the input`、`C2 repeated unpack still valid ...`、`C2 round trip keeps dtype ...`、`C3 ...: rejected before any block ran or RNG was used`、`C1 CUDA: offload frees device memory after forward`                                                                                                 |
+| C4/C5 训练步与测量      |    8 | `C4 setup: full-batch grad norm is far above max_grad_norm`、`C4 ...: update = full batch, clipped once after accumulation`、`C4 rejected call touched neither parameters nor grads`、`C5 d2h bytes per step = ...`、`C5 CUDA: checkpoint peak < retain peak`                                                                                        |
+| R 真实系统              |   24 | R1/R2/R3 的 float64 梯度、`gradcheck`、保存字节恰好等于手算值（10 分）；`R4 ...` 的六项与 `R variant ...` 的一致性检查（4 分）；CUDA 上 `R CUDA ...` 三项通过，`--mode bench --part R --device cuda` 的 RECORD JSON，含三个长度、七种变体、中位数和 IQR、`stable` 字段（6 分）；保存字节的手算值与实测值对照表、峰值减少不等于保存减少的解释（4 分） |
+| 实验与报告              |   18 | 三张必交图表；与 `activation_memory_budget` 的同口径对比；至少两个新增反例；负结果；modeled 与 measured 分列                                                                                                                                                                                                                                         |
+| 环境证据                |    — | 附 `bash tools/check_env.sh --lab 6` 的完整输出；缺失则 R 阶段不给分                                                                                                                                                                                                                                                                                 |
 
-CPU 可完成数学/训练正确性；C1/C2 的 CUDA 实际拷贝以及 C5 的 GPU 峰值证据要在 4060/服务器补齐。CPU 的 null 峰值和零拷贝应保留，不给它虚构 CUDA 分。可先获得其余部分并明确未验项目。
+每项可以按子性质部分给分。测试通过只说明在声明的数据范围内成立；保留原始 JSON 和源码版本才算可复现。没有 GPU 的学生可以拿到 R 的前 14 分，CUDA 证据（6 分）在 WSL 或服务器上补齐，CPU 上峰值为 null 的记录要原样保留。
 
-阶段命令 `--part A/B/C --mode test`，整体 `--mode bench`。参考 record 验证题目可执行，学生自己的 run 才验证本人实现。没有要求达到“offload 一定更快/更省”的方向性结论；出现慢或峰值更高需解释机制。
+**必交命令**：`--part A`、`--part B`、`--part C`、`--part R` 的 `--mode test` 各自通过；在 WSL 中 `--part all --device cuda` 的 `--mode test` 通过；`--mode bench --part all --device cuda` 完成；`bash tools/check_env.sh --lab 6` 的输出。参考 run 不能充当学生 run，二者 RECORD 的 `implementation` 字段不同。
 
-逐 TODO 的测试关联见 test 方法名称与 README。故意破坏保存 RNG、微批权重或参数排除应能触发相应失败；将阈值调大到吞掉错误、关掉原 dropout 测试或直接返回参考张量不能获得实现分。
+**必查错误**：把 saved bytes 当成峰值；把 `memory_reserved` 当成活张量；只比较梯度就宣称 checkpoint 或 offload 生效；在“只存 $X$ 和 $XA^\top$”的 Function 上宣称省了显存；用 float32 做 gradcheck；把同步 offload 说成隐藏了传输；在 `stable=false` 的计时上下结论；把手算（modeled）字节和实测字节放在同一列比较。出现这些错误扣相应的解释分，先改结论再做研究扩展。

@@ -1,21 +1,26 @@
-# Lab 7 验收与评分（100分）
+# Lab 7 评分与试跑依据
 
-以 [README](README.md) 的必修任务为准。`--part A/B/C` 是逐阶段验收入口；C必须有CUDA记录，CPU通过只证明C1/C2/C5。没有速度提升百分比门槛。
+[任务](README.md) · [参考导读](../../solutions/lab7/README.md) · [实际运行记录](../docs/validation.md)
 
-| 项目                       | 分值 | 可重复检查                                                         |
-| -------------------------- | ---: | ------------------------------------------------------------------ |
-| A1/A2 路由与稳定分段       |   10 | `a_router,a_dispatch`；tie、空桶、保留route                        |
-| A3/A4 数值与逆映射         |    8 | `a_quant,a_combine`；误差界、重复累加                              |
-| A5/A6 布局与统计           |    7 | `a_packing,a_stats`；padding mask、容量只诊断                      |
-| B1–B4 缓存生命周期         |   12 | `b_admission,b_lifetime`；blocked原子性、pin计数                   |
-| B5–B8 预测/事件/oracle     |   13 | `b_predictor,b_replay,b_oracle`；无未来泄漏                        |
-| C1/C2/C5 实际CPU MoE block |   10 | `c_expert,c_forward,c_block` 独立数值检查                          |
-| C3/C6 CUDA算子/布局        |   10 | `c_cuda_forward` 12组输入，误差≤2e-4                               |
-| C4 双槽依赖                |   10 | 1/2 slots均正确，无循环内全设备同步，展示事件图                    |
-| 实验矩阵与报告             |   20 | A9行/B6行/CPU C6行/CUDA C12行；一例负结果、真实/模拟区别、主源映射 |
+满分 100。A/B/C/R 都是必修，可选挑战不补偿缺失的阶段。数值容差来自 oracle 的计算精度和讲义 §1.2、§2.2 的推导；性能项不按参考机的绝对速度设门槛，只检查口径和内部一致性。
 
-自动测试是必要条件；报告20分由结果完整性8分、因果解释与失败反例6分、资源映射与局限6分组成。不能通过改测试预期或直接调用solutions得分。允许与参考答案不同的正确算法。
+| 项                        | 分值 | 自动或人工证据                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------- | ---: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1 路由约定               |    9 | `a_router` 的 12 项：三种归一化各自比对 long double oracle 与手算权重（0.7310585786 / 0.6439142599 / 1.3661227579）、并列偏向小 ID、$\{1000,1000,0\}$ 不溢出、selection-only bias 不进权重（0.4884376140）、非法 $k$ 与 shape、零 token                                                                                                                                |
+| A2/A3 布局与量化          |    7 | `a_dispatch` 的独立 $O(RE)$ 布局 oracle、空输入、非法索引、桶内稳定性；`a_quant` 的 rowmax/127、全零行、半个 scale 误差界、饱和到 $-127$                                                                                                                                                                                                                               |
+| A4/A5/A6 合并、打包与诊断 |    8 | `a_combine` 手算 $[3,14]$、未路由 token 保持零；`a_packing` 的 $-1$ 掩码、末尾不满 tile、刚好满的桶；`a_stats` 两组熵（0.5623351446 与 1.0114042647）、imbalance、overflow 不丢 route                                                                                                                                                                                  |
+| B1 准入与替换             |   11 | `b_admission` 的 12 项（串行链路 6/10 us、`Blocked` 不改状态、不逐出 pinned、先规划后提交、`Pending` 不重复拷贝、超容量恒 `Blocked`、时钟倒流）；`b_policy` 的 LRU/LFU 分歧轨迹与“预取触碰不提升”                                                                                                                                                                      |
+| B2/B3/B4 生命周期         |    4 | `b_lifetime`：loading 不可 pin、缺席不可 pin、引用计数、无主 release 报错、`advance` 按完成时刻排序且只报告一次                                                                                                                                                                                                                                                        |
+| B5/B6 预测                |    5 | `b_predictor`：冷启动、置信度阈值、字节预算（非计数）、长陈旧相位后仍跟随新热点、跳过超大候选而不终止扫描                                                                                                                                                                                                                                                              |
+| B7/B8 回放与下界          |    8 | `b_replay` 手算 finish 24、周期 trace 上预取取胜、字节守恒、单槽抖动全 miss、`wasted`/`stranded` 均非零且三个计数自洽；`b_oracle` 手算 4、与独立 Belady 模拟在 12 个用例上一致、是 LRU 的下界                                                                                                                                                                          |
+| C1/C2/C5 CPU 数值         |    8 | `c_expert`（FP64 反量化 oracle、手算 $[1,4]$、ReLU 截断）、`c_forward`（逐 route FP64 oracle，奇数维度、空 dispatch）、`c_block`（手算 $[3,5]$、非方阵 gate 的 $[6,3]$、top-2 权重和）                                                                                                                                                                                 |
+| C3/C4/C6 CUDA 依赖图      |    7 | `c_cuda_forward` 12 组（3 seed $\times$ $D=7/33$ $\times$ 1/2 槽）全部 `max_abs_error <= 2e-4`；`c_cuda_slot_reuse` 两组（512 token、8 专家、重复 8 次）；空 dispatch 不启动工作                                                                                                                                                                                       |
+| R 真实系统                |   20 | R1/R2/race/R3/R4/R5 六组全部 PASS（8 分）；`--part R --mode bench` 的 RECORD JSON，含 `asyncEngineCount`、pinned 与 pageable H2D 带宽、$\rho$ 随槽数与 `reads` 的变化、每行的 p25/p75 与 `stable`（7 分）；计时与字节口径写清楚（见 [authoring §5](../docs/authoring.md#5-测量规则)），并解释单槽 $\rho=0$、第三槽无收益、`reads` 翻八倍而墙钟几乎不变这三件事（5 分） |
+| 实验与报告                |   13 | A 的 padding 图、B 的 48 行表与三条 trace 的对比、R 的三张表；至少两个新增反例；至少一个负结果（例如 `uniform` 上预取无效）；同口径对比，不把 modeled 与 measured 放进同一列                                                                                                                                                                                           |
+| 环境证据                  |    — | 附 `bash tools/check_env.sh --lab 7` 的完整输出；缺失则 R 阶段不给分                                                                                                                                                                                                                                                                                                   |
 
-CPU 路径包含 14 个命名检查，CUDA 路径检查 12 组配置。提交自己运行产生的记录，并标明设备、阶段与源码版本；未执行的 CUDA 部分不能用编译成功或传输微基准替代。参考实现的验证范围见[验证说明](../docs/validation.md)。
+每项可以按子性质部分给分。编译失败不让手算部分归零，但相关实现项算未完成。测试通过只说明在声明的数据范围内成立；保留原始 JSON 和源码版本才算可复现。
 
-额外测试建议：所有请求均同专家；容量恰为一个专家；突然切换热点；所有logit相等；top-k=1/experts；D/H奇数。测试中正确报错也是结果，不能让错误静默变成空输出。
+**必交命令**：`--part A`、`--part B` 的 `--mode test` 各自通过；`--part all --mode bench`（CPU）输出 A 的 15 行、B 的 48 行、C 的 6 行；在 WSL 中 `--part C --device cuda --mode test` 与 `--mode bench` 通过；`--part R --device cuda` 的 `--mode test`（六组）与 `--mode bench` 通过；`bash tools/check_env.sh --lab 7` 的输出。参考 run 不能充当学生 run，二者 RECORD 的 `implementation` 字段不同。
+
+**必查错误**：把“先 softmax 再取 top-k”和“先取 top-k 再 softmax”当成同一件事；把 selection-only bias 写进权重；用 $\{1000,1000,0\}$ 这类无法区分约定的输入当作唯一的路由断言；把 active 参数量当成显存需求；把 `Loaded` 当成数据已就绪；失败的准入请求先逐出再报错；只报告 demand miss 下降而不报告总字节上升；把开了预取后的 `misses` 与 Belady 的 `oracle_misses` 直接比较并宣称突破下界；预取触碰刷新了已驻留 entry 的 recency；用 host 提交顺序代替跨 stream 的 event 依赖；在 KB 级专家上声称测到了 copy/compute 重叠；用 `cudaEventDisableTiming` 的事件做分段计时；pageable 内存上调用 `cudaMemcpyAsync` 后仍声称异步；把 $\rho$ 的分母写成 $T_{\mathrm{wall}}$；GPU 计时前没有 300 ms 自旋预热，或使用了 `stable` 为 `NO` 的行；CPU 步让专家变成了 resident；把 `cpu_speedup` 不为 1 的 modeled 行当作实测。出现这些错误扣相应的解释分，先改结论再做研究扩展。

@@ -1,14 +1,28 @@
 #!/usr/bin/env python3
-"""Show host tools and optionally probe the actual PyTorch Inductor backend."""
+"""Python-side probe used by check_env: host tools, compiler family, Inductor compile probe.
+
+The per-lab pass/fail verdict lives in tools/check_env.sh / check_env.ps1; this script
+only reports what the current interpreter sees (and --compile-probe really compiles).
+"""
 
 import argparse
 import importlib.util
+import os
+from pathlib import Path
 import platform
 import shutil
 import subprocess
 import sys
+import tempfile
 
-from platform_tools import find_cxx, host_platform
+from platform_tools import (
+    cargo_command,
+    compiler_family,
+    find_cxx,
+    find_nvcc,
+    host_platform,
+    mingw_path_warning,
+)
 
 
 def main():
@@ -17,13 +31,23 @@ def main():
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     args = parser.parse_args()
     print(host_platform(), platform.platform(), sys.version)
+    print("python:", sys.executable)
     try:
-        print("C++:", find_cxx())
+        cxx = find_cxx()
+        family = compiler_family(cxx)
+        print(f"C++: {cxx} ({family})")
+        labs = Path(__file__).resolve().parents[1]
+        if warning := mingw_path_warning(family, labs, tempfile.gettempdir()):
+            print("WARNING:", warning)
     except RuntimeError as error:
         print("C++:", error)
+    found = {"cargo": cargo_command(), "nvcc": find_nvcc()}
     for tool in ["cargo", "rustc", "nvcc", "nvidia-smi", "node", "npm"]:
-        print(f"{tool}: {shutil.which(tool) or 'MISSING'}")
+        print(f"{tool}: {found.get(tool) or shutil.which(tool) or 'MISSING'}")
+    if os.environ.get("VIRTUAL_ENV"):
+        print("VIRTUAL_ENV:", os.environ["VIRTUAL_ENV"])
     if shutil.which("nvidia-smi"):
+        sys.stdout.flush()
         subprocess.run(
             ["nvidia-smi", "--query-gpu=name,memory.total,driver_version", "--format=csv"]
         )

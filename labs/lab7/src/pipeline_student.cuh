@@ -39,7 +39,7 @@ inline std::vector<float> offload_forward(const std::vector<Expert> &experts, co
     // qn counts INT8 bytes, sn counts FLOAT ELEMENTS; confusing units corrupts results.
     // Test: c_cuda_forward validates odd-width records over repeated slot reuse.
     // BEGIN TODO C6
-    throw std::logic_error("TODO C6");
+    throw std::logic_error("Complete C6");
     // END TODO C6
     float *dx, *dy;
     int *ids;
@@ -64,7 +64,7 @@ inline std::vector<float> offload_forward(const std::vector<Expert> &experts, co
         CUDA_OK(cudaEventCreateWithFlags(&done[s], cudaEventDisableTiming));
     }
     // BEGIN TODO C4
-    throw std::logic_error("TODO C4");
+    throw std::logic_error("Complete C4");
     // END TODO C4
     std::vector<float> ys(routes * width);
     CUDA_OK(cudaMemcpy(ys.data(), dy, ys.size() * sizeof(float), cudaMemcpyDeviceToHost));

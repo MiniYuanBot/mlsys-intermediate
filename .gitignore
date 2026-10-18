@@ -59,8 +59,7 @@ compile_commands.json
 *.min.*
 
 # Obsidian runtime state and plugin binaries/data
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
+.obsidian/workspace*.json
 .obsidian/cache/
 .obsidian/plugins/
 

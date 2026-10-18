@@ -40,7 +40,5 @@
 **/yarn.lock
 **/Cargo.lock
 
-# Obsidian per-user state is not shared.
-.obsidian/workspace*.json
-.obsidian/cache/
-.obsidian/plugins/
+# Obsidian rewrites its own settings (without a final newline); never reformat them.
+.obsidian/

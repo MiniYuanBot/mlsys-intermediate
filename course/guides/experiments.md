@@ -14,7 +14,7 @@ tags: [measurement, reproducibility]
 | 数学/离散模型   | D3 bucket 成本、D4 推测控制、D8 调度     | 在明确假设下策略是否正确、是否有潜在收益 | GPU 实际加速、在线 tail latency、RL 收敛 |
 | 合成 microbench | D1 attention、D2 GEMV、D3 fusion、D7 H2D | 特定 shape/数据/设备上的成本与数值行为   | 完整 LLM 吞吐、任务质量、多卡可扩展性    |
 | 微型真实训练    | D6 LoRA block 网络                       | 当前网络的梯度与显存—重计算权衡          | 大模型微调质量、FlexLLM 共服务效果       |
-| 真实模型/trace  | `capture_model.py`、自己接入引擎         | 被测模型和负载范围的端到端行为           | 超出硬件、模型、数据范围的结论           |
+| 真实模型/trace  | 各 lab 的 R 阶段、`capture_model.py`     | 被测模型和负载范围的端到端行为           | 超出硬件、模型、数据范围的结论           |
 | 完整论文复现    | 另行跑原作者 artifact                    | 论文特定实验能否复现                     | 自动证明新颖性或你的优化普遍更好         |
 
 ## 每次实验的最低规范
@@ -26,6 +26,18 @@ tags: [measurement, reproducibility]
 5. **重复与随机化**：同一 kernel 至少 5 个独立测量批次，变换方法顺序；工作负载至少 3 seeds。默认教学 sweep 不等于充分统计功效；训练收敛结论需更多独立 seed 与置信区间。
 6. **记录硬件状态**：显卡型号、驱动、Toolkit、功率/温度、其他进程。笔记本功率和 WSL 调度会产生波动；小于噪声的改善不能作为贡献。
 7. **保留负结果**：OOM、超时、不满足 SLO、fallback 都计入；不要只保留跑通的配置。报告记录入口见 [run.py](../../labs/tools/run.py)。
+8. **标清证据来源**：由公式、规格表或仿真得到的数字标 `modeled, not measured`，本机实测的标 `measured`，两者不放在同一列比较。
+
+## 笔记本 GPU 上的测量教训
+
+下面几条来自本课程在 RTX 4060 Laptop 上实际踩过的坑，完整规则见 [authoring §5](../../labs/docs/authoring.md#5-测量规则)：
+
+- **P-state 预热**：主机在两组配置之间准备数据时 GPU 会空闲，驱动随即降到低 P-state，实测显存频率从 8000 MHz 掉到 810 MHz。lab1 的访存受限 kernel 因此偶尔慢 8 倍，split 扫描呈双峰。几次普通 warmup 不够，每组计时前要用同一个 launch 让 GPU 连续忙至少 300 ms。
+- **`stable` 列**：每行输出 $p_{75}\le1.5\,p_{25}$ 是否成立；不成立的行重跑后再用，仍不稳定就在报告里说明。怀疑频率问题时，用 `nvidia-smi --query-gpu=clocks.sm,clocks.mem,pstate --format=csv -lms 50` 记录时钟。
+- **一张卡一个计时任务**：`run.py --device cuda` 和 `fault_inject.py` 会自动拿 `/tmp/mlsys-gpu.lock`，记录里的 `gpu_lock` 字段写明是 `acquired` 还是 `inherited`；手动运行用 `flock /tmp/mlsys-gpu.lock <命令>`。后台有负载时 lab1 的结果整体慢了 2 倍，这种数即使很稳定也不能用。
+- **modeled 与 measured 会分叉**：lab2 推算 FP8 与 FP16 的交叉 batch 为 23，实测只在 2–8 之间；lab3 模型推算 DP 比固定网格好几个百分点，真实回放里两者几乎相同。代价模型的结论要用实测复核后才能写进结论。
+
+走出 lab 之后怎样测真实模型和 serving 系统，见[从 lab 到真实系统](real-systems.md)。
 
 ## 指标定义
 

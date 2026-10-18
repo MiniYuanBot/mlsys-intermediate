@@ -1,0 +1,36 @@
+{"id": 0, "task": "explain", "prompt": "Explain in plain English why the sky looks blue during the day and red at sunset."}
+{"id": 1, "task": "explain", "prompt": "What is the difference between a process and a thread? Give one example of each."}
+{"id": 2, "task": "explain", "prompt": "Explain what a hash table is and why lookups are usually constant time."}
+{"id": 3, "task": "explain", "prompt": "Why does a CPU have several levels of cache? Answer in a short paragraph."}
+{"id": 4, "task": "explain", "prompt": "Describe how a bicycle stays upright while it is moving."}
+{"id": 5, "task": "explain", "prompt": "What is the purpose of a version control system such as Git?"}
+{"id": 6, "task": "write", "prompt": "Write a short poem about a lighthouse keeper who talks to the sea."}
+{"id": 7, "task": "write", "prompt": "Write a friendly email inviting a colleague to a reading group on operating systems."}
+{"id": 8, "task": "write", "prompt": "Write the opening paragraph of a mystery story set in a university library."}
+{"id": 9, "task": "write", "prompt": "Write a product description for a reusable water bottle made of glass."}
+{"id": 10, "task": "write", "prompt": "Write a short dialogue between a student and a robot tutor about learning to cook."}
+{"id": 11, "task": "write", "prompt": "Write a motivational note for someone preparing for a programming contest."}
+{"id": 12, "task": "code", "prompt": "Write a Python function that returns the n-th Fibonacci number using iteration."}
+{"id": 13, "task": "code", "prompt": "Write a C function that reverses a null-terminated string in place."}
+{"id": 14, "task": "code", "prompt": "Write a Python function that checks whether a string is a palindrome, ignoring case and spaces."}
+{"id": 15, "task": "code", "prompt": "Write a Rust function that returns the largest element of a slice of i32, or None if it is empty."}
+{"id": 16, "task": "code", "prompt": "Write a Python class for a stack with push, pop and peek methods."}
+{"id": 17, "task": "code", "prompt": "Write a SQL query that returns the ten customers with the highest total order amount."}
+{"id": 18, "task": "math", "prompt": "A train travels 180 km in 2.5 hours. What is its average speed in km/h? Show the steps."}
+{"id": 19, "task": "math", "prompt": "Solve for x: 3x + 7 = 25. Explain each step."}
+{"id": 20, "task": "math", "prompt": "What is the sum of the integers from 1 to 100? Explain the method."}
+{"id": 21, "task": "math", "prompt": "A rectangle has a perimeter of 30 cm and a length of 9 cm. Find its area step by step."}
+{"id": 22, "task": "math", "prompt": "If a shirt costs 80 dollars after a 20 percent discount, what was the original price? Show the steps."}
+{"id": 23, "task": "math", "prompt": "Compute 17 multiplied by 23 and explain how to check the result."}
+{"id": 24, "task": "translate", "prompt": "Translate into Chinese: The library opens at eight in the morning and closes at ten in the evening. Students may borrow up to five books at a time."}
+{"id": 25, "task": "translate", "prompt": "Translate into English: 今天下午我们在实验室讨论了推测解码的实现细节，大家一致认为需要更多实验数据。"}
+{"id": 26, "task": "translate", "prompt": "Translate into French: The weather is cold today, so please bring a warm coat and an umbrella."}
+{"id": 27, "task": "translate", "prompt": "Translate into Chinese: A good benchmark reports the median, the spread, and the exact configuration that produced each number."}
+{"id": 28, "task": "translate", "prompt": "Translate into English: 这家餐厅的饺子非常好吃，但是周末通常要排队半个小时。"}
+{"id": 29, "task": "translate", "prompt": "Translate into German: My train was delayed by twenty minutes, so I missed the beginning of the meeting."}
+{"id": 30, "task": "extract", "prompt": "Copy the following list exactly, one item per line, and then add the word DONE: apple, banana, cherry, date, elderberry, fig, grape, honeydew."}
+{"id": 31, "task": "extract", "prompt": "Rewrite the following sentence with every word capitalized: the quick brown fox jumps over the lazy dog near the quiet river bank."}
+{"id": 32, "task": "extract", "prompt": "From the text below, list every year that is mentioned.\nText: The bridge was designed in 1931, opened in 1937, damaged by a storm in 1951, repaired in 1953 and renovated again in 2012."}
+{"id": 33, "task": "extract", "prompt": "Convert this record to JSON with keys name, age and city: Name is Lin Wei, age is 29, city is Hangzhou."}
+{"id": 34, "task": "extract", "prompt": "Repeat this sentence three times, each on its own line: Measure first, then optimize."}
+{"id": 35, "task": "extract", "prompt": "Summarize in one sentence: The lab measures how many draft tokens a target model accepts, records how long each verification takes, and replays both in a simulator to compare controllers."}

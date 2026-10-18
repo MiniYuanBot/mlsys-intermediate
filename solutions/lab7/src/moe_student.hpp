@@ -6,6 +6,7 @@
 #include <map>
 #include <numeric>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 namespace moe {
@@ -17,28 +18,59 @@ struct Dispatch {
     std::vector<int> offsets;
     std::vector<Route> ordered;
 };
-// A1: logits is row-major [tokens, experts]. Select top-k BEFORE normalization.
-// Equal logits prefer smaller expert IDs; subtract max before exp. Test: a_router.
+// Router conventions (lecture §1.2). Selection and weighting are separate steps:
+//   TopkSoftmax     Mixtral; Qwen3-MoE checkpoints with norm_topk_prob=true:
+//                   select by logit (+bias), weight = softmax over the k selected logits.
+//                   (Equal to softmax over all experts followed by renormalisation.)
+//   SoftmaxNoRenorm Switch, Qwen1.5-MoE, OLMoE, DeepSeek-V2: p = softmax over ALL experts,
+//                   select by logit (+bias), weight = p of the selected expert (sum < 1).
+//   SigmoidRenorm   DeepSeek-V3: s = sigmoid(logit), select by s + bias, weight =
+//                   s / (sum of s over the selected experts). The bias never enters weights.
+// Every weight is finally multiplied by spec.scale (routed_scaling_factor; 2.5 in V3).
+enum class Norm { TopkSoftmax, SoftmaxNoRenorm, SigmoidRenorm };
+struct RouterSpec {
+    Norm norm = Norm::TopkSoftmax;
+    std::vector<float> bias; // empty, or one selection-only bias per expert
+    float scale = 1.f;
+};
+// A1: logits is row-major [tokens, experts]. Routes of one token are emitted in descending
+// selection score; equal scores prefer the smaller expert ID. Use a max-subtracted softmax
+// (logits like 1000 must not overflow). Throw std::invalid_argument on bad shapes or a bias
+// whose size is neither 0 nor experts. Test: a_router (exact weights for all three norms).
 inline std::vector<Route> route_topk(const std::vector<float> &logits, int tokens, int experts,
-                                     int k) {
+                                     int k, const RouterSpec &spec = {}) {
     // BEGIN TODO A1
     if (tokens < 0 || experts < 1 || k < 1 || k > experts ||
-        logits.size() != size_t(tokens * experts))
+        logits.size() != size_t(tokens) * size_t(experts) ||
+        (!spec.bias.empty() && spec.bias.size() != size_t(experts)))
         throw std::invalid_argument("router shape");
     std::vector<Route> out;
     for (int t = 0; t < tokens; ++t) {
+        const float *row = logits.data() + size_t(t) * experts;
+        std::vector<double> base(experts), select(experts);
+        for (int e = 0; e < experts; ++e) {
+            base[e] = spec.norm == Norm::SigmoidRenorm ? 1.0 / (1.0 + std::exp(-double(row[e])))
+                                                       : double(row[e]);
+            select[e] = base[e] + (spec.bias.empty() ? 0.0 : double(spec.bias[e]));
+        }
         std::vector<int> ids(experts);
         std::iota(ids.begin(), ids.end(), 0);
-        std::stable_sort(ids.begin(), ids.end(), [&](int a, int b) {
-            return logits[t * experts + a] > logits[t * experts + b];
-        });
-        float maximum = logits[t * experts + ids[0]], total = 0;
-        std::vector<float> weights(k);
-        for (int j = 0; j < k; ++j) {
-            weights[j] = std::exp(logits[t * experts + ids[j]] - maximum);
-            total += weights[j];
+        std::stable_sort(ids.begin(), ids.end(),
+                         [&](int a, int b) { return select[a] > select[b]; });
+        std::vector<double> w(k);
+        double total = 0;
+        if (spec.norm == Norm::SigmoidRenorm) {
+            for (int j = 0; j < k; ++j) total += w[j] = base[ids[j]];
+        } else if (spec.norm == Norm::TopkSoftmax) {
+            double top = base[ids[0]];
+            for (int j = 1; j < k; ++j) top = std::max(top, base[ids[j]]);
+            for (int j = 0; j < k; ++j) total += w[j] = std::exp(base[ids[j]] - top);
+        } else {
+            double top = *std::max_element(base.begin(), base.end());
+            for (int e = 0; e < experts; ++e) total += std::exp(base[e] - top);
+            for (int j = 0; j < k; ++j) w[j] = std::exp(base[ids[j]] - top);
         }
-        for (int j = 0; j < k; ++j) out.push_back({t, ids[j], weights[j] / total});
+        for (int j = 0; j < k; ++j) out.push_back({t, ids[j], float(w[j] / total * spec.scale)});
     }
     return out;
     // END TODO A1
@@ -157,42 +189,58 @@ inline RouterStats router_stats(const Dispatch &d, int tile, int capacity) {
     // END TODO A6
 }
 enum class Access { Hit, Pending, Loaded, Blocked };
+// Replacement policy among ready, unpinned entries (lecture 4.3).
+//   LRU: evict the smallest stamp (last demand access or pin).
+//   LFU: evict the fewest demand uses while resident; ties go to the smaller stamp.
+//        Counts start at 1 for a demand load, 0 for a prefetch, and are forgotten on eviction.
+enum class Policy { LRU, LFU };
 struct Entry {
     size_t bytes;
     double ready;
     long stamp;
     int pins = 0;
-    bool prefetched = false;
+    bool prefetched = false; // loaded speculatively and not yet touched by a demand access
+    long uses = 0;
 };
 struct Cache {
     size_t capacity, used = 0, transferred = 0, wasted = 0;
     double bandwidth, link_free = 0, now = 0;
     long clock = 0;
+    Policy policy;
     std::map<int, Entry> entries;
-    Cache(size_t bytes, double bytes_per_us) : capacity(bytes), bandwidth(bytes_per_us) {
+    Cache(size_t bytes, double bytes_per_us, Policy p = Policy::LRU)
+        : capacity(bytes), bandwidth(bytes_per_us), policy(p) {
         if (bytes_per_us <= 0) throw std::invalid_argument("bandwidth");
     }
-    // B1: monotonic clock and serial-copy-engine reservation. Loading entries occupy bytes.
-    // Victims are ready, unpinned LRU. Plan all evictions first: Blocked must be atomic.
-    // Demand access to an existing prefetch clears speculative status. Test: b_admission.
+    // B1: monotonic clock and ONE serial copy engine: a new load finishes at
+    // max(time, link_free) + bytes / bandwidth. Loading entries occupy bytes immediately.
+    // Victims are ready, unpinned entries ordered by `policy`. Plan all evictions first:
+    // a Blocked request changes nothing. A demand access to an existing entry refreshes its
+    // stamp, adds one use and clears `prefetched`; a prefetch access to an existing entry
+    // changes nothing (speculation must not promote). Evicting an entry whose `prefetched`
+    // flag is still set adds its bytes to `wasted`. Test: b_admission, b_policy.
     Access request(int id, size_t bytes, double time, bool prefetch = false) {
         // BEGIN TODO B1
         if (time < now) throw std::invalid_argument("time reversal");
         now = time;
         auto found = entries.find(id);
         if (found != entries.end()) {
-            found->second.stamp = ++clock;
-            if (!prefetch) found->second.prefetched = false;
+            if (!prefetch) {
+                found->second.stamp = ++clock;
+                ++found->second.uses;
+                found->second.prefetched = false;
+            }
             return found->second.ready <= time ? Access::Hit : Access::Pending;
         }
         if (bytes > capacity) return Access::Blocked;
-        std::vector<std::pair<long, int>> candidates;
+        std::vector<std::tuple<long, long, int>> candidates;
         for (const auto &[key, e] : entries)
-            if (!e.pins && e.ready <= time) candidates.emplace_back(e.stamp, key);
+            if (!e.pins && e.ready <= time)
+                candidates.emplace_back(policy == Policy::LFU ? e.uses : 0, e.stamp, key);
         std::sort(candidates.begin(), candidates.end());
         size_t available = capacity - used;
         std::vector<int> victims;
-        for (auto [stamp, key] : candidates) {
+        for (auto [uses, stamp, key] : candidates) {
             if (available >= bytes) break;
             available += entries.at(key).bytes;
             victims.push_back(key);
@@ -205,15 +253,14 @@ struct Cache {
             entries.erase(key);
         }
         link_free = std::max(time, link_free) + double(bytes) / bandwidth;
-        entries.emplace(id, Entry{bytes, link_free, ++clock, 0, prefetch});
+        entries.emplace(id, Entry{bytes, link_free, ++clock, 0, prefetch, prefetch ? 0 : 1});
         used += bytes;
         transferred += bytes;
         return Access::Loaded;
         // END TODO B1
     }
-    // B2: wait for the actual load completion before pinning. Pins are reference counts.
-    // Do not silently pin an absent/loading expert or release someone else's lease.
-    // Test: b_lifetime; return ready IDs sorted by completion then ID for deterministic replay.
+    // B2: advance the clock; return IDs whose load completed in (now, time], sorted by
+    // completion time then ID, for deterministic replay. Test: b_lifetime.
     std::vector<int> advance(double time) {
         // BEGIN TODO B2
         if (time < now) throw std::invalid_argument("time reversal");
@@ -227,7 +274,8 @@ struct Cache {
         return done;
         // END TODO B2
     }
-    // B3: acquire a ready expert lease; nested consumers each own one pin.
+    // B3: acquire a ready expert lease (refreshes the stamp); nested consumers each own one
+    // pin. Absent or still-loading experts throw std::logic_error. Test: b_lifetime.
     void pin(int id) {
         // BEGIN TODO B3
         auto it = entries.find(id);
@@ -248,9 +296,9 @@ struct Cache {
 struct Predictor {
     std::map<int, std::map<int, double>> counts;
     int previous = -1;
-    // B5: exponentially discount the whole transition table then observe one transition.
-    // predict budget is bytes of overlap, not number of experts. Never inspect future trace.
-    // Test: b_predictor (cold start, confidence threshold, phase change, byte budget).
+    // B5: multiply the WHOLE transition table by 0.9, then add 1 to previous->expert (if a
+    // previous expert exists), then remember expert. Never inspect the future trace.
+    // Test: b_predictor (cold start, decay, phase change).
     void observe(int expert) {
         // BEGIN TODO B5
         for (auto &[from, row] : counts)
@@ -259,7 +307,9 @@ struct Predictor {
         previous = expert;
         // END TODO B5
     }
-    // B6: return confidence-ranked expert IDs fitting the overlap byte budget.
+    // B6: successors of `previous` with p = C[prev][b] / sum_j C[prev][j] >= min_probability,
+    // in descending p (ties: smaller ID); greedily keep those whose bytes still fit the
+    // remaining budget (skip, do not stop at, one that does not fit). Test: b_predictor.
     std::vector<int> predict(const std::vector<size_t> &bytes, size_t budget,
                              double min_probability) const {
         // BEGIN TODO B6
@@ -283,21 +333,33 @@ struct Predictor {
 };
 struct TraceResult {
     double finish;
-    size_t transferred, wasted;
-    int misses, blocked;
+    size_t transferred; // all admitted loads (demand + prefetch), counted at admission
+    size_t prefetched;  // bytes admitted as prefetch
+    size_t wasted;      // prefetched bytes evicted before any demand touched them
+    size_t stranded;    // prefetched bytes still untouched when the trace ends
+    int misses;         // demand accesses that were not an immediate Hit (Loaded or Pending)
+    int prefetch_hits;  // demand Hits whose entry was still flagged prefetched
+    int blocked;        // demand retries caused by Blocked
 };
-// B7: causal event replay. Demand blocks until its transfer completes; prediction runs
-// only after observing this demand and receives compute-time*bandwidth as byte budget.
-// Prefetch uses the SAME copy engine/cache as demand, so a wrong prediction can hurt.
-// Test: b_replay checks the no-prefetch hand schedule and byte conservation.
+// B7: causal event replay. For each demand: request at `time`; while Blocked, wait for the
+// link to drain (time = link_free, advance) and retry; on Loaded/Pending wait until that
+// entry is ready. Then pin, observe, and only if `prefetch`: predict with budget
+// compute*bandwidth bytes and threshold 0.3 and request each candidate as a prefetch at the
+// same time (a Blocked prefetch is dropped). Then compute for `compute` us, advance and
+// release. Prefetch uses the SAME copy engine and cache as demand.
+// Test: b_replay (hand schedules with and without prefetch, byte conservation).
 inline TraceResult replay(const std::vector<int> &trace, const std::vector<size_t> &sizes,
-                          size_t capacity, double bandwidth, double compute, bool prefetch) {
+                          size_t capacity, double bandwidth, double compute, bool prefetch,
+                          Policy policy = Policy::LRU) {
     // BEGIN TODO B7
-    Cache cache(capacity, bandwidth);
+    Cache cache(capacity, bandwidth, policy);
     Predictor predictor;
     double time = 0;
-    int misses = 0, blocked = 0;
+    size_t prefetched = 0;
+    int misses = 0, blocked = 0, prefetch_hits = 0;
     for (int expert : trace) {
+        auto old = cache.entries.find(expert);
+        bool was_prefetch = old != cache.entries.end() && old->second.prefetched;
         auto status = cache.request(expert, sizes.at(expert), time);
         while (status == Access::Blocked) {
             if (cache.link_free <= time) throw std::logic_error("expert larger than capacity");
@@ -306,7 +368,9 @@ inline TraceResult replay(const std::vector<int> &trace, const std::vector<size_
             cache.advance(time);
             status = cache.request(expert, sizes.at(expert), time);
         }
-        if (status != Access::Hit) {
+        if (status == Access::Hit) {
+            if (was_prefetch) ++prefetch_hits;
+        } else {
             ++misses;
             time = cache.entries.at(expert).ready;
             cache.advance(time);
@@ -315,13 +379,19 @@ inline TraceResult replay(const std::vector<int> &trace, const std::vector<size_
         predictor.observe(expert);
         if (prefetch) {
             auto candidates = predictor.predict(sizes, size_t(compute * bandwidth), .3);
-            for (int next : candidates) cache.request(next, sizes.at(next), time, true);
+            for (int next : candidates)
+                if (cache.request(next, sizes.at(next), time, true) == Access::Loaded)
+                    prefetched += sizes.at(next);
         }
         time += compute;
         cache.advance(time);
         cache.release(expert);
     }
-    return {time, cache.transferred, cache.wasted, misses, blocked};
+    size_t stranded = 0;
+    for (const auto &[id, e] : cache.entries)
+        if (e.prefetched) stranded += e.bytes;
+    return {time,   cache.transferred, prefetched, cache.wasted, stranded,
+            misses, prefetch_hits,     blocked};
     // END TODO B7
 }
 // B8: clairvoyant Belady lower bound for equal-sized experts. On a miss, evict

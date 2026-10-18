@@ -38,3 +38,7 @@ ignore = true
 
 [*.{generated,min}.*]
 ignore = true
+
+# Obsidian writes its settings without a final newline; keep that form stable.
+[.obsidian/**]
+insert_final_newline = false

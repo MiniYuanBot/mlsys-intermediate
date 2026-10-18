@@ -84,8 +84,11 @@ def segment_costs(histogram, profiles):
     # END TODO A3
 
 
-# A4: histogram total-variation distance on union support; counterexample must
-# detect a new shape even when old mean length is unchanged. Test: distribution_shift.
+# A4: total-variation distance TV(p,q) = 1/2 * sum_n |p(n) - q(n)| between the
+# normalized training histogram p and the empirical distribution q of `recent`, summed
+# over the UNION of supports (a shape seen only in `recent` counts fully). Range [0,1].
+# Both empty -> 0.0; exactly one empty -> 1.0. Nonpositive shapes/counts raise
+# ValueError. Test: distribution_shift (fractional cases vs an exact Fraction oracle).
 def trace_shift(training, recent):
     # BEGIN TODO A4
     old = dict(training)
@@ -105,8 +108,10 @@ def trace_shift(training, recent):
 
 
 # B1: exact DP over prefix length and number of buckets, constrained by capacity.
-# Backtrack chosen upper bounds; deterministic tie: smaller bucket count, then
-# earliest split. Test: dp_exhaustive enumerates ALL partitions independently.
+# Bounds are training shapes; the last bound is the largest shape. Return sorted bounds.
+# Deterministic ties: fewer buckets first; then, scanning split points left to right,
+# keep the first strict minimum (the last bucket starts as early as possible).
+# Test: dp_exhaustive enumerates ALL partitions independently.
 def plan(histogram, profiles, capacity):
     # BEGIN TODO B1
     if capacity < 1:
@@ -138,8 +143,9 @@ def plan(histogram, profiles, capacity):
     # END TODO B1
 
 
-# B2: upper-bound route; enforce padding ratio budget. Unknown large shapes
-# return None for eager fallback. Zero is never a legal length. Test: guarded_route.
+# B2: route to the SMALLEST bound >= length; return None (eager fallback) when no bound
+# fits or bound/length > max_padding (ratio exactly max_padding is allowed). Lengths
+# must be positive, bounds sorted/unique/positive, max_padding >= 1. Test: guarded_route.
 def route(length, bounds, max_padding=2.0):
     # BEGIN TODO B2
     if length <= 0 or max_padding < 1:

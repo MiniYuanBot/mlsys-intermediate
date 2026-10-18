@@ -1,0 +1,31 @@
+[
+  {
+    "id": "a1-scale-denominator-16",
+    "todo": "A1",
+    "file": "src/kv_student.hpp",
+    "find": "/ 15.0));",
+    "replace": "/ 16.0));",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "int4 has 16 codes but 15 steps; dividing by 16 shrinks the scale and clips the group maximum"
+  },
+  {
+    "id": "c1-lloyd-no-center-update",
+    "todo": "C1",
+    "file": "src/pq_student.hpp",
+    "find": "if (count[p * centroids + c])",
+    "replace": "if (false && count[p * centroids + c])",
+    "expect_fail_part": "C",
+    "why": "Lloyd keeps the seed centers forever; the SSE objective must strictly drop on separable data"
+  },
+  {
+    "id": "b2-kv-axis-swap",
+    "todo": "B2",
+    "file": "src/cache_student.hpp",
+    "find": "auto pk = quantize(a, block, dim, group, Axis::Channel);\n            auto pv = quantize(b, block, dim, group, Axis::Token);",
+    "replace": "auto pk = quantize(a, block, dim, group, Axis::Token);\n            auto pv = quantize(b, block, dim, group, Axis::Channel);",
+    "expect_fail_part": "B",
+    "device": "cpu",
+    "why": "K and V grouping axes swapped on flush; an oracle that rebuilds both layouts independently must reject it"
+  }
+]

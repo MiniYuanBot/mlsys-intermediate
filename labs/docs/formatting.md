@@ -25,10 +25,10 @@ UTF-8、LF、末尾换行。格式化与 lint 是不同操作；这里不附带 
 # 首次安装；Windows/Linux/macOS/WSL，需 Python、Node/npm、Rust/rustup。
 python tools/setup_format.py
 # 检查整个项目，不修改源文件。
-python3 tools/format_check.py
+python tools/format_check.py
 # 按同样规则统一格式，然后再次检查。
-python3 tools/format_check.py --write
-python3 tools/format_check.py --report results/format-check.json
+python tools/format_check.py --write
+python tools/format_check.py --report results/format-check.json
 ```
 
 安装只在 `labs/.venv-format/` 中放 Python/Node 工具，rustfmt 使用现有 Rust 工具链。Windows 可在 PowerShell 运行同一个 Python 入口；脚本使用 `Scripts/` 和 Windows shfmt，Linux/macOS/WSL 使用 `bin/` 与对应架构的 shfmt。`bash tools/setup-format.sh` 保留为 POSIX 包装入口。用 `python tools/setup_format.py --dry-run` 可先查看安装计划。
@@ -54,4 +54,4 @@ code ..
 
 也可以先激活格式工具环境再启动。若已有 VS Code 进程，重启相应窗口以使用更新的环境。使用 WSL 时，在 WSL 内安装工具并通过 Remote WSL 打开仓库。
 
-`.editorconfig`和各formatter从文件目录向上查找根目录的共享配置。统一脚本也支持从根目录运行`python3 labs/tools/format_check.py`。Obsidian基础设置保存在根目录`.obsidian/`，个人workspace、cache、plugins不进入版本管理。
+`.editorconfig`和各formatter从文件目录向上查找根目录的共享配置。统一脚本也支持从根目录运行`python labs/tools/format_check.py`。Obsidian基础设置保存在根目录`.obsidian/`，按Obsidian自己写出的格式提交（JSON末尾不带换行），格式检查与Prettier都跳过该目录；个人workspace、cache、plugins不进入版本管理。

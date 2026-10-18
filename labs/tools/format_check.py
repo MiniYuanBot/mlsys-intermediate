@@ -51,16 +51,14 @@ EXCLUDED_FILES = ("*.generated.*", "*.min.*", "package-lock.json", "Cargo.lock")
 
 def files() -> list[Path]:
     selected = [p for p in ROOT.iterdir() if p.is_file()]
-    for base in ("course", "labs", "solutions", ".vscode", ".obsidian", ".github"):
+    # .obsidian/ is excluded: Obsidian rewrites its JSON (no final newline) on every save,
+    # so the committed form is whatever Obsidian writes, not the Prettier form.
+    for base in ("course", "labs", "solutions", ".vscode", ".github"):
         for directory, dirs, names in os.walk(ROOT / base):
             dirs[:] = [d for d in dirs if not any(fnmatch(d, p) for p in EXCLUDED_DIRS)]
-            if Path(directory) == ROOT / ".obsidian":
-                dirs[:] = [d for d in dirs if d not in ("cache", "plugins")]
             for name in sorted(names):
                 path = Path(directory) / name
                 if any(fnmatch(name, p) for p in EXCLUDED_FILES):
-                    continue
-                if path.parent == ROOT / ".obsidian" and fnmatch(name, "workspace*.json"):
                     continue
                 selected.append(path)
     return sorted(selected)

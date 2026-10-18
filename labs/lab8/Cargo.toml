@@ -1,10 +1,10 @@
 [package]
 name = "rollout-scheduling"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 [lib]
 name = "rollout_scheduling"
-path = "src/rollout_student.rs"
+path = "src/lib.rs"
 [[bin]]
 name = "bench"
 path = "src/main.rs"

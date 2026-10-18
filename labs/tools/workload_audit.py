@@ -11,9 +11,11 @@ import json
 import re
 from pathlib import Path
 
+import lab_meta
+
 ROOT = Path(__file__).resolve().parents[2]
-BEGIN = re.compile(r"(?:#|//)\s*BEGIN TODO\s+([ABC]\d+)\b")
-END = re.compile(r"(?:#|//)\s*END TODO\s+([ABC]\d+)\b")
+BEGIN = re.compile(r"(?:#|//)\s*BEGIN TODO\s+([ABCR]\d+)\b")
+END = re.compile(r"(?:#|//)\s*END TODO\s+([ABCR]\d+)\b")
 EXTENSIONS = {".py", ".hpp", ".h", ".cpp", ".cu", ".cuh", ".rs", ".c"}
 
 
@@ -47,8 +49,12 @@ def regions(path):
 
 
 def audit():
-    output, errors = [], []
-    for lab in range(1, 9):
+    output, errors, notes = [], [], []
+    for lab in lab_meta.LAB_NUMBERS:
+        meta = lab_meta.get(lab)
+        if not meta.directory.is_dir():
+            notes.append(f"lab{lab}: registered in lab_meta but labs/lab{lab} is absent; skipped")
+            continue
         rows, identifiers = [], set()
         student_root = ROOT / "labs" / f"lab{lab}"
         for solution in sorted((ROOT / "solutions" / f"lab{lab}").rglob("*")):
@@ -73,7 +79,7 @@ def audit():
                 identifiers.add(identifier)
                 body = "\n".join(region["lines"])
                 if re.search(
-                    r"NotImplementedError|todo!\(|unimplemented!\(|Complete [ABC]\d+", body
+                    r"NotImplementedError|todo!\(|unimplemented!\(|Complete [ABCR]\d+", body
                 ):
                     errors.append(f"reference stub: lab{lab}/{identifier}")
                 rows.append(
@@ -93,10 +99,12 @@ def audit():
                     row["reference_eloc"] for row in rows if row["id"].startswith(stage)
                 ),
             }
-            for stage in "ABC"
+            for stage in "ABCR"
+            if stage in meta.required_stages() or any(row["id"].startswith(stage) for row in rows)
         }
-        if any(value["todos"] == 0 for value in stages.values()):
-            errors.append(f"empty stage: lab{lab}")
+        for stage in meta.required_stages():
+            if stages[stage]["todos"] == 0:
+                errors.append(f"empty stage: lab{lab} {stage}")
         output.append(
             {
                 "lab": lab,
@@ -106,7 +114,7 @@ def audit():
                 "regions": rows,
             }
         )
-    return {"method": __doc__, "labs": output, "errors": errors}
+    return {"method": __doc__, "labs": output, "errors": errors, "notes": notes}
 
 
 def main():
@@ -118,6 +126,8 @@ def main():
         print(
             f"lab{row['lab']}: {row['total_todos']} TODO, {row['total_reference_eloc']} ELOC; {row['stages']}"
         )
+    for note in data["notes"]:
+        print("NOTE:", note)
     for error in data["errors"]:
         print("ERROR:", error)
     if args.output:

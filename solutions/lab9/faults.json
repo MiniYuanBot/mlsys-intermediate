@@ -1,0 +1,590 @@
+[
+  {
+    "id": "a1-decode-missing-kv-read",
+    "todo": "A1",
+    "file": "src/cost_student.hpp",
+    "find": "out.kv_read_bytes = e * R * ctx * 2 * kvd;",
+    "replace": "out.kv_read_bytes = 0;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "decode cost without reading the cached K/V: the brute-force byte counter (and the 4 MiB hand value) rejects it"
+  },
+  {
+    "id": "a1-gqa-attention-flops-kv-heads",
+    "todo": "A1",
+    "file": "src/cost_student.hpp",
+    "find": "4.0 * c.heads * c.head_dim * pairs",
+    "replace": "4.0 * c.kv_heads * c.head_dim * pairs",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "GQA shares K/V but every query head computes its own QK^T and PV; the explicit MAC loop over query heads catches it"
+  },
+  {
+    "id": "a1-causal-pairs-off-by-one",
+    "todo": "A1",
+    "file": "src/cost_student.hpp",
+    "find": "q * (q + 1) / 2",
+    "replace": "q * (q - 1) / 2",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "token i of a prefill attends to i + 1 positions (itself included); the brute-force loop counts context + i + 1"
+  },
+  {
+    "id": "a1-kv-write-only-k",
+    "todo": "A1",
+    "file": "src/cost_student.hpp",
+    "find": "out.kv_write_bytes = e * n * 2 * kvd;",
+    "replace": "out.kv_write_bytes = e * n * kvd;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "writes only K rows for new tokens; V must be written too"
+  },
+  {
+    "id": "a2-roofline-sum-not-max",
+    "todo": "A2",
+    "file": "src/cost_student.hpp",
+    "find": "return eff.t0 + std::max(tc, tm);",
+    "replace": "return eff.t0 + tc + tm;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "adds compute and memory time instead of overlapping them; the at-ridge hand value doubles"
+  },
+  {
+    "id": "a2-eta-multiplies-time",
+    "todo": "A2",
+    "file": "src/cost_student.hpp",
+    "find": "double tc = flops / (eff.eta_c * gpu.peak_flops());",
+    "replace": "double tc = flops * eff.eta_c / gpu.peak_flops();",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "efficiency applied in the wrong direction (achieved = eta * peak, so time divides by eta)"
+  },
+  {
+    "id": "a3-unweighted-least-squares",
+    "todo": "A3",
+    "file": "src/cost_student.hpp",
+    "find": "double w = 1.0 / (s.seconds * s.seconds);",
+    "replace": "double w = 1.0;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "absolute instead of relative error: still exact on noise-free data, but the finite-difference gradient of the weighted objective is not zero"
+  },
+  {
+    "id": "a3-no-regime-relabel",
+    "todo": "A3",
+    "file": "src/cost_student.hpp",
+    "find": "for (int round = 0; round < 50; ++round) {",
+    "replace": "for (int round = 0; round < 1; ++round) {",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "labels regimes once with the spec ridge; samples between the true and the spec ridge stay mislabeled, so known coefficients are not recovered"
+  },
+  {
+    "id": "a3-swap-eta",
+    "todo": "A3",
+    "file": "src/cost_student.hpp",
+    "find": "cur = {1.0 / beta[1], 1.0 / beta[2], beta[0]};",
+    "replace": "cur = {1.0 / beta[2], 1.0 / beta[1], beta[0]};",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "compute and memory coefficients swapped when unpacking the solution vector"
+  },
+  {
+    "id": "a4-tied-embedding-counted-twice",
+    "todo": "A4",
+    "file": "src/cost_student.hpp",
+    "find": "(c.tied_embeddings ? 1 : 2)",
+    "replace": "(c.tied_embeddings ? 2 : 1)",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "tied embeddings share one matrix with the LM head; the hand total for Qwen3-1.7B (3,441,149,952 B) rejects it"
+  },
+  {
+    "id": "a4-exact-fit-floor",
+    "todo": "A4",
+    "file": "src/cost_student.hpp",
+    "find": "/ per_token + 1e-9)",
+    "replace": "/ per_token - 1e-9)",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "floating-point floor at an exact fit: capacity = need(12345) must return 12345, not 12344"
+  },
+  {
+    "id": "a4-kv-only-k",
+    "todo": "A4",
+    "file": "src/cost_student.hpp",
+    "find": "double per_token = e * layers * 2.0 * double(c.kv_dim());",
+    "replace": "double per_token = e * layers * double(c.kv_dim());",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "KV memory counts only K"
+  },
+  {
+    "id": "a5-median-even-n",
+    "todo": "A5",
+    "file": "src/cost_student.hpp",
+    "find": "st.n % 2 ? err[st.n / 2] : 0.5 * (err[st.n / 2 - 1] + err[st.n / 2])",
+    "replace": "err[st.n / 2]",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "median of an even-sized set must average the two middle values"
+  },
+  {
+    "id": "a5-fit-on-test-set",
+    "todo": "A5",
+    "file": "src/cost_student.hpp",
+    "find": "st.fit = fit_efficiency(train, gpu);",
+    "replace": "st.fit = fit_efficiency(test.size() >= 3 ? test : train, gpu);",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "held-out error computed after fitting on the test set (leakage); the fit-uses-train check catches it"
+  },
+  {
+    "id": "b1-compute-cap-not-divided-by-layers",
+    "todo": "B1",
+    "file": "src/flow_student.hpp",
+    "find": "c.nodes[i].rate_per_layer / p[i].size(), EdgeKind::Compute",
+    "replace": "c.nodes[i].rate_per_layer, EdgeKind::Compute",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "a node holding k layers is k times slower; the hand edge multiset (600/600/300) rejects the undivided capacity"
+  },
+  {
+    "id": "b1-no-node-splitting",
+    "todo": "B1",
+    "file": "src/flow_student.hpp",
+    "find": "c.nodes[i].rate_per_layer / p[i].size(), EdgeKind::Compute",
+    "replace": "kInf, EdgeKind::Compute",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "node capacity lost (GPU modeled as an unconstrained vertex): max-flow no longer equals the enumerated min-cut of the true graph"
+  },
+  {
+    "id": "b1-link-cap-from-compute",
+    "todo": "B1",
+    "file": "src/flow_student.hpp",
+    "find": "                g.edges.push_back(\n                    {FlowGraph::out(i), FlowGraph::in(j), c.link[i][j], EdgeKind::Link, i, j});",
+    "replace": "                g.edges.push_back(\n                    {FlowGraph::out(i), FlowGraph::in(j), c.nodes[i].rate_per_layer / p[i].size(), EdgeKind::Link, i, j});",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "node-split capacity put on the outgoing link edge instead of the link bandwidth"
+  },
+  {
+    "id": "b1-overlapping-ranges-connected",
+    "todo": "B1",
+    "file": "src/flow_student.hpp",
+    "find": "p[i].end == p[j].start && c.link[i][j] > 0",
+    "replace": "p[i].end >= p[j].start && c.link[i][j] > 0",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "connects overlapping ranges; a pipeline must hand off exactly at the layer boundary"
+  },
+  {
+    "id": "b2-no-reverse-residual",
+    "todo": "B2",
+    "file": "src/flow_student.hpp",
+    "find": "res_[a ^ 1] += got;",
+    "replace": "(void)0;",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "Dinic without reverse residual arcs cannot cancel flow; the cancellation graph stops at 1 instead of 2"
+  },
+  {
+    "id": "b2-single-phase",
+    "todo": "B2",
+    "file": "src/flow_student.hpp",
+    "find": "if (level[t] < 0) break;",
+    "replace": "if (level[t] < 0 || total > 0) break;",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "stops after the first blocking flow; random graphs disagree with the enumerated min-cut"
+  },
+  {
+    "id": "b2-push-ignores-bottleneck",
+    "todo": "B2",
+    "file": "src/flow_student.hpp",
+    "find": "double got = dfs(v, std::min(pushed, res_[a]));",
+    "replace": "double got = dfs(v, res_[a]);",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "pushes more than an earlier arc can carry: capacity check and max-flow = min-cut both fail"
+  },
+  {
+    "id": "b3-forward-arcs-only",
+    "todo": "B3",
+    "file": "src/flow_student.hpp",
+    "find": "if (e.v == u && f > kFlowEps) next = e.u;",
+    "replace": "if (false && e.v == u && f > kFlowEps) next = e.u;",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "residual reachability must follow backward arcs that carry flow; the test recomputes the reachable set"
+  },
+  {
+    "id": "b3-cut-counts-both-directions",
+    "todo": "B3",
+    "file": "src/flow_student.hpp",
+    "find": "if (r.source_side[g.edges[k].u] && !r.source_side[g.edges[k].v]) {",
+    "replace": "if (r.source_side[g.edges[k].u] != r.source_side[g.edges[k].v]) {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "edges from the T side back to the S side are not part of the cut capacity"
+  },
+  {
+    "id": "b4-dp-layer-range-off-by-one",
+    "todo": "B4",
+    "file": "src/flow_student.hpp",
+    "find": "for (int k = 1; k <= std::min(node.max_layers, l); ++k) {",
+    "replace": "for (int k = 1; k < std::min(node.max_layers, l); ++k) {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "DP never gives a node its full allowed range; composition enumeration finds better or feasible plans"
+  },
+  {
+    "id": "b4-ignores-link",
+    "todo": "B4",
+    "file": "src/flow_student.hpp",
+    "find": "double v = std::min({prev, in_link, node.rate_per_layer / k});",
+    "replace": "double v = std::min({prev, node.rate_per_layer / k});",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "chain bottleneck must include the link into each node"
+  },
+  {
+    "id": "b4-ignores-sink",
+    "todo": "B4",
+    "file": "src/flow_student.hpp",
+    "find": "plan.bottleneck = std::min(f[m][L], c.to_sink[chain.back()]);",
+    "replace": "plan.bottleneck = f[m][L];",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "the last node's link to the coordinator also bounds the chain"
+  },
+  {
+    "id": "b5-no-local-search",
+    "todo": "B5",
+    "file": "src/flow_student.hpp",
+    "find": "for (int sweep = 0; sweep < 200; ++sweep) {",
+    "replace": "for (int sweep = 0; sweep < 0; ++sweep) {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "seeds only: single-node moves still improve the result, which the local-optimality oracle detects"
+  },
+  {
+    "id": "b5-ignores-memory",
+    "todo": "B5",
+    "file": "src/flow_student.hpp",
+    "find": "for (int e = s + 1; e <= std::min(L, s + c.nodes[i].max_layers); ++e)\n                out.push_back({s, e});",
+    "replace": "for (int e = s + 1; e <= std::min(L, s + c.nodes[i].max_layers + 1); ++e)\n                out.push_back({s, e});",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "local search proposes a range one layer larger than the memory allows"
+  },
+  {
+    "id": "b5-single-seed",
+    "todo": "B5",
+    "file": "src/flow_student.hpp",
+    "find": "for (int st = 0; st < std::min<int>(starts, static_cast<int>(seeds.size())); ++st) {",
+    "replace": "for (int st = 0; st < 1; ++st) {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "local search only from the best seed; on the replica-heavy fixed cases the mean ratio to the optimum drops below 0.97"
+  },
+  {
+    "id": "b6-path-rate-first-edge",
+    "todo": "B6",
+    "file": "src/flow_student.hpp",
+    "find": "for (int k : walk) rate = std::min(rate, edge_flow[k]);",
+    "replace": "rate = edge_flow[walk[0]];",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "path rate must be the bottleneck of the walk; otherwise per-edge recomposition and conservation break"
+  },
+  {
+    "id": "b6-gpus-from-every-edge",
+    "todo": "B6",
+    "file": "src/flow_student.hpp",
+    "find": "if (g.edges[k].kind == EdgeKind::Compute) p.gpus.push_back(g.edges[k].a);",
+    "replace": "if (g.edges[k].kind != EdgeKind::Source) p.gpus.push_back(g.edges[k].a);",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "pipeline lists GPUs once per compute edge only; link/sink edges must not add stages"
+  },
+  {
+    "id": "b7-iwrr-weight-inversion",
+    "todo": "B7",
+    "file": "src/flow_student.hpp",
+    "find": "cur_[i] += w_[i];",
+    "replace": "cur_[i] += total_ - w_[i];",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "IWRR weight inversion: light pipelines get heavy traffic; prefix deviation and the hand sequence fail"
+  },
+  {
+    "id": "b7-subtract-own-weight",
+    "todo": "B7",
+    "file": "src/flow_student.hpp",
+    "find": "cur_[pick] -= total_;",
+    "replace": "cur_[pick] -= w_[pick];",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "smooth WRR subtracts the TOTAL weight from the picked entry; subtracting its own weight breaks the proportional schedule"
+  },
+  {
+    "id": "c1-ignores-share",
+    "todo": "C1",
+    "file": "src/coloc_student.hpp",
+    "find": "double tp = m.prefill_s(w.prompt) / share;",
+    "replace": "double tp = m.prefill_s(w.prompt);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "a model with half the GPU sees prefill twice as long; the half-share case disagrees"
+  },
+  {
+    "id": "c1-no-prefill-interruption",
+    "todo": "C1",
+    "file": "src/coloc_student.hpp",
+    "find": "double observed = tpot / (1.0 - rate * tp);",
+    "replace": "double observed = tpot;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "decode pauses while other requests prefill; ignoring it overstates capacity under a tight TPOT"
+  },
+  {
+    "id": "c1-output-steps-not-minus-one",
+    "todo": "C1",
+    "file": "src/coloc_student.hpp",
+    "find": "double rate = 1.0 / (tp + (w.output - 1) * tpot / b);",
+    "replace": "double rate = 1.0 / (tp + w.output * tpot / b);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "the first output token comes from prefill: only output - 1 decode steps"
+  },
+  {
+    "id": "c1-memory-limit-doubled",
+    "todo": "C1",
+    "file": "src/coloc_student.hpp",
+    "find": "if (b * per_req > kv_budget_bytes) break;",
+    "replace": "if (b * per_req > 2 * kv_budget_bytes) break;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "KV budget check too loose; the memory-bound case picks an infeasible batch"
+  },
+  {
+    "id": "c2-sum-lower-bound",
+    "todo": "C2",
+    "file": "src/coloc_student.hpp",
+    "find": "lb = std::max(lb, r[m] * unit);",
+    "replace": "lb += r[m] * unit;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "B&B pruning bound wrong: summing per-model bounds overestimates when one instance serves several models and prunes the co-located optimum"
+  },
+  {
+    "id": "c2-branch-upper-floor",
+    "todo": "C2",
+    "file": "src/coloc_student.hpp",
+    "find": "std::ceil(r[m] / tpl[t].capacity[m] - 1e-9)",
+    "replace": "std::floor(r[m] / tpl[t].capacity[m] + 1e-9)",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "branching upper limit rounded down: the count that covers a fractional demand is never tried"
+  },
+  {
+    "id": "c2-over-pruning",
+    "todo": "C2",
+    "file": "src/coloc_student.hpp",
+    "find": "if (t == T || cost + lb >= best.cost_hr - 1e-9) return;",
+    "replace": "if (t == T || cost + lb >= 0.9 * best.cost_hr) return;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "heuristic pruning margin makes B&B miss optima that brute force finds"
+  },
+  {
+    "id": "c3-area-ignores-queue",
+    "todo": "C3",
+    "file": "src/coloc_student.hpp",
+    "find": "st.area += in_system * dt;",
+    "replace": "{ long long queued = 0; for (const auto &wq : waiting) queued += static_cast<long long>(wq.size()); st.area += (in_system - queued) * dt; }",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "simulator not counting queueing: Little's law (area = sum of sojourn) and the hand area 9.5 fail"
+  },
+  {
+    "id": "c3-area-misses-midstep-arrivals",
+    "todo": "C3",
+    "file": "src/coloc_student.hpp",
+    "find": "for (size_t j = next; j < n && reqs[j].arrival < end; ++j) st.area += end - reqs[j].arrival;",
+    "replace": "(void)end;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "requests that arrive during an iteration are in the system before they are admitted"
+  },
+  {
+    "id": "c3-decode-before-prefill",
+    "todo": "C3",
+    "file": "src/coloc_student.hpp",
+    "find": "if (!waiting[chosen].empty() && static_cast<int>(active[chosen].size()) < sl.max_batch) {",
+    "replace": "if (!waiting[chosen].empty() && active[chosen].empty()) {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "prefill-first rule replaced by decode-first; the hand trace's first-token times change"
+  },
+  {
+    "id": "c3-no-round-robin",
+    "todo": "C3",
+    "file": "src/coloc_student.hpp",
+    "find": "rr = (chosen + 1) % S;",
+    "replace": "rr = 0;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "always restarting at slot 0 starves later models; the two-model round-robin check fails"
+  },
+  {
+    "id": "c4-greedy-floor",
+    "todo": "C4",
+    "file": "src/coloc_student.hpp",
+    "find": "int k = static_cast<int>(std::ceil(demand[m] / tpl[pick].capacity[m] - 1e-9));",
+    "replace": "int k = static_cast<int>(std::floor(demand[m] / tpl[pick].capacity[m] + 1e-9));",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "greedy baseline under-provisions; recomputed counts disagree"
+  },
+  {
+    "id": "c4-homogeneous-first-type",
+    "todo": "C4",
+    "file": "src/coloc_student.hpp",
+    "find": "if (a.feasible && (!b.homogeneous.feasible || a.cost_hr < b.homogeneous.cost_hr - 1e-9))",
+    "replace": "if (a.feasible && !b.homogeneous.feasible)",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "homogeneous baseline must be the best single GPU type, not the first feasible one"
+  },
+  {
+    "id": "r5-copy-read-only",
+    "todo": "R5",
+    "file": "src/replan_student.hpp",
+    "find": "s.flops = 0, s.bytes = 2 * m;",
+    "replace": "s.flops = 0, s.bytes = m;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "a copy reads and writes every byte"
+  },
+  {
+    "id": "r5-gemm-output-fp16",
+    "todo": "R5",
+    "file": "src/replan_student.hpp",
+    "find": "s.bytes = 2 * (m * k + k * n) + 4 * m * n;",
+    "replace": "s.bytes = 2 * (m * k + k * n) + 2 * m * n;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "the GEMM output is FP32 (4 bytes per element)"
+  },
+  {
+    "id": "r6-wrong-nominal-row",
+    "todo": "R6",
+    "file": "src/replan_student.hpp",
+    "find": "const SweepRow &nom = rows[nominal_it - scales.begin()];",
+    "replace": "const SweepRow &nom = rows[0];",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "rankings must be compared with the scale-1.0 row, not with the first row"
+  },
+  {
+    "id": "r6-rank-descending",
+    "todo": "R6",
+    "file": "src/replan_student.hpp",
+    "find": "[&](int a, int b) { return row.cost[a] < row.cost[b]; });",
+    "replace": "[&](int a, int b) { return row.cost[a] > row.cost[b]; });",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "cheapest plan ranks first"
+  },
+  {
+    "id": "r1-no-warmup",
+    "todo": "R1",
+    "file": "src/profile_student.cuh",
+    "find": "for (int i = 0; i < warmup; ++i) launch();",
+    "replace": "for (int i = 0; i < 0; ++i) launch();",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "skipping warmup times the slow first launches; the warmup-exclusion check sees a 4 ms max"
+  },
+  {
+    "id": "r1-nearest-rank-quantile",
+    "todo": "R1",
+    "file": "src/profile_student.cuh",
+    "find": "return ms[lo] + (h - lo) * (ms[hi] - ms[lo]);",
+    "replace": "return ms[static_cast<size_t>(std::lround(h))];",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "nearest-rank quantiles differ from linear interpolation by >= 0.25 ms on the 1..20 ms pattern"
+  },
+  {
+    "id": "r2-no-grid-stride",
+    "todo": "R2",
+    "file": "src/profile_student.cuh",
+    "find": "for (size_t i = tid; i < n4; i += stride) out4[i] = in4[i];",
+    "replace": "if (tid < n4) out4[tid] = in4[tid];",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "one pass per thread with a capped grid leaves most of a 4M-element copy unwritten"
+  },
+  {
+    "id": "r2-tail-overrun",
+    "todo": "R2",
+    "file": "src/profile_student.cuh",
+    "find": "for (size_t i = 4 * n4 + tid; i < n; i += stride) out[i] = in[i];",
+    "replace": "for (size_t i = 4 * n4 + tid; i < 4 * n4 + 4; i += stride) out[i] = in[i];",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "the scalar tail writes past n; the sentinel guard band catches it"
+  },
+  {
+    "id": "r3-reduction-stops-early",
+    "todo": "R3",
+    "file": "src/profile_student.cuh",
+    "find": "for (int off = 16; off > 0; off >>= 1) acc += __shfl_down_sync(0xffffffffu, acc, off);",
+    "replace": "for (int off = 16; off > 1; off >>= 1) acc += __shfl_down_sync(0xffffffffu, acc, off);",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "warp reduction misses the last shuffle step"
+  },
+  {
+    "id": "r3-row-index",
+    "todo": "R3",
+    "file": "src/profile_student.cuh",
+    "find": "int row = blockIdx.x * (blockDim.x / 32) + warp;",
+    "replace": "int row = blockIdx.x + warp;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "one warp per row needs the block offset times warps per block"
+  },
+  {
+    "id": "r4-ldm-without-padding",
+    "todo": "R4",
+    "file": "src/profile_student.cuh",
+    "find": "wmma::load_matrix_sync(fb[j], &Bs[kk][warp_n * 32 + j * 16], kGemmBN + 8);",
+    "replace": "wmma::load_matrix_sync(fb[j], &Bs[kk][warp_n * 32 + j * 16], kGemmBN);",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "leading dimension must include the shared-memory padding"
+  },
+  {
+    "id": "r4-half-k-step",
+    "todo": "R4",
+    "file": "src/profile_student.cuh",
+    "find": "for (int kk = 0; kk < kGemmBK; kk += 16) {",
+    "replace": "for (int kk = 0; kk < 16; kk += 16) {",
+    "count": 1,
+    "expect_fail_part": "R",
+    "device": "cuda",
+    "why": "only the first 16 of each 32-deep K tile are multiplied"
+  }
+]

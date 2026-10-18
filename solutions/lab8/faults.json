@@ -1,0 +1,532 @@
+[
+  {
+    "id": "a1-window-off-by-one",
+    "todo": "A1",
+    "file": "src/rollout_student.rs",
+    "find": "while row.len() > self.window.max(1) {",
+    "replace": "while row.len() > self.window.max(1) + 1 {",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "history keeps window+1 values; [5,1,9,7] with window 3 then predicts from 4 values"
+  },
+  {
+    "id": "a1-no-eviction",
+    "todo": "A1",
+    "file": "src/rollout_student.rs",
+    "find": "            row.pop_front();\n        }\n        // END TODO A1",
+    "replace": "            break;\n        }\n        // END TODO A1",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "window never evicts; retained-length and median checks reject it"
+  },
+  {
+    "id": "a2-lower-median",
+    "todo": "A2",
+    "file": "src/rollout_student.rs",
+    "find": "lengths[lengths.len() / 2]",
+    "replace": "lengths[(lengths.len() - 1) / 2]",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "lower median: even history [1,2,3,4] must predict 3, not 2"
+  },
+  {
+    "id": "a2-cold-start-zero",
+    "todo": "A2",
+    "file": "src/rollout_student.rs",
+    "find": "            return 32;\n        };\n        let mut lengths",
+    "replace": "            return 0;\n        };\n        let mut lengths",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "cold start must be 32"
+  },
+  {
+    "id": "a3-lpt-ignores-flag",
+    "todo": "A3",
+    "file": "src/rollout_student.rs",
+    "find": "    if lpt {\n        order.sort_by",
+    "replace": "    if true {\n        order.sort_by",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "LPT applied even when lpt=false; the unsorted D8-2 input exposes the input-order queues [[0,2,4],[1,3]]"
+  },
+  {
+    "id": "a3-never-sorts",
+    "todo": "A3",
+    "file": "src/rollout_student.rs",
+    "find": "    if lpt {\n        order.sort_by",
+    "replace": "    if false {\n        order.sort_by",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "lpt=true without sorting; exact LPT queues [[1,0,4],[3,2]] on unsorted input reject it"
+  },
+  {
+    "id": "a3-tie-break-reversed",
+    "todo": "A3",
+    "file": "src/rollout_student.rs",
+    "find": ".then(a.id.cmp(&b.id))",
+    "replace": ".then(b.id.cmp(&a.id))",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "equal estimates with shuffled ids must be ordered by ascending id"
+  },
+  {
+    "id": "a3-worker-tie-highest",
+    "todo": "A3",
+    "file": "src/rollout_student.rs",
+    "find": ".min_by_key(|&w| (load[w], w))",
+    "replace": ".min_by_key(|&w| (load[w], std::cmp::Reverse(w)))",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "equal loads must go to the lower worker index; exact queues differ"
+  },
+  {
+    "id": "a4-always-population",
+    "todo": "A4",
+    "file": "src/rollout_student.rs",
+    "find": "let denom = if bessel { n as f64 - 1.0 } else { n as f64 };",
+    "replace": "let denom = n as f64;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "ignores the bessel flag: sample std of [0,1] gives +-0.707, not +-1"
+  },
+  {
+    "id": "a4-sample-std-always",
+    "todo": "A4",
+    "file": "src/rollout_student.rs",
+    "find": "let denom = if bessel { n as f64 - 1.0 } else { n as f64 };",
+    "replace": "let denom = n as f64 - 1.0;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "Bessel correction applied to the population convention"
+  },
+  {
+    "id": "a4-no-constant-guard",
+    "todo": "A4",
+    "file": "src/rollout_student.rs",
+    "find": "    if denom <= 0.0 || (ss / denom).sqrt() < 1e-10 {\n        return vec![0.; n];\n    }\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "constant groups divide by zero and return NaN instead of zeros"
+  },
+  {
+    "id": "a5-floor-rank",
+    "todo": "A5",
+    "file": "src/rollout_student.rs",
+    "find": "* quantile).ceil() as usize;",
+    "replace": "* quantile).floor() as usize;",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "q=0.3 on 5 values must return sorted[2]=5, floor gives 4"
+  },
+  {
+    "id": "a5-exclusive-bound",
+    "todo": "A5",
+    "file": "src/rollout_student.rs",
+    "find": ".position(|&bound| length <= bound)",
+    "replace": ".position(|&bound| length < bound)",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "bucket upper bounds are inclusive"
+  },
+  {
+    "id": "a6-behavior-of-taken-action",
+    "todo": "A6",
+    "file": "src/rollout_student.rs",
+    "find": "                behavior_p: p,\n",
+    "replace": "                behavior_p: if action == 1 { p } else { 1.0 - p },\n",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "behavior_p is defined as P(action 1); storing P(taken action) breaks ratios for action 0"
+  },
+  {
+    "id": "a6-le-instead-of-lt",
+    "todo": "A6",
+    "file": "src/rollout_student.rs",
+    "find": "let action = usize::from(u < p);",
+    "replace": "let action = usize::from(u <= p);",
+    "count": 1,
+    "expect_fail_part": "A",
+    "why": "u == p must give action 0"
+  },
+  {
+    "id": "b1-no-gap-check",
+    "todo": "B1",
+    "file": "src/rollout_student.rs",
+    "find": "if terminal || segment.start != tokens.len() || segment.tokens.is_empty() {",
+    "replace": "if terminal || segment.start > tokens.len() + 1 || segment.tokens.is_empty() {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "gap and overlap accepted"
+  },
+  {
+    "id": "b1-ignores-version",
+    "todo": "B1",
+    "file": "src/rollout_student.rs",
+    "find": "if (segment.id, segment.group, segment.version) != (first.id, first.group, first.version) {",
+    "replace": "if (segment.id, segment.group) != (first.id, first.group) {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "mixed-version trajectory accepted"
+  },
+  {
+    "id": "b2-group-count-only",
+    "todo": "B2",
+    "file": "src/rollout_student.rs",
+    "find": "    if expected.len() != expected_ids.len() || actual.len() != completed.len() || actual != expected\n    {",
+    "replace": "    if actual.len() != completed.len() {",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "only the fast group is trained; group sizes still look complete"
+  },
+  {
+    "id": "b2-ignores-version",
+    "todo": "B2",
+    "file": "src/rollout_student.rs",
+    "find": "        if sample.version != version {\n            return Err(\"stale version\".into());\n        }\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "a batch sampled by another policy version passes the gate"
+  },
+  {
+    "id": "b3-steal-head",
+    "todo": "B3",
+    "file": "src/rollout_student.rs",
+    "find": "next = queues[victim].pop_back();",
+    "replace": "next = queues[victim].pop_front();",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "stealing the victim's head changes the hand timeline [6,1,1,1]"
+  },
+  {
+    "id": "b3-no-requeue",
+    "todo": "B3",
+    "file": "src/rollout_student.rs",
+    "find": "            if !terminal {\n                queues[worker].push_back(id);\n            }\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "unfinished jobs are dropped after one quantum: work conservation and reassembly fail"
+  },
+  {
+    "id": "b3-steal-not-counted",
+    "todo": "B3",
+    "file": "src/rollout_student.rs",
+    "find": "                    result.steals += 1;\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "steal count must be reported (hand timeline expects one steal)"
+  },
+  {
+    "id": "b4-keeps-slowest",
+    "todo": "B4",
+    "file": "src/rollout_student.rs",
+    "find": "            .finish\n            .total_cmp(&group[b].finish)",
+    "replace": "            .finish\n            .total_cmp(&group[b].finish)\n            .reverse()",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "keeps the slowest instead of the fastest; exact order-statistic oracle (5/3, 14/27) rejects it"
+  },
+  {
+    "id": "b4-tie-by-position",
+    "todo": "B4",
+    "file": "src/rollout_student.rs",
+    "find": ".then(group[a].sample_idx.cmp(&group[b].sample_idx))",
+    "replace": ".then(a.cmp(&b))",
+    "count": 1,
+    "expect_fail_part": "B",
+    "why": "ties must be broken by sample_idx, not by position in the input"
+  },
+  {
+    "id": "c1-capacity-per-sample",
+    "todo": "C1",
+    "file": "src/rollout_student.rs",
+    "find": "if !self.pending.contains_key(&sample.group) && self.pending.len() == self.capacity {",
+    "replace": "if self.pending.values().map(|g| g.len()).sum::<usize>() >= self.capacity {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "capacity counted in samples deadlocks a partial group"
+  },
+  {
+    "id": "c1-lag-off-by-one",
+    "todo": "C1",
+    "file": "src/rollout_student.rs",
+    "find": "self.version - sample.version > self.max_lag {",
+    "replace": "self.version - sample.version >= self.max_lag {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "lag exactly max_lag must still be admitted"
+  },
+  {
+    "id": "c1-no-mismatch-check",
+    "todo": "C1",
+    "file": "src/rollout_student.rs",
+    "find": "if sample.id / self.group_size != sample.group || self.consumed.contains(&sample.group) {",
+    "replace": "if self.consumed.contains(&sample.group) {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "id/group mismatch admitted"
+  },
+  {
+    "id": "c2-evicts-nothing",
+    "todo": "C2",
+    "file": "src/rollout_student.rs",
+    "find": "(self.version.saturating_sub(v) > self.max_lag).then_some(id)",
+    "replace": "(self.version.saturating_sub(v) > self.max_lag + 1).then_some(id)",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "stale group is trained instead of evicted"
+  },
+  {
+    "id": "c2-partial-group",
+    "todo": "C2",
+    "file": "src/rollout_student.rs",
+    "find": ".find(|(_, row)| row.len() == self.group_size)",
+    "replace": ".find(|(_, row)| !row.is_empty())",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "returns a partial group"
+  },
+  {
+    "id": "c3-current-as-behavior",
+    "todo": "C3",
+    "file": "src/rollout_student.rs",
+    "find": "let ratio = self.action_probability(s.context, s.action) / behavior;\n            let clipped",
+    "replace": "let ratio = self.action_probability(s.context, s.action) / self.action_probability(s.context, s.action);\n            let clipped",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "recomputing behavior from the current policy forces rho=1; the logit-3 hand value -0.905 rejects it"
+  },
+  {
+    "id": "c3-max-instead-of-min",
+    "todo": "C3",
+    "file": "src/rollout_student.rs",
+    "find": "total += (ratio * a).min(clipped * a);",
+    "replace": "total += (ratio * a).max(clipped * a);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "pessimistic min replaced by max; closed-form oracle rejects it"
+  },
+  {
+    "id": "c4-missing-ratio-factor",
+    "todo": "C4",
+    "file": "src/rollout_student.rs",
+    "find": "gradient[sample.context] += ratio * a * (sample.action as f64 - p);",
+    "replace": "gradient[sample.context] += a * (sample.action as f64 - p);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "forgot the ratio factor: at logit 0.3 the gradient is 0.5 instead of 2p(1-p)=0.4889 (passes at rho=1)"
+  },
+  {
+    "id": "c4-zero-when-out-of-range",
+    "todo": "C4",
+    "file": "src/rollout_student.rs",
+    "find": "let inactive = (a > 0. && ratio > 1. + epsilon) || (a < 0. && ratio < 1. - epsilon);",
+    "replace": "let inactive = ratio > 1. + epsilon || ratio < 1. - epsilon;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "zero gradient whenever rho leaves [1-eps,1+eps]: the active (A<0, rho>1+eps) and (A>0, rho<1-eps) case must give -2p(1-p)"
+  },
+  {
+    "id": "c4-wrong-clip-branch",
+    "todo": "C4",
+    "file": "src/rollout_student.rs",
+    "find": "let inactive = (a > 0. && ratio > 1. + epsilon) || (a < 0. && ratio < 1. - epsilon);",
+    "replace": "let inactive = (a < 0. && ratio > 1. + epsilon) || (a > 0. && ratio < 1. - epsilon);",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "clip branches swapped by sign of A: active and flat regions exchanged"
+  },
+  {
+    "id": "c4-no-group-mean",
+    "todo": "C4",
+    "file": "src/rollout_student.rs",
+    "find": "            *value += lr * g / n;",
+    "replace": "            *value += lr * g;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "gradient summed instead of averaged over the group; finite difference of the mean objective rejects it"
+  },
+  {
+    "id": "c4-returns-after",
+    "todo": "C4",
+    "file": "src/rollout_student.rs",
+    "find": "        self.version += 1;\n        before\n",
+    "replace": "        self.version += 1;\n        self.objective(samples, epsilon)\n",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "must return the objective before the step"
+  },
+  {
+    "id": "c5-staleness-off-by-one",
+    "todo": "C5",
+    "file": "src/rollout_student.rs",
+    "find": "generated / batch <= version + eta",
+    "replace": "generated / batch <= version + eta + 1",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "admits eta+1-stale data; the simulator sees max staleness eta+1"
+  },
+  {
+    "id": "c5-strict-less",
+    "todo": "C5",
+    "file": "src/rollout_student.rs",
+    "find": "generated / batch <= version + eta",
+    "replace": "generated / batch < version + eta",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "eta=0 never submits (deadlock); the simulator reports no progress"
+  },
+  {
+    "id": "c5-per-sample-bound",
+    "todo": "C5",
+    "file": "src/rollout_student.rs",
+    "find": "generated / batch <= version + eta",
+    "replace": "generated <= (version + eta) * batch",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "bound applied per trajectory instead of per batch: with eta=0, B=4 only one trajectory is admitted and the trainer never fills a batch (deadlock)"
+  },
+  {
+    "id": "c6-no-behavior-correction",
+    "todo": "C6",
+    "file": "src/rollout_student.rs",
+    "find": "            (p_prox / behav, p_cur / p_prox)",
+    "replace": "            (1.0, p_cur / p_prox)",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "drops the off-policy correction: resumed tokens from older versions must carry pi_prox/pi_behav"
+  },
+  {
+    "id": "c6-ratio-to-behavior",
+    "todo": "C6",
+    "file": "src/rollout_student.rs",
+    "find": "            (p_prox / behav, p_cur / p_prox)",
+    "replace": "            (p_prox / behav, p_cur / behav)",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "trust-region ratio centred on behavior instead of prox (AReaL's decoupling undone)"
+  },
+  {
+    "id": "c7-no-version-sync",
+    "todo": "C7",
+    "file": "src/rollout_student.rs",
+    "find": "        while let Some(group) = produced.pop_front() {\n            queue.version = policy.version;",
+    "replace": "        while let Some(group) = produced.pop_front() {",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "queue never learns the new version, so no stale group is dropped under max_lag 0"
+  },
+  {
+    "id": "c7-no-retry",
+    "todo": "C7",
+    "file": "src/rollout_student.rs",
+    "find": "                produced.push_front(group);\n                continue;",
+    "replace": "                continue;",
+    "count": 1,
+    "expect_fail_part": "C",
+    "why": "a backpressured group is lost instead of retried; update count drops below 400"
+  },
+  {
+    "id": "r1-predictor-leaks-future",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "        let predicted: Vec<u64> = groups\n            .iter()\n            .map(|g| predictor.predict(g.prompt_id))\n            .collect();\n",
+    "replace": "        for g in &groups {\n            let l: Vec<u64> = g.samples.iter().map(|s| s.response_tokens).collect();\n            predictor.observe(g.prompt_id, &l);\n        }\n        let predicted: Vec<u64> = groups\n            .iter()\n            .map(|g| predictor.predict(g.prompt_id))\n            .collect();\n",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "predictor sees this round's true lengths before dispatch; recorded predictions must be cold in round 0"
+  },
+  {
+    "id": "r1-keep-first-shift-not-reported",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "    report.mean_len_kept = len_kept / report.kept_samples.max(1) as f64;",
+    "replace": "    report.mean_len_kept = len_all / n_all.max(1) as f64;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "reports the all-sample mean as the kept mean, hiding keep-first-n's length bias"
+  },
+  {
+    "id": "r1-observes-aborted",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "            let lengths: Vec<u64> = kept.iter().map(|s| s.response_tokens).collect();",
+    "replace": "            let lengths: Vec<u64> = g.samples.iter().map(|s| s.response_tokens).collect();",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "aborted samples never finished; observing them leaks lengths the system cannot know"
+  },
+  {
+    "id": "r1-duration-sum",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "let duration = kept.iter().map(|s| s.gen_ms).fold(0.0, f64::max).round() as u64;",
+    "replace": "let duration = kept.iter().map(|s| s.gen_ms).sum::<f64>().round() as u64;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "a batched group occupies its worker for max(gen_ms), not the sum"
+  },
+  {
+    "id": "r1-pull-ignores-prediction",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "order.sort_by(|&a, &b| predicted[b].cmp(&predicted[a]).then(a.cmp(&b)));",
+    "replace": "order.sort_by(|&a, &b| a.cmp(&b));",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "lpt_pull without sorting equals fifo; hand makespan 3800 for round 1 rejects it"
+  },
+  {
+    "id": "r1-zero-adv-uses-all",
+    "todo": "R1",
+    "file": "src/replay_student.rs",
+    "find": "report.zero_adv_groups_kept += all_equal(&kept_rewards) as usize;",
+    "replace": "report.zero_adv_groups_kept += all_equal(&all_rewards) as usize;",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "zero-advantage groups must be counted on the kept subset"
+  },
+  {
+    "id": "r2-no-window",
+    "todo": "R2",
+    "file": "src/replay_student.rs",
+    "find": "            while row.len() > self.window {\n                row.pop_front();\n            }\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "per-prompt history never evicted"
+  },
+  {
+    "id": "r2-global-unbounded",
+    "todo": "R2",
+    "file": "src/replay_student.rs",
+    "find": "while self.global.len() > 16 * self.window {",
+    "replace": "while self.global.len() > 1_000_000 {",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "global history must keep only 16*window values"
+  },
+  {
+    "id": "r3-rank-floor",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "let rank = ((self.q * sorted.len() as f64).ceil() as usize).max(1);",
+    "replace": "let rank = ((self.q * sorted.len() as f64).floor() as usize).max(1);",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "nearest rank uses ceil; the randomized cases and window checks differ"
+  },
+  {
+    "id": "r3-no-global-fallback",
+    "todo": "R3",
+    "file": "src/replay_student.rs",
+    "find": "            _ if !self.global.is_empty() => &self.global,\n",
+    "replace": "",
+    "count": 1,
+    "expect_fail_part": "R",
+    "why": "unseen prompt must fall back to the global history"
+  }
+]

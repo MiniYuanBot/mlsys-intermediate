@@ -6,13 +6,41 @@ on:
   workflow_dispatch:
 
 jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Shell syntax
+        run: for f in labs/tools/*.sh; do bash -n "$f"; done
+      - name: PowerShell syntax
+        shell: pwsh
+        run: |
+          $failed = $false
+          foreach ($f in Get-ChildItem labs/tools/*.ps1) {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$tokens, [ref]$errors)
+            if ($errors.Count) { $errors | ForEach-Object { Write-Host "$($f.Name): $_" }; $failed = $true }
+            else { Write-Host "parse ok: $($f.Name)" }
+          }
+          if ($failed) { exit 1 }
+      - name: Registry, links and TODO audit
+        run: |
+          python labs/tools/lab_meta.py --json > /dev/null
+          python labs/tools/check_links.py
+          python labs/tools/workload_audit.py
+          if [ -f labs/tools/math_check.py ]; then python labs/tools/math_check.py; fi
+
   cpu:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: utf-8
@@ -25,31 +53,74 @@ jobs:
         if: runner.os == 'Windows'
         with:
           arch: amd64
-      - name: Install Rust
-        run: rustup toolchain install stable --profile minimal
+      - name: Read pinned versions
+        shell: bash
+        run: |
+          # KEY=VALUE lines of both pin files become environment variables for later steps.
+          grep -hE '^[A-Z_][A-Z0-9_]*=' labs/tools/env-versions.env labs/tools/formatter-versions.env | tr -d '\r' >> "$GITHUB_ENV"
+      - name: Install Rust (pinned)
+        shell: bash
+        run: |
+          rustup toolchain install "$RUST" --profile minimal
+          rustup default "$RUST"
+          rustc --version
+      - name: Install pinned Python packages
+        shell: bash
+        run: |
+          python -m pip install "numpy==$NUMPY" "matplotlib==$MATPLOTLIB" "pytest==$PYTEST"
+          if [ "$RUNNER_OS" = macOS ]; then
+            python -m pip install "torch==$TORCH"
+          else
+            python -m pip install "torch==$TORCH" --index-url https://download.pytorch.org/whl/cpu
+          fi
       - name: Check tooling and CPU labs
         shell: python
         run: |
           import subprocess
           import sys
+          from pathlib import Path
           def run(*args):
               subprocess.run([sys.executable, *args], check=True)
           run("labs/tools/test_platform.py")
           run("labs/tools/check_links.py")
+          run("labs/tools/workload_audit.py")
           for lab in (1, 4, 5, 7, 8):
               run("labs/tools/run.py", "--lab", str(lab), "--impl", "reference", "--mode", "test")
           for part in ("A", "B"):
               run("labs/tools/run.py", "--lab", "3", "--impl", "reference", "--part", part)
           for part in ("A", "C"):
               run("labs/tools/run.py", "--lab", "2", "--impl", "reference", "--part", part)
-      - name: Install CPU PyTorch
-        shell: python
-        run: |
-          import subprocess
-          import sys
-          command = [sys.executable, "-m", "pip", "install", "torch"]
-          if sys.platform != "darwin":
-              command += ["--index-url", "https://download.pytorch.org/whl/cpu"]
-          subprocess.run(command, check=True)
+          if Path("labs/lab9/exercise.py").is_file():
+              for part in ("A", "B", "C"):
+                  run("labs/tools/run.py", "--lab", "9", "--impl", "reference", "--part", part)
       - name: Check CPU training
         run: python labs/tools/run.py --lab 6 --impl reference --mode test
+      - name: CUDA requests are refused with exit 3 off WSL/Linux
+        if: runner.os != 'Linux'
+        shell: bash
+        run: |
+          set +e
+          python labs/tools/run.py --lab 2 --impl reference --mode test --device cuda
+          rc=$?
+          test "$rc" = 3
+
+  check-env:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Create the course venv at the pins (no CUDA on the runner)
+        run: |
+          set -a; . labs/tools/env-versions.env; set +a
+          python -m venv ~/venvs/mlsys
+          ~/venvs/mlsys/bin/python -m pip install "numpy==$NUMPY" "matplotlib==$MATPLOTLIB" "pytest==$PYTEST"
+      - name: check_env smoke (lab 5 must pass; lab 2 must report missing CUDA)
+        run: |
+          export PATH="$HOME/venvs/mlsys/bin:$PATH"
+          bash labs/tools/check_env.sh --lab 5
+          set +e
+          bash labs/tools/check_env.sh --lab 2
+          test $? = 1
