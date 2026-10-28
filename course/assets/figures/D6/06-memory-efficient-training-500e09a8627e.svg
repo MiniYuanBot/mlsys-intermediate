@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="585" viewBox="0 0 900 585" role="img" aria-labelledby="title description">
+<title id="title">LoRA: two forward paths, one sum</title>
+<desc id="description">LoRA: two forward paths, one sum. Shape-aware data flow; frozen parameters still carry input gradients</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="585" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">LoRA: two forward paths, one sum</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Shape-aware data flow; frozen parameters still carry input gradients</text>
+<rect x="32" y="250" width="145" height="90" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,250,145,90" data-padding="7">
+<text x="104.5" y="288.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">X</text>
+<text x="104.5" y="314.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">[N, d_in]</text>
+</g>
+<rect x="275" y="118" width="320" height="88" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="275,118,320,88" data-padding="7">
+<text x="435.0" y="156.14" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">Base linear: W (frozen)</text>
+<text x="435.0" y="182.14" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">X W^T</text>
+</g>
+<rect x="238" y="400" width="115" height="74" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="238,400,115,74" data-padding="7">
+<text x="295.5" y="430.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">A</text>
+<text x="295.5" y="456.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">[r, d_in]</text>
+</g>
+<rect x="390" y="400" width="150" height="74" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="390,400,150,74" data-padding="7">
+<text x="465.0" y="430.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Z = X A^T</text>
+<text x="465.0" y="456.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">[N, r]</text>
+</g>
+<rect x="575" y="400" width="125" height="74" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="575,400,125,74" data-padding="7">
+<text x="637.5" y="429.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">B</text>
+<text x="637.5" y="455.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">[d_out, r]</text>
+</g>
+<rect x="725" y="400" width="135" height="74" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="725,400,135,74" data-padding="7">
+<text x="792.5" y="429.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">Scale</text>
+<text x="792.5" y="455.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">s = alpha/r</text>
+</g>
+<polyline points="177,295 210,295 210,162 272,162" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="210,295 210,437 235,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="353,437 387,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="540,437 572,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="700,437 722,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="725" y="250" width="135" height="90" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="725,250,135,90" data-padding="7">
+<text x="792.5" y="288.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Y = sum</text>
+<text x="792.5" y="314.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">[N, d_out]</text>
+</g>
+<polyline points="595,162 792,162 792,247" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="792,400 792,343" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="32" y="535" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Both paths contribute to dX. Freezing W removes dW, not the base path&#x27;s input gradient.</text>
+<text x="32" y="560" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">The merge is addition, not concatenation. Shapes and gradient formulas remain in the text.</text>
+</svg>

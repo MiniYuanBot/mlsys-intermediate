@@ -76,12 +76,9 @@ $$
 
 ASCII 图只用英文，中文解释写在图下方：
 
-```text
-+-----------+     append      +-----------+    flush (full block)   +-------------+
-| new token | --------------> |  recent   | ----------------------> |  quantized  |
-+-----------+                 |  window   |                         |   blocks    |
-                              +-----------+                         +-------------+
-```
+![新 token 经残余窗口以完整块形式进入量化存储](../assets/figures/template/lecture-d0e7e2e7bccc.svg)
+
+图：示意图：只表示 append 与满块 flush，不指定容量或耗时。
 
 图中 `recent window` 保存最近若干行高精度数据，攒满一个块后整体量化并移入 `quantized blocks`。
 

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="760" viewBox="0 0 900 760" role="img" aria-labelledby="title description">
+<title id="title">From projection to the KV cache</title>
+<desc id="description">From projection to the KV cache. Axis order is explicit; normalization acts on the last dimension</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="760" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">From projection to the KV cache</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Axis order is explicit; normalization acts on the last dimension</text>
+<rect x="335" y="100" width="230" height="52" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="335,100,230,52" data-padding="7">
+<text x="450.0" y="132.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Input x [T, hidden]</text>
+</g>
+<polyline points="450,152 450,174 245,174 245,196" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="55" y="193" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">K path</text>
+<polyline points="450,152 450,174 655,174 655,196" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="465" y="193" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">V path</text>
+<rect x="55" y="200" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,200,380,54" data-padding="7">
+<text x="245.0" y="233.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">k_proj: [T, Hkv*D]</text>
+</g>
+<rect x="55" y="280" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,280,380,54" data-padding="7">
+<text x="245.0" y="313.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">reshape: [T, Hkv, D]</text>
+</g>
+<polyline points="245,254 245,277" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="55" y="360" width="380" height="54" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,360,380,54" data-padding="7">
+<text x="245.0" y="393.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">RMSNorm over D; gamma[D]</text>
+</g>
+<polyline points="245,334 245,357" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="55" y="440" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,440,380,54" data-padding="7">
+<text x="245.0" y="473.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">transpose T / Hkv: [Hkv, T, D]</text>
+</g>
+<polyline points="245,414 245,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="55" y="520" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,520,380,54" data-padding="7">
+<text x="245.0" y="553.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">RoPE at each token position</text>
+</g>
+<polyline points="245,494 245,517" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="465" y="200" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="465,200,380,54" data-padding="7">
+<text x="655.0" y="233.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v_proj: [T, Hkv*D]</text>
+</g>
+<rect x="465" y="280" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="465,280,380,54" data-padding="7">
+<text x="655.0" y="313.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">reshape: [T, Hkv, D]</text>
+</g>
+<polyline points="655,254 655,277" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="465" y="440" width="380" height="54" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="465,440,380,54" data-padding="7">
+<text x="655.0" y="473.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">transpose T / Hkv: [Hkv, T, D]</text>
+</g>
+<polyline points="655,334 655,437" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="680" y="379" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">No normalization</text>
+<text x="680" y="405" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">No RoPE</text>
+<polyline points="245,574 245,620" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="655,494 655,620" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="55" y="623" width="790" height="55" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="55,623,790,55" data-padding="7">
+<text x="450.0" y="657.3" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">Cache update: normalized + rotated K, projected V</text>
+</g>
+<text x="32" y="710" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Batch axis omitted. Transpose changes axis order; reshape alone does not.</text>
+<text x="32" y="735" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">RMSNorm acts on D and can commute with the T/Hkv axis swap; gamma is shared across heads.</text>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="650" viewBox="0 0 900 650" role="img" aria-labelledby="title description">
+<title id="title">Roofline: intensity determines the limiting resource</title>
+<desc id="description">Roofline: intensity determines the limiting resource. Ideal bound from the lecture; workload markers have no measured y-coordinate</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="650" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Roofline: intensity determines the limiting resource</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Ideal bound from the lecture; workload markers have no measured y-coordinate</text>
+<text x="32" y="115" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">Attainable throughput (TFLOP/s)</text>
+<polyline points="106,454.0 845,454.0" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="90" y="460.0" font-size="17" text-anchor="end" font-weight="400" style="fill:#182c42">0.1</text>
+<polyline points="106,341.0 845,341.0" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="90" y="347.0" font-size="17" text-anchor="end" font-weight="400" style="fill:#182c42">1</text>
+<polyline points="106,228.0 845,228.0" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="90" y="234.0" font-size="17" text-anchor="end" font-weight="400" style="fill:#182c42">10</text>
+<polyline points="106.0,454 106.0,462" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="106.0" y="485" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+<polyline points="331.0,454 331.0,462" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="331.0" y="485" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">10</text>
+<polyline points="556.0,454 556.0,462" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="556.0" y="485" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">100</text>
+<polyline points="781.0,454 781.0,462" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="781.0" y="485" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">1000</text>
+<polyline points="106,145 106,454 862,454" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="106.0,407.868883919761 568.521930326663,175.5800922445925 820.6205332875284,175.5800922445925" fill="none" stroke="#526579" stroke-width="4" stroke-linejoin="round"/>
+<polyline points="568.521930326663,175.5800922445925 568.521930326663,454" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="582.521930326663" y="332" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">Ridge: 113.7 FLOP/B</text>
+<text x="610" y="159.5800922445925" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Compute roof: 29.1 TFLOP/s</text>
+<text x="148" y="282" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">Bandwidth roof</text>
+<text x="148" y="310" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">256 GB/s</text>
+<text x="106" y="529" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">Decode R=1</text>
+<text x="106" y="555" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">I ~ 1 FLOP/B</text>
+<text x="775.7818759010648" y="529" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Prefill s=1024</text>
+<text x="775.7818759010648" y="555" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">I ~ 948 FLOP/B</text>
+<polyline points="775.7818759010648,444 775.7818759010648,454" fill="none" stroke="#526579" stroke-width="3" stroke-linejoin="round"/>
+<text x="460" y="505" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Arithmetic intensity (FLOP/B)</text>
+<text x="32" y="600" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Both axes are logarithmic. Curve: ideal bound min(P_peak, bandwidth * intensity).</text>
+<text x="32" y="625" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Workloads are located on the intensity axis only; no achieved-performance points are assumed.</text>
+</svg>

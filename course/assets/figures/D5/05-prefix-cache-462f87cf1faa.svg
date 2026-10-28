@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="610" viewBox="0 0 900 610" role="img" aria-labelledby="title description">
+<title id="title">In-flight misses and publication time</title>
+<desc id="description">In-flight misses and publication time. Modeled timeline in ms; one replica with two slots</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="610" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">In-flight misses and publication time</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Modeled timeline in ms; one replica with two slots</text>
+<text x="32" y="123" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">Request / policy</text>
+<text x="245" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">0</text>
+<polyline points="245,136 245,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="325" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+<polyline points="325,136 325,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="405" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">2</text>
+<polyline points="405,136 405,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="485" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">3</text>
+<polyline points="485,136 485,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="565" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">4</text>
+<polyline points="565,136 565,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="645" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">5</text>
+<polyline points="645,136 645,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="725" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">6</text>
+<polyline points="725,136 725,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="805" y="123" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">7</text>
+<polyline points="805,136 805,470" fill="none" stroke="#526579" stroke-width="1" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="842" y="123" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">ms</text>
+<text x="32" y="191" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">r0: miss</text>
+<rect x="245" y="165" width="160" height="42" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="245,165,160,42" data-padding="7">
+<text x="325.0" y="191.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">prefill</text>
+</g>
+<rect x="405" y="165" width="80" height="42" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="405,165,80,42" data-padding="7">
+<text x="445.0" y="191.44" font-size="16" text-anchor="middle" font-weight="400" style="fill:#182c42">decode</text>
+</g>
+<text x="32" y="271" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">r1: miss</text>
+<rect x="245" y="245" width="160" height="42" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="245,245,160,42" data-padding="7">
+<text x="325.0" y="271.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">prefill</text>
+</g>
+<rect x="405" y="245" width="80" height="42" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="405,245,80,42" data-padding="7">
+<text x="445.0" y="271.44" font-size="16" text-anchor="middle" font-weight="400" style="fill:#182c42">decode</text>
+</g>
+<text x="32" y="381" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">r2: SGLang</text>
+<rect x="565" y="355" width="80" height="42" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="565,355,80,42" data-padding="7">
+<text x="605.0" y="381.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">prefill</text>
+</g>
+<rect x="645" y="355" width="80" height="42" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="645,355,80,42" data-padding="7">
+<text x="685.0" y="381.44" font-size="16" text-anchor="middle" font-weight="400" style="fill:#182c42">decode</text>
+</g>
+<text x="32" y="461" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">r2: vLLM</text>
+<rect x="565" y="435" width="160" height="42" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="565,435,160,42" data-padding="7">
+<text x="645.0" y="461.78" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">prefill</text>
+</g>
+<rect x="725" y="435" width="80" height="42" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="725,435,80,42" data-padding="7">
+<text x="765.0" y="461.44" font-size="16" text-anchor="middle" font-weight="400" style="fill:#182c42">decode</text>
+</g>
+<polyline points="485,150 485,310" fill="none" stroke="#526579" stroke-width="3" stroke-linejoin="round"/>
+<text x="497" y="319" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">publish [1,2] at t=3</text>
+<text x="32" y="524" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">r2 arrives at t=4: matched=2; reuse=1 (SGLang) or 0 (vLLM).</text>
+<text x="32" y="560" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Two slots; B=2. Prefill costs 1 ms/token; decode costs 1 ms (modeled, not measured).</text>
+<text x="32" y="585" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">The two r2 rows are alternative policies, not simultaneous extra requests.</text>
+</svg>

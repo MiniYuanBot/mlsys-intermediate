@@ -159,13 +159,19 @@ decode 一步要 128 个专家，全 miss 时是 128 ms，对应约 7.8 tok/s �
 
 给五条 route、4 个专家：
 
-```text
-r0: token0 -> expert2, weight=.75
-r1: token0 -> expert0, weight=.25
-r2: token1 -> expert2, weight=.50
-r3: token1 -> expert2, weight=.50   # duplicate route kept intentionally
-r4: token2 -> expert1, weight=1.0
-```
+![五条 MoE 路由经稳定重排进入专家桶，保留重复路由](../assets/figures/D7/07-moe-offload-c5a11fe7b3b6.svg)
+
+图：r0 至 r4 是 route ID；r2 与 r3 都保留，专家内顺序稳定，combine 逐条加权累加。
+
+| route | token  | expert  | weight |
+| ----- | ------ | ------- | ------ |
+| r0    | token0 | expert2 | 0.75   |
+| r1    | token0 | expert0 | 0.25   |
+| r2    | token1 | expert2 | 0.50   |
+| r3    | token1 | expert2 | 0.50   |
+| r4    | token2 | expert1 | 1.00   |
+
+r2 与 r3 是有意保留的两条重复 route，不能去重或覆盖。
 
 计数为 $[1,1,3,0]$，排他前缀和即 $\mathrm{offsets}=[0,1,2,5,5]$。专家 $e$ 占据 `ordered[offsets[e] : offsets[e+1]]`，空专家的区间长度为 0，最后一项必须等于 route 总数 $R$。复杂度 $O(R+E)$，额外存储 $O(R+E)$。
 
@@ -325,11 +331,11 @@ $$
 
 一个槽被反复复用时，有两条必须成立的 happens-before：
 
-```text
-slot s, step i:
-  comp_end[i-slots] --(WAR)--> copy_start[i] : the copy must not overwrite a slot a kernel still reads
-  copy_end[i]       --(RAW)--> comp_start[i] : the kernel must not read a half-written slot
-```
+![槽复用同时保护前次读取和本次写入的 WAR 与 RAW 依赖](../assets/figures/D7/07-moe-offload-961548d63708.svg)
+
+图：WAR 防止新拷贝覆盖尚未结束的旧计算；RAW 防止新计算读取未写完的槽。依赖边不等于实测重叠。
+
+同一 slot 的两条依赖仍分别成立：`comp_end[i-slots]` 必须先于 `copy_start[i]`（WAR，避免覆盖旧 kernel 仍在读的数据）；`copy_end[i]` 必须先于 `comp_start[i]`（RAW，避免读取尚未写完的数据）。
 
 ```mermaid
 flowchart LR

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="660" viewBox="0 0 900 660" role="img" aria-labelledby="title description">
+<title id="title">Quantization groups change the error scale</title>
+<desc id="description">Quantization groups change the error scale. Same 3 x 3 data; 4-bit affine quantization with group size 3</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="660" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Quantization groups change the error scale</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Same 3 x 3 data; 4-bit affine quantization with group size 3</text>
+<text x="32" y="120" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">A. Per-token: group each row</text>
+<text x="182" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 0</text>
+<text x="267" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 1</text>
+<text x="352" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 2</text>
+<text x="35" y="204" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 0</text>
+<rect x="142" y="173" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="142,173,78,53" data-padding="7">
+<text x="181.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="227" y="173" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="227,173,78,53" data-padding="7">
+<text x="266.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="312" y="173" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="312,173,78,53" data-padding="7">
+<text x="351.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">30</text>
+</g>
+<text x="35" y="265" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 1</text>
+<rect x="142" y="234" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="142,234,78,53" data-padding="7">
+<text x="181.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="227" y="234" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="227,234,78,53" data-padding="7">
+<text x="266.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">2</text>
+</g>
+<rect x="312" y="234" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="312,234,78,53" data-padding="7">
+<text x="351.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">29</text>
+</g>
+<text x="35" y="326" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 2</text>
+<rect x="142" y="295" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="142,295,78,53" data-padding="7">
+<text x="181.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">2</text>
+</g>
+<rect x="227" y="295" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="227,295,78,53" data-padding="7">
+<text x="266.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="312" y="295" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="312,295,78,53" data-padding="7">
+<text x="351.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">31</text>
+</g>
+<text x="32" y="393" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">Row scales: 29/15, 28/15, 30/15</text>
+<text x="472" y="120" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">B. Per-channel: group each column</text>
+<text x="622" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 0</text>
+<text x="707" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 1</text>
+<text x="792" y="157" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">ch 2</text>
+<text x="475" y="204" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 0</text>
+<rect x="582" y="173" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="582,173,78,53" data-padding="7">
+<text x="621.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="667" y="173" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="667,173,78,53" data-padding="7">
+<text x="706.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="752" y="173" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="752,173,78,53" data-padding="7">
+<text x="791.0" y="206.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">30</text>
+</g>
+<text x="475" y="265" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 1</text>
+<rect x="582" y="234" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="582,234,78,53" data-padding="7">
+<text x="621.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="667" y="234" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="667,234,78,53" data-padding="7">
+<text x="706.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">2</text>
+</g>
+<rect x="752" y="234" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="752,234,78,53" data-padding="7">
+<text x="791.0" y="267.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">29</text>
+</g>
+<text x="475" y="326" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">token 2</text>
+<rect x="582" y="295" width="78" height="53" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="582,295,78,53" data-padding="7">
+<text x="621.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">2</text>
+</g>
+<rect x="667" y="295" width="78" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="667,295,78,53" data-padding="7">
+<text x="706.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">1</text>
+</g>
+<rect x="752" y="295" width="78" height="53" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="752,295,78,53" data-padding="7">
+<text x="791.0" y="328.64" font-size="21" text-anchor="middle" font-weight="400" style="fill:#182c42">31</text>
+</g>
+<text x="472" y="393" font-size="19" text-anchor="start" font-weight="400" style="fill:#182c42">Column scales: 1/15, 1/15, 2/15</text>
+<text x="32" y="457" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">C. Check the actual rounding (row 1, values 1 and 2)</text>
+<rect x="32" y="482" width="396" height="95" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,482,396,95" data-padding="7">
+<text x="230.0" y="509.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Per-token: m=1, scale=28/15</text>
+<text x="230.0" y="535.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">codes: 0 and 1</text>
+<text x="230.0" y="561.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">reconstructed: 1 and 43/15</text>
+</g>
+<rect x="472" y="482" width="396" height="95" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="472,482,396,95" data-padding="7">
+<text x="670.0" y="509.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Per-channel: scale=1/15</text>
+<text x="670.0" y="535.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">each small column spans [1,2]</text>
+<text x="670.0" y="561.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">both values are represented exactly</text>
+</g>
+<text x="32" y="610" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">The large channel coarsens row quantization; 1 and 2 do not always collapse to one code.</text>
+<text x="32" y="635" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Example uses 4-bit affine quantization, nearest rounding and ideal real-valued scales.</text>
+</svg>

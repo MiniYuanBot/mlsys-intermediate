@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="675" viewBox="0 0 900 675" role="img" aria-labelledby="title description">
+<title id="title">Warp ownership and reduction provenance</title>
+<desc id="description">Warp ownership and reduction provenance. 32 lanes; output row fixed; source-lane counts are derived</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="675" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Warp ownership and reduction provenance</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">32 lanes; output row fixed; source-lane counts are derived</text>
+<text x="32" y="120" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">B2 column ownership (one warp per output row)</text>
+<rect x="32" y="142" width="170" height="49" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,142,170,49" data-padding="7">
+<text x="117.0" y="172.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">lane 0</text>
+</g>
+<polyline points="202,166 245,166" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="250" y="142" width="355" height="49" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="250,142,355,49" data-padding="7">
+<text x="427.5" y="172.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">0, 32, 64, ...</text>
+</g>
+<rect x="640" y="142" width="228" height="49" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="640,142,228,49" data-padding="7">
+<text x="754.0" y="172.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">private partial sum</text>
+</g>
+<polyline points="605,166 635,166" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="32" y="203" width="170" height="49" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,203,170,49" data-padding="7">
+<text x="117.0" y="233.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">lane 1</text>
+</g>
+<polyline points="202,227 245,227" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="250" y="203" width="355" height="49" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="250,203,355,49" data-padding="7">
+<text x="427.5" y="233.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">1, 33, 65, ...</text>
+</g>
+<rect x="640" y="203" width="228" height="49" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="640,203,228,49" data-padding="7">
+<text x="754.0" y="233.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">private partial sum</text>
+</g>
+<polyline points="605,227 635,227" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="32" y="264" width="170" height="49" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,264,170,49" data-padding="7">
+<text x="117.0" y="294.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">lane l</text>
+</g>
+<polyline points="202,288 245,288" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="250" y="264" width="355" height="49" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="250,264,355,49" data-padding="7">
+<text x="427.5" y="294.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">l, l+32, l+64, ...</text>
+</g>
+<rect x="640" y="264" width="228" height="49" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="640,264,228,49" data-padding="7">
+<text x="754.0" y="294.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">private partial sum</text>
+</g>
+<polyline points="605,288 635,288" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="32" y="325" width="170" height="49" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,325,170,49" data-padding="7">
+<text x="117.0" y="355.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">lane 31</text>
+</g>
+<polyline points="202,349 245,349" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="250" y="325" width="355" height="49" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="250,325,355,49" data-padding="7">
+<text x="427.5" y="355.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">31, 63, 95, ...</text>
+</g>
+<rect x="640" y="325" width="228" height="49" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="640,325,228,49" data-padding="7">
+<text x="754.0" y="355.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">private partial sum</text>
+</g>
+<polyline points="605,349 635,349" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="32" y="431" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">Shuffle-down: provenance grows at lane 0</text>
+<rect x="32" y="457" width="151" height="85" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,457,151,85" data-padding="7">
+<text x="107.5" y="492.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">offset 16</text>
+<text x="107.5" y="518.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">2 source lanes</text>
+</g>
+<polyline points="183,499 201,499" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="203" y="457" width="151" height="85" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="203,457,151,85" data-padding="7">
+<text x="278.5" y="492.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">offset 8</text>
+<text x="278.5" y="518.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">4 source lanes</text>
+</g>
+<polyline points="354,499 372,499" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="374" y="457" width="151" height="85" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="374,457,151,85" data-padding="7">
+<text x="449.5" y="492.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">offset 4</text>
+<text x="449.5" y="518.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">8 source lanes</text>
+</g>
+<polyline points="525,499 543,499" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="545" y="457" width="151" height="85" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="545,457,151,85" data-padding="7">
+<text x="620.5" y="492.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">offset 2</text>
+<text x="620.5" y="518.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">16 source lanes</text>
+</g>
+<polyline points="696,499 714,499" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="716" y="457" width="151" height="85" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="716,457,151,85" data-padding="7">
+<text x="791.5" y="492.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">offset 1</text>
+<text x="791.5" y="518.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">32 source lanes</text>
+</g>
+<text x="32" y="580" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">First sources: {0,16}; then {0,8,16,24}. Final sources: all lanes 0..31.</text>
+<text x="32" y="625" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">All 32 lanes participate, including lanes whose partial sum is zero.</text>
+<text x="32" y="650" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Offsets describe operations, not contiguous intermediate ranges or elapsed time.</text>
+</svg>

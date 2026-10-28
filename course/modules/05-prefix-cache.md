@@ -50,13 +50,11 @@ x_{0:t}=y_{0:t}\ \land\ \text{same weights, positions, numerics}
 \big(k_s^{(\ell)},v_s^{(\ell)}\big)_{s\le t,\ \ell\le L}\ \text{are identical}.
 $$
 
-这是**精确前缀复用**的全部依据。条件有三部分：token 序列相同（不是文本相同，见 §2）；从位置 0 开始（RoPE 把绝对位置转进了 $k$）；权重和数值路径相同（同一模型、同一 LoRA、同一 dtype 与 attention 实现）。后缀不同不影响前缀的 KV，所以两个共享系统提示的请求可以共用系统提示那一段；但同一段文档放在不同上文之后，高层 KV 不同，不能共用。
+这是**精确前缀复用**的全部依据。条件有三部分：token 序列相同（不是文本相同，见 §2）；从位置 0 开始（RoPE 把绝对位置转进了 $k$）；权重和数值路径相同（同一模型、同一 LoRA、同一 dtype 与 attention 实现）。后缀不同不影响前缀的 KV，所以两个共享系统提示的请求可以共用系统提示那一段；但同一段文档放在不同上文之后，高层 KV 可能不同，不能仅凭文档相同就保证整段、全层缓存可复用。
 
-```text
-A = [system: translate][document X][question A]
-B = [system: summarize][document X][question B]
-     ^ differ here       ^ same tokens, but every layer above 0 differs
-```
+![不同上文后的相同文档：首层键值可能相同，高层不保证相同](../assets/figures/D5/05-prefix-cache-ec70381c1b0c.svg)
+
+图：即使文档 token 和位置都相同，不同上文也会破坏整段、全层 KV 一致的保证。首层 K/V 可相同；第一次 attention 后的隐藏状态及后续层 K/V 可能不同。
 
 ### 1.2 全命中也要算一点
 
@@ -74,7 +72,7 @@ B = [system: summarize][document X][question B]
 
 > [!tip]- 核对要点
 >
-> 1. 前三个位置 $s_1,s_2,d_1$ 可复用（按块计还要看块边界）。B 改成以 $s_3$ 开头后，第 0 个位置就不同，按因果性一个都不能复用，后面相同的 $s_2,d_1,d_2$ 也不行。
+> 1. 前三个位置 $s_1,s_2,d_1$ 可复用（按块计还要看块边界）。B 改成以 $s_3$ 开头后，连续公共前缀长度为 0，因此前缀缓存不能保证复用后面相同的 $s_2,d_1,d_2$ 的全层 KV；这不等于这些位置在每一层的 KV 都必然不同。
 > 2. 48：vLLM 上限 47，取整到 32，重算 16；SGLang 重算 1。49：vLLM 上限 48，三块全用，重算 1；SGLang 重算 1。
 
 ## §2 文本相同，KV 不一定相同
@@ -136,11 +134,15 @@ $$
 
 其中 $e_i$ 是 §2 的 extra key 列表。因为 $h_i$ 含 $h_{i-1}$，两个请求的第 $i$ 块哈希相等，就意味着前 $i+1$ 块全部相等（不计碰撞）。查找从第 0 块开始，**遇到第一个不在表里的哈希就停**；即使后面某块的哈希碰巧在表里，它也不可达。设计文档里的例子是块大小 4、两个请求共享 10 个 token，只复用 8 个：第三块没满，不进表。
 
-```text
-block:    [x0..x15]        [x16..x31]        [x32..x40 partial]
-hash:  h0=H(NONE,b0,e0) -> h1=H(h0,b1,e1) ->  (not hashed)
-lookup: h0 hit -> h1 hit -> stop: 32 tokens matched
-```
+![两个完整前缀块的哈希链及不参与哈希的部分块](../assets/figures/D5/05-prefix-cache-dba4fdcb5191.svg)
+
+图：两个完整块各含 16 个 token，末尾 9 个 token 构成部分块；匹配长度与实际复用长度分开计算。
+
+| 块      | token 范围                      | 哈希 / 查找结果                     |
+| ------- | ------------------------------- | ----------------------------------- |
+| $b_0$   | $x_0,\ldots,x_{15}$（16 个）    | $h_0=H(\mathrm{NONE},b_0,e_0)$，hit |
+| $b_1$   | $x_{16},\ldots,x_{31}$（16 个） | $h_1=H(h_0,b_1,e_1)$，hit           |
+| partial | $x_{32},\ldots,x_{40}$（9 个）  | 不哈希，停止；共匹配 32 个 token    |
 
 ### 3.2 哈希函数与种子
 
@@ -313,14 +315,17 @@ TwoHit 只是基线。频率类策略（SGLang 的 LFU）和成本感知策略�
 
 两个相同前缀的请求同时到达、同时开始，谁都还没把 KV 写进缓存，所以两个都要付全额预填充。KV 只在请求完成时发布。C4 的手算时间线（$B=2$，1 个副本、2 个槽位，每个未缓存 token 1 ms，decode 1 ms）：
 
-```text
-t=0  r0 [1,2] start, miss -> first token 2, finish 3
-t=0  r1 [1,2] start, miss (r0 not finished) -> finish 3
-t=3  both finish; [1,2] published
-t=4  r2 [1,2] matched 2:
-       SGLang reuses min(2, 2-1)=1 -> prefill 1 -> finish 6
-       vLLM   reuses floor(1/2)*2=0 -> prefill 2 -> finish 7
-```
+![并发请求在发布前均未命中，随后请求按两种复用规则完成](../assets/figures/D5/05-prefix-cache-462f87cf1faa.svg)
+
+图：两种 r2 时间线是替代策略；发布发生在 3 ms，4 ms 到达的请求才可命中。时间由讲义给定代价推算，非本次实测。
+
+| 请求 / 策略      | 到达时刻（ms） | 查找与复用                                                 | 首 token / 完成时刻（ms） |
+| ---------------- | -------------- | ---------------------------------------------------------- | ------------------------- |
+| r0，输入 $[1,2]$ | 0              | miss                                                       | 2 / 3                     |
+| r1，输入 $[1,2]$ | 0              | miss；r0 尚未完成                                          | 2 / 3                     |
+| 发布             | 3              | 两请求完成，发布 $[1,2]$                                   | —                         |
+| r2，SGLang       | 4              | matched 2，复用 $\min(2,2-1)=1$，prefill 1 ms              | 5 / 6                     |
+| r2，vLLM         | 4              | matched 2，复用 $\lfloor1/2\rfloor\times2=0$，prefill 2 ms | 6 / 7                     |
 
 命中 $[0,0,2]$，SGLang 规则下完成时刻 $[3,3,6]$，vLLM 规则下 $[3,3,7]$。
 

@@ -241,11 +241,16 @@ flowchart TB
 
 提出 4 个、接受 1 个，观测是：
 
-```text
-position       1         2           3           4
-observation  accepted  rejected    unobserved  unobserved
-reached        yes       yes         no          no
-```
+![接受、首次拒绝和未观测后缀的四位置观察图](../assets/figures/D4/04-speculative-slo-1a79d83d1264.svg)
+
+图：只有位置 1 增加成功、位置 2 增加失败；位置 3 和 4 不增加新的失败证据，旧计数仍按原公式折扣。
+
+| position | observation | reached |
+| -------- | ----------- | ------- |
+| 1        | accepted    | yes     |
+| 2        | rejected    | yes     |
+| 3        | unobserved  | no      |
+| 4        | unobserved  | no      |
 
 lab 的 B1 对每个位置维护折扣计数 $s_j,f_j$，初值为 0。每轮先把所有位置乘以 $\lambda$（包括 $k=0$ 的轮次，旧证据照样变旧），再给已接受的前缀加成功、给首次拒绝的位置加失败：
 
@@ -314,11 +319,11 @@ lab R4 的控制器用的就是这条结构：每个位置用 Wilson **上端** 
 
 TTFT 是到达到第一个 token 可见的时间；TPOT 是一个请求在首 token 之后平均每个 token 的时间，$(t_{\mathrm{finish}}-t_{\mathrm{first}})/(n-1)$；ITL 是相邻两个可见 token 的间隔分布。推测一次提交多个 token，同一轮的 token 时间戳相同，ITL 会变得突发：一次验证 37ms 提交 3 个 token，平均每 token 12.3ms，但用户看到的是等 37ms 后一下出来 3 个。
 
-```text
-arrival -> queue wait -> prefill -> first token -> round 1 -> round 2 -> finish
-|<------------ TTFT ------------->|
-                                 |<---- TPOT = (finish - first) / (n - 1) ---->|
-```
+![包含排队的 TTFT、首 token 后的 TPOT 区间及突发提交](../assets/figures/D4/04-speculative-slo-589d48b4e5f0.svg)
+
+图：TTFT 包括排队；同轮 token 可以同时可见，平均 TPOT 不等于逐 token 的 ITL。横向间距不代表实测时长。
+
+这里的 finish 是最后一个可见 token 的输出时刻；$n>1$ 时，$\mathrm{TPOT}=(t_{\mathrm{finish}}-t_{\mathrm{first}})/(n-1)$。同一轮输出多个 token 时，它们可共享时间戳，不能把平均 TPOT 当作每个 token 的 ITL。
 
 图中 TTFT 包含排队和 prefill，TPOT 只看首 token 之后。lab C 没有 prefill 模型，TTFT 是首轮提交的时延。
 

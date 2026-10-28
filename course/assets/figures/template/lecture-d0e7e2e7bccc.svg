@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="355" viewBox="0 0 900 355" role="img" aria-labelledby="title description">
+<title id="title">A recent window feeds quantized blocks</title>
+<desc id="description">A recent window feeds quantized blocks. Schematic teaching template; capacities are unspecified</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="355" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">A recent window feeds quantized blocks</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Schematic teaching template; capacities are unspecified</text>
+<rect x="32" y="150" width="185" height="108" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,150,185,108" data-padding="7">
+<text x="124.5" y="211.48" font-size="22" text-anchor="middle" font-weight="400" style="fill:#182c42">New token</text>
+</g>
+<rect x="330" y="150" width="225" height="108" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="330,150,225,108" data-padding="7">
+<text x="442.5" y="197.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">Recent window</text>
+<text x="442.5" y="223.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">High-precision rows</text>
+</g>
+<rect x="680" y="150" width="188" height="108" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="680,150,188,108" data-padding="7">
+<text x="774.0" y="198.48" font-size="22" text-anchor="middle" font-weight="400" style="fill:#182c42">Quantized</text>
+<text x="774.0" y="224.48" font-size="22" text-anchor="middle" font-weight="400" style="fill:#182c42">blocks</text>
+</g>
+<polyline points="217,204 327,204" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="273" y="180" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">append</text>
+<polyline points="555,204 677,204" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="616" y="180" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">flush</text>
+<text x="616" y="235" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">full block</text>
+<text x="32" y="305" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Only full blocks move to quantized storage; the recent window keeps exact rows.</text>
+<text x="32" y="330" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Schematic template: block size, residual capacity and timing are not specified.</text>
+</svg>

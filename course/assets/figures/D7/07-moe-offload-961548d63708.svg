@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480" role="img" aria-labelledby="title description">
+<title id="title">Slot reuse requires two dependency directions</title>
+<desc id="description">Slot reuse requires two dependency directions. One physical slot s; different copy and compute streams</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="480" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Slot reuse requires two dependency directions</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">One physical slot s; different copy and compute streams</text>
+<text x="32" y="124" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">A. Protect the old read before reusing slot s (WAR)</text>
+<rect x="32" y="150" width="330" height="76" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,150,330,76" data-padding="7">
+<text x="197.0" y="181.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Previous compute completes</text>
+<text x="197.0" y="207.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">comp_end[i-slots]</text>
+</g>
+<polyline points="362,188 500,188" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="430" y="171" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">must precede</text>
+<rect x="503" y="150" width="365" height="76" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="503,150,365,76" data-padding="7">
+<text x="685.5" y="181.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">New copy may begin</text>
+<text x="685.5" y="207.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">copy_start[i]</text>
+</g>
+<text x="32" y="287" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">B. Finish the new write before the new read (RAW)</text>
+<rect x="32" y="314" width="330" height="76" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,314,330,76" data-padding="7">
+<text x="197.0" y="345.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">New copy completes</text>
+<text x="197.0" y="371.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">copy_end[i]</text>
+</g>
+<polyline points="362,352 500,352" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="430" y="335" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">must precede</text>
+<rect x="503" y="314" width="365" height="76" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="503,314,365,76" data-padding="7">
+<text x="685.5" y="345.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">New compute may begin</text>
+<text x="685.5" y="371.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">comp_start[i]</text>
+</g>
+<text x="32" y="430" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">i and i-slots use the same slot. For its first use, there is no previous compute to wait for.</text>
+<text x="32" y="455" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Edges are event dependencies, not measured overlap. Drain the final compute events too.</text>
+</svg>

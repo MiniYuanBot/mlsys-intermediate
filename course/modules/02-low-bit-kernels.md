@@ -205,12 +205,19 @@ lab2 R3 每个 lane 用一条 128 位加载读 16 个 E4M3 码（行宽补到 16
 
 FasterTransformer 的 MoE 论文（[Kim et al., 2022](https://arxiv.org/abs/2211.10017)）给出了一个不需要整数转浮点指令的技巧，后来被 AWQ、Marlin、vLLM、TileLang 沿用。FP16 的 `0x6400` 是 1024：指数字段 25，$2^{25-15}=2^{10}$，尾数为 0。在 $[1024,2048)$ 里 FP16 的步长正好是 1，所以对 $0\le v<1024$ 的整数，位模式 `0x6400 | v` 恰好表示 $1024+v$。把一个 32 位寄存器看成两个 FP16：
 
-```text
-q        = [ ... v5 v4 | ... v1 v0 ]   8 nibbles in one 32-bit register
-q & 0x000F000F           keeps the low nibble of each 16-bit half
-  | 0x64006400           -> half2(1024 + v4', 1024 + v0')
-hsub2(.., 0x64086408)    -> half2(v4' - 8, v0' - 8)     since 0x6408 = 1032
-```
+![INT4 寄存器中第 4 与第 0 个码经掩码和 FP16 常数解包](../assets/figures/D2/02-low-bit-kernels-7d11e61e8263.svg)
+
+图：左侧显示高半字，右侧显示低半字；两码来自位置 4 和 0，精确位运算见下表。
+
+精确位运算如下；显示顺序为高半字、低半字，$q$ 的 8 个半字节从高到低是 $v'_7,\ldots,v'_0$：
+
+| 操作                            | 高 16 bit              | 低 16 bit              |
+| ------------------------------- | ---------------------- | ---------------------- |
+| `q & 0x000F000F`                | 保留位置 4 的码 $v'_4$ | 保留位置 0 的码 $v'_0$ |
+| 再 `\| 0x64006400`，解释为 FP16 | $1024+v'_4$            | $1024+v'_0$            |
+| `hsub2(..., 0x64086408)`        | $v'_4-8$               | $v'_0-8$               |
+
+其中 `0x6408` 对应 FP16 的 1032；一次解码的两个码来自位置 4 和 0。
 
 `(q & LO) | EX` 是三输入布尔函数，`lop3.b32` 一条指令就能做，查找表常数 $\mathrm{immLut}=(\mathtt{0xF0}\ \&\ \mathtt{0xCC})\mid\mathtt{0xAA}=\mathtt{0xEA}$（`0xF0`、`0xCC`、`0xAA` 分别代表输入 a、b、c）。高半字节用掩码 `0x00F000F0` 得到 $1024+16v$，再一条 `hfma2` 乘 $1/16$（`0x2C00`）加 $-72$（`0xD480`）：
 
@@ -250,15 +257,11 @@ $$
 
 lab2 B2 让一个 warp 的 32 个 lane 分别处理列 $l,l+32,\dots$，各自累加后用 `__shfl_down_sync` 做五轮（16、8、4、2、1）树形归约，lane 0 得到整行的和。
 
-```text
-lane 0: columns 0, 32, 64, ...        each lane: private partial sum
-lane 1: columns 1, 33, 65, ...
-...
-lane31: columns 31, 63, 95, ...
-        | shuffle offsets 16 -> 8 -> 4 -> 2 -> 1
-        v
-lane 0 holds y[row]
-```
+![一个 warp 的列索引分配及 lane 0 在五轮 shuffle 后覆盖全部来源](../assets/figures/D2/02-low-bit-kernels-365a1d8264b8.svg)
+
+图：每个 lane 处理步长为 32 的列；无数据的 lane 以零参与，归约中间贡献不按连续区间解释。
+
+lane $\ell$ 负责列 $\ell,\ell+32,\ell+64,\ldots$：lane 0 为 $0,32,64,\ldots$，lane 1 为 $1,33,65,\ldots$，lane 31 为 $31,63,95,\ldots$。各 lane 先保留自己的部分和，再依次以偏移 $16,8,4,2,1$ 做 shuffle-down；最后 lane 0 持有该输出行的总和。
 
 两条不变量：行越界（$\mathrm{row}\ge M$）时整个 warp 一起返回；有效行内没有列可处理的 lane（$K<32$ 时）不能提前返回，必须以 0 参加归约，否则全掩码的 shuffle 就有不参与的线程。[NVIDIA 的 warp 原语博客](https://developer.nvidia.com/blog/using-cuda-warp-level-primitives/)开头的归约树图和 Listing 1 画的就是这个过程。
 

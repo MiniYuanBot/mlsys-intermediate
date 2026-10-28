@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="710" viewBox="0 0 900 710" role="img" aria-labelledby="title description">
+<title id="title">Split each GPU node to enforce its capacity</title>
+<desc id="description">Split each GPU node to enforce its capacity. Both forwarding branches start after GPU A has computed its layers</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="710" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Split each GPU node to enforce its capacity</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Both forwarding branches start after GPU A has computed its layers</text>
+<text x="32" y="119" font-size="20" text-anchor="start" font-weight="400" style="fill:#182c42">All capacities in token/s; inf means non-limiting</text>
+<rect x="32" y="307" width="65" height="60" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,307,65,60" data-padding="7">
+<text x="64.5" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">S</text>
+</g>
+<rect x="147" y="307" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="147,307,100,60" data-padding="7">
+<text x="197.0" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">A_in</text>
+</g>
+<rect x="357" y="307" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="357,307,100,60" data-padding="7">
+<text x="407.0" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">A_out</text>
+</g>
+<rect x="510" y="168" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="510,168,100,60" data-padding="7">
+<text x="560.0" y="204.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">B_in</text>
+</g>
+<rect x="710" y="168" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="710,168,100,60" data-padding="7">
+<text x="760.0" y="204.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">B_out</text>
+</g>
+<rect x="510" y="445" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="510,445,100,60" data-padding="7">
+<text x="560.0" y="481.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">C_in</text>
+</g>
+<rect x="710" y="445" width="100" height="60" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="710,445,100,60" data-padding="7">
+<text x="760.0" y="481.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">C_out</text>
+</g>
+<rect x="815" y="307" width="65" height="60" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="815,307,65,60" data-padding="7">
+<text x="847.5" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">T</text>
+</g>
+<polyline points="97,337 144,337" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="120" y="320" font-size="17" text-anchor="middle" font-weight="400" style="fill:#182c42">inf</text>
+<polyline points="247,337 354,337" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="302" y="320" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">2500</text>
+<polyline points="457,337 480,337 480,198 507,198" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="440" y="180" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">600</text>
+<polyline points="457,337 480,337 480,475 507,475" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="445" y="505" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">inf</text>
+<polyline points="610,198 707,198" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="660" y="181" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">1000</text>
+<polyline points="610,475 707,475" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="660" y="458" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">1000</text>
+<polyline points="810,198 848,198 848,304" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="833" y="265" font-size="17" text-anchor="end" font-weight="400" style="fill:#182c42">inf</text>
+<polyline points="810,475 848,475 848,370" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="833" y="423" font-size="17" text-anchor="end" font-weight="400" style="fill:#182c42">inf</text>
+<text x="302" y="396" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">A: layers [0,2)</text>
+<text x="660" y="146" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">B: layers [2,4)</text>
+<text x="660" y="540" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">C: layers [2,4)</text>
+<rect x="90" y="580" width="720" height="76" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="90,580,720,76" data-padding="7">
+<text x="450.0" y="611.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Both branches leave A_out: every path crosses A&#x27;s 2500 edge.</text>
+<text x="450.0" y="637.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Min-cut: A_out -&gt; B_in (600) + C_in -&gt; C_out (1000) = 1600</text>
+</g>
+<text x="32" y="685" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Static capacity model, not measured throughput. Original node capacities and layer ranges retained.</text>
+</svg>

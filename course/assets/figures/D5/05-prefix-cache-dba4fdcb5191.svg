@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="485" viewBox="0 0 900 485" role="img" aria-labelledby="title description">
+<title id="title">Only full blocks enter the hash chain</title>
+<desc id="description">Only full blocks enter the hash chain. B=16; 41 input tokens; 32 tokens matched</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="485" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Only full blocks enter the hash chain</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">B=16; 41 input tokens; 32 tokens matched</text>
+<rect x="32" y="131" width="264" height="88" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,131,264,88" data-padding="7">
+<text x="164.0" y="168.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">x0 .. x15</text>
+<text x="164.0" y="194.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">16 tokens: full</text>
+</g>
+<rect x="318" y="131" width="264" height="88" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="318,131,264,88" data-padding="7">
+<text x="450.0" y="168.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">x16 .. x31</text>
+<text x="450.0" y="194.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">16 tokens: full</text>
+</g>
+<rect x="604" y="131" width="264" height="88" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5" stroke-dasharray="6 4"/>
+<g data-label-box="604,131,264,88" data-padding="7">
+<text x="736.0" y="168.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">x32 .. x40</text>
+<text x="736.0" y="194.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">9 tokens: partial</text>
+</g>
+<polyline points="164,219 164,267" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="450,219 450,267" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="32" y="270" width="264" height="70" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,270,264,70" data-padding="7">
+<text x="164.0" y="298.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">h0 = H(NONE,b0,e0)</text>
+<text x="164.0" y="324.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">hit</text>
+</g>
+<rect x="318" y="270" width="264" height="70" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="318,270,264,70" data-padding="7">
+<text x="450.0" y="298.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">h1 = H(h0,b1,e1)</text>
+<text x="450.0" y="324.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">hit</text>
+</g>
+<rect x="604" y="270" width="264" height="70" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5" stroke-dasharray="6 4"/>
+<g data-label-box="604,270,264,70" data-padding="7">
+<text x="736.0" y="298.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Not hashed</text>
+<text x="736.0" y="324.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">lookup stops</text>
+</g>
+<polyline points="296,305 315,305" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="32,371 32,379 584,379 584,371" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="308.0" y="404" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">32 tokens matched in the contiguous full-block chain</text>
+<text x="32" y="435" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Block size B=16. Lookup stops at the first missing full-block hash.</text>
+<text x="32" y="460" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Matched length is not automatically the reusable length for next-token generation.</text>
+</svg>

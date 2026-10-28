@@ -245,11 +245,9 @@ $$
 Y=XW^\top+s\,(XA^\top)B^\top
 $$
 
-```text
-X [N, d_in] --+-- base linear (W, frozen) -----------------------+--> Y [N, d_out]
-              |                                                  |
-              +-- A --> Z = X A^T [N, r] --> B --> scale (s) ----+
-```
+![LoRA 的冻结基座分支和低秩分支相加，输入梯度经过两条路径](../assets/figures/D6/06-memory-efficient-training-500e09a8627e.svg)
+
+图：基座路径与低秩路径的输出相加；冻结基座权重不切断输入梯度。
 
 令 $G=\partial L/\partial Y$，$Z=XA^\top$：
 

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="610" viewBox="0 0 900 610" role="img" aria-labelledby="title description">
+<title id="title">Residual KV window: append and flush</title>
+<desc id="description">Residual KV window: append and flush. State transitions; symbolic row counts, not elapsed time</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="610" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Residual KV window: append and flush</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">State transitions; symbolic row counts, not elapsed time</text>
+<rect x="32" y="110" width="225" height="115" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,110,225,115" data-padding="7">
+<text x="144.5" y="147.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Build recent window</text>
+<text x="144.5" y="173.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">At most R+B-1 rows</text>
+<text x="144.5" y="199.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">t = 0 .. R+B-2</text>
+</g>
+<polyline points="257,168 307,168" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="310" y="110" width="265" height="115" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="310,110,265,115" data-padding="7">
+<text x="442.5" y="147.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Append t = R+B-1</text>
+<text x="442.5" y="173.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">R+B exact rows</text>
+<text x="442.5" y="199.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Flush threshold reached</text>
+</g>
+<polyline points="575,168 625,168" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="628" y="110" width="240" height="115" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="628,110,240,115" data-padding="7">
+<text x="748.0" y="147.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">After flush</text>
+<text x="748.0" y="173.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">B rows packed</text>
+<text x="748.0" y="199.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">R rows stay exact</text>
+</g>
+<text x="32" y="282" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">At the threshold: oldest to newest</text>
+<rect x="32" y="310" width="405" height="80" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,310,405,80" data-padding="7">
+<text x="234.5" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Oldest B rows</text>
+<text x="234.5" y="369.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">K: group along tokens</text>
+</g>
+<rect x="460" y="310" width="408" height="80" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="460,310,408,80" data-padding="7">
+<text x="664.0" y="343.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Newest R rows</text>
+<text x="664.0" y="369.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Keep in the recent window</text>
+</g>
+<polyline points="235,390 235,435" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="664,390 664,435" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="32" y="438" width="405" height="70" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,438,405,70" data-padding="7">
+<text x="234.5" y="466.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">New packed chunk</text>
+<text x="234.5" y="492.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Fixed quantization metadata</text>
+</g>
+<rect x="460" y="438" width="408" height="70" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="460,438,408,70" data-padding="7">
+<text x="664.0" y="466.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Recent: R exact rows</text>
+<text x="664.0" y="492.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Ready for the next append</text>
+</g>
+<text x="32" y="560" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">K and V flush together in this lab; V groups channels within each token.</text>
+<text x="32" y="585" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Row conservation: packed_chunks * B + recent_rows = tokens. Schematic, not to scale.</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="595" viewBox="0 0 900 595" role="img" aria-labelledby="title description">
+<title id="title">Same document is not the same prefix</title>
+<desc id="description">Same document is not the same prefix. Distinguish a reuse guarantee from equality in an individual layer</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="595" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Same document is not the same prefix</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Distinguish a reuse guarantee from equality in an individual layer</text>
+<text x="32" y="165" font-size="23" text-anchor="start" font-weight="600" style="fill:#182c42">A</text>
+<rect x="85" y="133" width="250" height="52" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="85,133,250,52" data-padding="7">
+<text x="210.0" y="165.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">system: translate</text>
+</g>
+<rect x="358" y="133" width="250" height="52" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="358,133,250,52" data-padding="7">
+<text x="483.0" y="165.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">document X</text>
+</g>
+<rect x="631" y="133" width="237" height="52" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="631,133,237,52" data-padding="7">
+<text x="749.5" y="165.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">question A</text>
+</g>
+<text x="32" y="239" font-size="23" text-anchor="start" font-weight="600" style="fill:#182c42">B</text>
+<rect x="85" y="207" width="250" height="52" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="85,207,250,52" data-padding="7">
+<text x="210.0" y="239.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">system: summarize</text>
+</g>
+<rect x="358" y="207" width="250" height="52" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="358,207,250,52" data-padding="7">
+<text x="483.0" y="239.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">document X</text>
+</g>
+<rect x="631" y="207" width="237" height="52" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="631,207,237,52" data-padding="7">
+<text x="749.5" y="239.8" font-size="20" text-anchor="middle" font-weight="400" style="fill:#182c42">question B</text>
+</g>
+<polyline points="85,284 85,292 335,292 335,284" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="210.0" y="317" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Different earlier tokens</text>
+<polyline points="358,284 358,292 608,292 608,284" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="483.0" y="317" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Same document tokens</text>
+<text x="32" y="376" font-size="21" text-anchor="start" font-weight="600" style="fill:#182c42">For identical document tokens at identical positions:</text>
+<rect x="32" y="403" width="252" height="104" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,403,252,104" data-padding="7">
+<text x="158.0" y="435.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Embedding h(0)</text>
+<text x="158.0" y="461.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">First-layer K/V</text>
+<text x="158.0" y="487.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">can be identical</text>
+</g>
+<polyline points="284,455 318,455" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="321" y="403" width="255" height="104" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="321,403,255,104" data-padding="7">
+<text x="448.5" y="435.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">First attention</text>
+<text x="448.5" y="461.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">sees earlier tokens</text>
+<text x="448.5" y="487.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">h(1) may differ</text>
+</g>
+<polyline points="576,455 610,455" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="613" y="403" width="255" height="104" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="613,403,255,104" data-padding="7">
+<text x="740.5" y="435.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Later-layer K/V</text>
+<text x="740.5" y="461.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">may differ</text>
+<text x="740.5" y="487.46" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">No all-layer guarantee</text>
+</g>
+<text x="32" y="545" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Exact prefix reuse needs identical prefix tokens, positions, weights and numerical conditions.</text>
+<text x="32" y="570" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Different prefixes break the guarantee; they do not prove every layer&#x27;s values must differ.</text>
+</svg>

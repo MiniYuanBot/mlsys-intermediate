@@ -94,11 +94,9 @@ MLA（[DeepSeek-V2](https://arxiv.org/abs/2405.04434)）缓存的不是每个头
 
 Qwen3 去掉了 QKV bias，加了 QK-Norm（[技术报告](https://arxiv.org/abs/2505.09388)）。HF 实现（[modeling_qwen3.py](https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py)）里 K 的算子顺序是：
 
-```text
-x --k_proj--> [T, Hkv*D] --view--> [Hkv, T, D] --k_norm (RMSNorm over D,
-weight gamma[D] shared by all heads)--> --RoPE(pos)--> past_key_values.update
-v_proj --view--> past_key_values.update          (V: no norm, no RoPE)
-```
+![K 与 V 的投影、轴交换和缓存写入；K 额外经过归一化与 RoPE](../assets/figures/D1/01-kv-cache-5d8631aaf619.svg)
+
+图：图中省略 batch 轴。先 reshape 拆出 head 轴，再交换 token 与 head 轴；沿最后一维的 RMSNorm 可与这次轴交换交换顺序。K 在 RoPE 后写入，V 不做归一化或 RoPE。
 
 所以 **Qwen3 缓存的 K 已经过 RMSNorm 和 RoPE**，V 没有经过任何归一化。这有三个后果。
 
@@ -150,17 +148,20 @@ $$
 
 把一个 KV head 的缓存写成行优先 $[T,D]$：行是 token，列是通道。**per-token** 分组沿通道切，每组是一个 token 的 $g$ 个通道；**per-channel** 分组沿时间切，每组是一个通道的 $g$ 个 token。
 
-```text
-              channel 0  channel 1  channel 2
- token 0           1          1         30
- token 1           1          2         29
- token 2           2          1         31
+![按行与按列量化的分组、步长和最近舍入反例](../assets/figures/D1/01-kv-cache-786a60c582ea.svg)
 
-per-token   (g=3): one group per row    -> scale of row 0 = 29/15
-per-channel (g=3): one group per column -> scale of col 0 = 1/15, col 2 = 2/15
-```
+图：大值通道会放大逐行量化的步长，但不保证小值合并成同一码。第二行的 1 和 2 仍映射到不同码，反量化后差距失真。
 
-上图里通道 2 是一个持续的大值通道。per-token 时它把每一行的 scale 撑到约 1.93，通道 0、1 上 1 和 2 的差别被量化掉；per-channel 时大值只影响自己那一列。把矩阵转置（大值集中在一个 token 上），结论就反过来。
+原始数据与步长保留如下：
+
+| token            | channel 0 | channel 1 | channel 2 | per-token 步长 |
+| ---------------- | --------- | --------- | --------- | -------------- |
+| 0                | 1         | 1         | 30        | $29/15$        |
+| 1                | 1         | 2         | 29        | $28/15$        |
+| 2                | 2         | 1         | 31        | $30/15$        |
+| per-channel 步长 | $1/15$    | $1/15$    | $2/15$    | 分组大小均为 3 |
+
+上图里通道 2 是一个持续的大值通道。per-token 时各行的 scale 分别为 $29/15$、$28/15$ 和 $30/15$，小值的分辨率明显变粗，但并非 1 和 2 一定变成同一码。例如 token 1 的码为 0 和 1，反量化为 1 和 $43/15$，差值被放大；token 2 的 1 和 2 则因半整数舍入规则而可能合并。per-channel 时大值只影响自己那一列。把矩阵转置（大值集中在一个 token 上），分组的利弊随之交换。
 
 [KIVI](https://arxiv.org/abs/2402.02750) 在 Llama/Mistral 上观察到 K 有固定的离群通道、V 没有，于是 **K 按通道、V 按 token**。V 按 token 还有一个理由：输出 $o=\sum_t p_t v_t$ 是 V 行的凸组合，每一行的误差被它自己的权重 $p_t$ 加权，与别的行无关。§2.2 的本机探针显示这个结论在 Qwen3 上大体成立，而且 K 用错轴的代价远大于 V。
 
@@ -320,12 +321,11 @@ $$
 
 per-channel 的组沿时间展开。若每来一个 token 就重算组的 scale，已经写好的旧码也得重编码，否则同一个码在不同 scale 下代表不同数值。KIVI 的做法是先把新 token 放进高精度的残余窗口，攒够一个块再整体量化：
 
-```text
-append t=0..R+B-2 : recent window holds up to R+B-1 exact rows
-append t=R+B-1    : recent has R+B rows -> quantize the OLDEST B rows
-                    (K per-channel over those B tokens, V per-token) -> packed chunk
-                    recent keeps R rows
-```
+![残余窗口达到阈值后将最旧块量化，并保留最近的高精度行](../assets/figures/D1/01-kv-cache-1855b7b5a088.svg)
+
+图：窗口达到阈值后移走最旧的一整块，留下最新的残余行；本 lab 中 K/V 同步 flush。
+
+从空窗口开始，追加 $t=0,\ldots,R+B-2$ 后最多保留 $R+B-1$ 行；追加 $t=R+B-1$ 后达到 $R+B$ 行。此时量化最旧的 $B$ 行（K 沿这 $B$ 个 token 按通道分组，V 按 token 分组），写入 packed chunk，窗口留下最新的 $R$ 行。
 
 图中 $R$ 是残余窗口大小，$B$ 是块大小。lab1 B2 维护这几个不变量：`chunks.size()*block + recent_rows == tokens`；返回后 recent 行数小于 $R+B$；已量化块的元数据不会因为新 token 改变；非法输入在修改状态之前拒绝。总字节
 
@@ -359,17 +359,9 @@ $$
 
 在线 softmax（lab1 B5）是同一个公式的流式版本：新分数 $\sigma$ 到来时，$m'=\max(m,\sigma)$，旧的 $\ell$ 和 $a$ 都乘上 $e^{m-m'}$。漏掉对 $a$ 的重缩放是最常见的错误，测试里分数先小后大的序列会把它暴露出来。
 
-```mermaid
-flowchart LR
-  Q[q for 2 query heads] --> W1[warp: KV head 0, split 0]
-  Q --> W2[warp: KV head 0, split 1]
-  Q --> W3[warp: KV head 7, split S-1]
-  W1 --> P[(partials m, l, acc)]
-  W2 --> P
-  W3 --> P
-  P --> R[reduce: log-sum-exp merge per query head]
-  R --> O[output 16 x 128]
-```
+![GQA 头分组与组内 split-K 的独立 softmax 状态及合并](../assets/figures/D1/01-kv-cache-2a3b6dd1b1bc.svg)
+
+图：每个 KV head 只服务自己的一对 query head；不同 split 的状态只在同一 query head 内重缩放并合并。最后按 head 排列输出。
 
 ### 5.4 lab1 R 阶段的 kernel 设计
 
@@ -399,7 +391,7 @@ flowchart LR
 > [!tip]- 核对要点
 >
 > 1. $M=5$。分子 $e^{-3}\times6+4\approx4.30$，分母 $e^{-3}\times3+1\approx1.149$，输出约 3.74。
-> 2. 只有所有 split 的 $m_s$ 相等时才对。测试故意让局部最大值相差 100 以上。
+> 2. 所有非空 split 的 $m_s$ 相等时，对任意局部输出都能保证正确；这不是特定输入下的必要条件。例如各段 $a_s/\ell_s$ 相同，即使 $m_s$ 不同也会得到相同结果。一般仍须重缩放，测试应同时覆盖局部最大值相差 100 以上且局部输出不同的情况。
 > 3. 它读 $B_4$、写 $B_{16}$、再读 $B_{16}$，总量 $B_4+2B_{16}$ 大于 $B_{16}$，而且多了一次 kernel 启动。
 
 ## §6 机制与代码的对应

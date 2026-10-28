@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="835" viewBox="0 0 900 835" role="img" aria-labelledby="title description">
+<title id="title">Guard checks, compilation and cache hits</title>
+<desc id="description">Guard checks, compilation and cache hits. Schematic control flow; a first call can reuse disk caches</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="835" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">Guard checks, compilation and cache hits</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Schematic control flow; a first call can reuse disk caches</text>
+<rect x="60" y="100" width="460" height="47" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,100,460,47" data-padding="7">
+<text x="290.0" y="129.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">call f(x)</text>
+</g>
+<polyline points="290,147 290,178" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="60" y="181" width="460" height="65" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,181,460,65" data-padding="7">
+<text x="290.0" y="206.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Dynamo: check guards</text>
+<text x="290.0" y="232.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">against cached entries</text>
+</g>
+<polyline points="520,213 600,213" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="560" y="197" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">hit</text>
+<rect x="605" y="181" width="235" height="65" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="605,181,235,65" data-padding="7">
+<text x="722.5" y="206.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Run compiled code</text>
+<text x="722.5" y="232.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">fast path</text>
+</g>
+<polyline points="290,246 290,286" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="305" y="272" font-size="18" text-anchor="start" font-weight="400" style="fill:#182c42">miss</text>
+<rect x="60" y="290" width="460" height="68" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,290,460,68" data-padding="7">
+<text x="290.0" y="317.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Dynamo: trace Python to FX + guards</text>
+<text x="290.0" y="343.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Graph breaks can produce several graphs</text>
+</g>
+<polyline points="290,358 290,387" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="60" y="390" width="460" height="68" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,390,460,68" data-padding="7">
+<text x="290.0" y="417.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">AOTAutograd: functionalize</text>
+<text x="290.0" y="443.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Build backward graph if training</text>
+</g>
+<polyline points="290,458 290,487" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="60" y="490" width="460" height="68" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,490,460,68" data-padding="7">
+<text x="290.0" y="517.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Inductor: lower, fuse, generate code</text>
+<text x="290.0" y="543.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">GPU: Triton | CPU: C++ / OpenMP</text>
+</g>
+<polyline points="290,558 290,597" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="60" y="600" width="460" height="68" rx="10" fill="#e2effc" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,600,460,68" data-padding="7">
+<text x="290.0" y="640.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Compile kernels / autotune</text>
+</g>
+<polyline points="290,668 290,697" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="60" y="700" width="460" height="68" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="60,700,460,68" data-padding="7">
+<text x="290.0" y="740.12" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Store entry + guards; run it</text>
+</g>
+<rect x="605" y="485" width="235" height="103" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="605,485,235,103" data-padding="7">
+<text x="722.5" y="516.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Disk caches</text>
+<text x="722.5" y="542.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">FX graph / Triton</text>
+<text x="722.5" y="568.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">autotune</text>
+</g>
+<polyline points="605,537 565,537 565,634 523,634" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="592" y="620" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">may hit</text>
+<text x="32" y="810" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Schematic: first-call premium depends on guards, cache state and backend work.</text>
+</svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="650" viewBox="0 0 900 650" role="img" aria-labelledby="title description">
+<title id="title">INT4 decoding: two halfwords, two codes</title>
+<desc id="description">INT4 decoding: two halfwords, two codes. Bit layout and exact FP16 constants; high half displayed first</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526579"/></marker></defs>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#182c42}.mono{font-family:Consolas,"Courier New",monospace}</style>
+<rect width="900" height="650" fill="#f8fafc"/>
+<text x="32" y="41" font-size="27" text-anchor="start" font-weight="650" style="fill:#182c42">INT4 decoding: two halfwords, two codes</text>
+<text x="32" y="72" font-size="17" text-anchor="start" font-weight="400" style="fill:#526579">Bit layout and exact FP16 constants; high half displayed first</text>
+<text x="32" y="116" font-size="20" text-anchor="start" font-weight="600" style="fill:#182c42">One 32-bit register: high bits on the left</text>
+<rect x="32" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="32,136,99,67" data-padding="7">
+<text x="81.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v7&#x27;</text>
+<text x="81.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 31:28</text>
+</g>
+<rect x="136" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="136,136,99,67" data-padding="7">
+<text x="185.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v6&#x27;</text>
+<text x="185.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 27:24</text>
+</g>
+<rect x="240" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="240,136,99,67" data-padding="7">
+<text x="289.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v5&#x27;</text>
+<text x="289.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 23:20</text>
+</g>
+<rect x="344" y="136" width="99" height="67" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="344,136,99,67" data-padding="7">
+<text x="393.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v4&#x27;</text>
+<text x="393.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 19:16</text>
+</g>
+<rect x="448" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="448,136,99,67" data-padding="7">
+<text x="497.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v3&#x27;</text>
+<text x="497.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 15:12</text>
+</g>
+<rect x="552" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="552,136,99,67" data-padding="7">
+<text x="601.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v2&#x27;</text>
+<text x="601.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 11:8</text>
+</g>
+<rect x="656" y="136" width="99" height="67" rx="10" fill="#edf1f5" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="656,136,99,67" data-padding="7">
+<text x="705.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v1&#x27;</text>
+<text x="705.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 7:4</text>
+</g>
+<rect x="760" y="136" width="99" height="67" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="760,136,99,67" data-padding="7">
+<text x="809.5" y="162.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">v0&#x27;</text>
+<text x="809.5" y="188.62" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">bits 3:0</text>
+</g>
+<polyline points="32,214 32,222 443,222 443,214" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="237.5" y="247" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">High 16 bits</text>
+<polyline points="448,214 448,222 859,222 859,214" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round"/>
+<text x="653.5" y="247" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Low 16 bits</text>
+<rect x="150" y="280" width="600" height="55" rx="10" fill="#eee7fa" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="150,280,600,55" data-padding="7">
+<text x="450.0" y="314.98" font-size="22" text-anchor="middle" font-weight="400" style="fill:#182c42">(q &amp; 0x000F000F) | 0x64006400</text>
+</g>
+<polyline points="300,335 235,375" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="600,335 665,375" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="65" y="378" width="340" height="65" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="65,378,340,65" data-padding="7">
+<text x="235.0" y="403.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">High FP16 half</text>
+<text x="235.0" y="429.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">1024 + v4&#x27;</text>
+</g>
+<rect x="495" y="378" width="340" height="65" rx="10" fill="#fff0d6" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="495,378,340,65" data-padding="7">
+<text x="665.0" y="403.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">Low FP16 half</text>
+<text x="665.0" y="429.96" font-size="19" text-anchor="middle" font-weight="400" style="fill:#182c42">1024 + v0&#x27;</text>
+</g>
+<text x="450" y="474" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">Subtract 1032 from each half</text>
+<text x="450" y="498" font-size="18" text-anchor="middle" font-weight="400" style="fill:#182c42">hsub2(..., 0x64086408)</text>
+<polyline points="235,443 235,508" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="665,443 665,508" fill="none" stroke="#526579" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="65" y="511" width="340" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="65,511,340,53" data-padding="7">
+<text x="235.0" y="545.32" font-size="23" text-anchor="middle" font-weight="400" style="fill:#182c42">v4&#x27; - 8</text>
+</g>
+<rect x="495" y="511" width="340" height="53" rx="10" fill="#dff3ed" stroke="#9caebf" stroke-width="1.5"/>
+<g data-label-box="495,511,340,53" data-padding="7">
+<text x="665.0" y="545.32" font-size="23" text-anchor="middle" font-weight="400" style="fill:#182c42">v0&#x27; - 8</text>
+</g>
+<text x="32" y="600" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">vN&#x27; is an unsigned stored nibble (0..15); the decoded value is signed (-8..7).</text>
+<text x="32" y="625" font-size="17" text-anchor="start" font-weight="400" style="fill:#182c42">Display order is high half, low half. Exact bit operations are given in the text.</text>
+</svg>

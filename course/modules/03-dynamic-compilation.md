@@ -35,27 +35,9 @@ updated: 2026-10-18
 
 `torch.compile` 包装的函数第一次被调用时，要依次经过下面几步。以后的调用如果通过了 guard，就直接执行缓存好的代码：
 
-```text
-call f(x)
-  |
-  v
-Dynamo: run guards of cached entries ---- hit ----> run compiled code (fast path)
-  | miss
-  v
-Dynamo: trace Python bytecode -> FX graph (+ guards)      [graph break -> several graphs]
-  |
-  v
-AOTAutograd: functionalize, (backward graph if training)
-  |
-  v
-Inductor: lower -> fuse -> codegen (Triton on GPU, C++/OpenMP on CPU)
-  |
-  v
-compile kernels / autotune  <---- disk caches (FX graph, Triton, autotune) may hit
-  |
-  v
-store entry + guards, run it
-```
+![Dynamo guard 的命中路径、编译流程及磁盘缓存复用](../assets/figures/D3/03-dynamic-compilation-d59a341783d9.svg)
+
+图：箭头表示控制流或缓存复用关系，不表示耗时比例。
 
 每一层都可能命中缓存，所以“第一次调用的时间”不等于“编译时间”。lab 里把 $\text{first} - \text{median(steady)}$ 记作 first-call premium（A2），它是当前进程和当前缓存状态下的附加成本，不是冷编译时间。
 
